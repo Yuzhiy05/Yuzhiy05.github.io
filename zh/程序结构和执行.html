@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="VuePress 2.0.0-rc.18" />
+    <style>
+      :root {
+        --vp-c-bg: #fff;
+      }
+
+      [data-theme='dark'] {
+        --vp-c-bg: #1b1b1f;
+      }
+
+      html,
+      body {
+        background-color: var(--vp-c-bg);
+      }
+    </style>
+    <script>
+      const userMode = localStorage.getItem('vuepress-color-scheme')
+      const systemDarkMode =
+        'matchMedia' in window
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : false
+
+      if (userMode === 'light') {
+        document.documentElement.dataset.theme = 'light'
+      } else if (userMode === 'dark' || systemDarkMode) {
+        document.documentElement.dataset.theme = 'dark'
+      }
+    </script>
+    <title>你好， VuePress ！</title><meta name="description" content="这是我的第一个 VuePress 站点">
+    <link rel="preload" href="/assets/style-DLCVoCaA.css" as="style"><link rel="stylesheet" href="/assets/style-DLCVoCaA.css">
+    <link rel="modulepreload" href="/assets/app-DrRd5LvD.js"><link rel="modulepreload" href="/assets/程序结构和执行.html-TgsYAE4w.js">
+    <link rel="prefetch" href="/assets/index.html-DwU_zl5G.js" as="script"><link rel="prefetch" href="/assets/CppProLan.html-DuCKZqGg.js" as="script"><link rel="prefetch" href="/assets/404.html-CINksRi6.js" as="script"><link rel="prefetch" href="/assets/setupDevtools-7MC2TMWH-vAXyHoMz.js" as="script">
+  </head>
+  <body>
+    <div id="app"><!--[--><div class="vp-theme-container external-link-icon" vp-container><!--[--><header class="vp-navbar" vp-navbar><div class="vp-toggle-sidebar-button" title="toggle sidebar" aria-expanded="false" role="button" tabindex="0"><div class="icon" aria-hidden="true"><span></span><span></span><span></span></div></div><span><a class="route-link" href="/"><!----><span class="vp-site-name" aria-hidden="true">你好， VuePress ！</span></a></span><div class="vp-navbar-items-wrapper" style=""><!--[--><!--]--><!----><!--[--><!--]--><button type="button" class="vp-toggle-color-mode-button" title="toggle color mode"><svg class="light-icon" viewbox="0 0 32 32" style=""><path d="M16 12.005a4 4 0 1 1-4 4a4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6a6 6 0 0 0-6-6z" fill="currentColor"></path><path d="M5.394 6.813l1.414-1.415l3.506 3.506L8.9 10.318z" fill="currentColor"></path><path d="M2 15.005h5v2H2z" fill="currentColor"></path><path d="M5.394 25.197L8.9 21.691l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 25.005h2v5h-2z" fill="currentColor"></path><path d="M21.687 23.106l1.414-1.415l3.506 3.506l-1.414 1.414z" fill="currentColor"></path><path d="M25 15.005h5v2h-5z" fill="currentColor"></path><path d="M21.687 8.904l3.506-3.506l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 2.005h2v5h-2z" fill="currentColor"></path></svg><svg class="dark-icon" viewbox="0 0 32 32" style="display:none;"><path d="M13.502 5.414a15.075 15.075 0 0 0 11.594 18.194a11.113 11.113 0 0 1-7.975 3.39c-.138 0-.278.005-.418 0a11.094 11.094 0 0 1-3.2-21.584M14.98 3a1.002 1.002 0 0 0-.175.016a13.096 13.096 0 0 0 1.825 25.981c.164.006.328 0 .49 0a13.072 13.072 0 0 0 10.703-5.555a1.01 1.01 0 0 0-.783-1.565A13.08 13.08 0 0 1 15.89 4.38A1.015 1.015 0 0 0 14.98 3z" fill="currentColor"></path></svg></button><!----></div></header><!--]--><div class="vp-sidebar-mask"></div><!--[--><aside class="vp-sidebar" vp-sidebar><!----><!--[--><!--]--><ul class="vp-sidebar-items"><!--[--><li><p tabindex="0" class="vp-sidebar-item vp-sidebar-heading"> <!----></p><!----></li><!--]--></ul><!--[--><!--]--></aside><!--]--><!--[--><main class="vp-page"><!--[--><!--]--><div class="theme-default-content" vp-content><!--[--><!--]--><div><h3 id="at-t汇编" tabindex="-1"><a class="header-anchor" href="#at-t汇编"><span>AT&amp;T汇编</span></a></h3><p>指令 源操作数 目的操作数 描述内存中的位置 intel QWORD PTR[rbx] AT&amp;T (%rbx)</p><p>16位数据 字 WORD 32位数据 双字 DWORD 64位数据 四字 QWORD</p><p>x86-64 提供了16个通用寄存器<br> rax eax ax al 返回值<br> rbx 被调用者保存 rcx 第四个参数 rdx 第三个参数 rsi esi si sil 第二个参数 rdi 第一个参数<br> rbp 栈底指针 r8 r8d r8w r8b 第五个参数 r9 第六个参数 r10 被调用者保存 ... r15 被调用者保存</p><p>mov 指令 MOV S D S-&gt;D 传送 源操作数是一个立即数，存储寄存器或内存中 目的操作数是一个&quot;地址&quot;，也就是这个位置。它可以是寄存器或是内存地址 目的操作数指定为立即数时需要 movabsq指令 如 movabsq $0x0011223344556677 ,%rax %rax =0x0011223344556677 指令需要指明移动寄存器的部分大小(b,w,l,q) movl以寄存器为目的寄存器时会把寄存器的高四位设置为0</p><p>较小的原值移动到较大的目的地址 MOVS 以0填充高位 MOVZ 以符号位填充高位</p><p>cltq S R 符号位扩展%eax -&gt; %rax</p><p>exampl movabsq$0x0011223344556677 ,%rax %rax =0x0011223344556677 movb $0xAA ,%dl %dl=AA 将立即数移动到寄存器rdx最低八位也就是dl movb %dl,%al %rax=0x00112233445566AA 将寄存器rdx的低八位%dl中的值移动到%al寄存器中 movsbq %dl ,%rax %rax=FFFFFFFFFFFFFFAA 跟据原字节最高位设置扩展 movzbq %dl,%rax %rax=00000000000000AA 零扩展</p><p>示例</p><div class="language-c line-numbers-mode" data-highlighter="prismjs" data-ext="c" data-title="c"><pre><code><span class="line"><span class="token keyword">long</span> <span class="token function">exchange</span> <span class="token punctuation">(</span><span class="token keyword">long</span> <span class="token operator">*</span>xo<span class="token punctuation">,</span><span class="token keyword">long</span> y<span class="token punctuation">)</span><span class="token punctuation">{</span></span>
+<span class="line">    <span class="token keyword">long</span> x<span class="token operator">=</span><span class="token operator">*</span>xp<span class="token punctuation">;</span></span>
+<span class="line">    <span class="token operator">*</span>xp<span class="token operator">=</span>y<span class="token punctuation">;</span></span>
+<span class="line">    <span class="token keyword">return</span> x<span class="token punctuation">;</span></span>
+<span class="line"><span class="token punctuation">}</span></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><div class="language-AT&amp;T line-numbers-mode" data-highlighter="prismjs" data-ext="AT&amp;T" data-title="AT&amp;T"><pre><code><span class="line">long exchange(long *xp,long y) xp int %rdi,y in %rsi</span>
+<span class="line">1 exchange:  </span>
+<span class="line">2 moveq (%rdi),%rax   取%rdi地址指向的内存空间的值传送给%rax。xp是指针，指针的值在寄存器中，那么解引用指针得出指针指向的值，这个&quot;解引用&quot;的操作映射为(%rdi)</span>
+<span class="line">3 movq %rsi,(%rdi)   作为对比这里不加括号，因为值就存储在%rsi寄存器中，取%rsi寄存器存储的值，移动到%rdi寄存器值所指向的内存中。</span>
+<span class="line">4 ret</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>pushq S 栈指针减少8（指针大小） 将四字压入栈 因为栈是倒过来画的地址由高到低 等价于 subq $8 ,%rsp movq %rbq,(%rsp) popq D 栈指针加8 将四字弹出 等价于 movq (%rsp),%rax addq $8,%rsp</p><p>算数操作 leaq S, D D &lt;-&amp;S 把S的地址传送给D INC D D &lt;-D+1 加1 DEC D D &lt;-D-1 减1 NEG 取负 NOR 取补 ADD 加 SUB S,D D&lt;-D+S 减 IMUL 乘<br> XOR 异或 OR 或 AND 与 SAL S,D D &lt;-D&lt;&lt;k 左移 SHL 左移同上 SAR 算数右移 SHR 逻辑右移</p><p>leaq 指令 load effective address 是movq指令的变形，他将有效地址写入到目的操作数，是从内存读数据到寄存器 如 设 %rdx中值为x leaq 7(%rdx,%rdx,4),%rax 将%rax中的值设置为5x+7 例</p><div class="language-c line-numbers-mode" data-highlighter="prismjs" data-ext="c" data-title="c"><pre><code><span class="line"><span class="token keyword">long</span> <span class="token function">scale</span> <span class="token punctuation">(</span><span class="token keyword">long</span> x<span class="token punctuation">,</span><span class="token keyword">long</span> y <span class="token punctuation">,</span><span class="token keyword">long</span> z<span class="token punctuation">)</span><span class="token punctuation">{</span></span>
+<span class="line">    <span class="token keyword">long</span> t<span class="token operator">=</span>x<span class="token operator">+</span><span class="token number">4</span><span class="token operator">*</span>y<span class="token operator">+</span><span class="token number">12</span><span class="token operator">*</span>z</span>
+<span class="line"><span class="token punctuation">}</span></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>3.9.1</p><p>#例题3.46</p><h3 id="_3-1" tabindex="-1"><a class="header-anchor" href="#_3-1"><span>3.1</span></a></h3><p>%rax 0x100<br> 0x104 0xAB<br> $0x108 0x108<br> (%rax) 0xFF<br> 4(%rax) 0x103<br> 9(%rcx,%rdx) 0x10c<br> 260(%rcx,%rdx) 0x108<br> 0xFC(,%rcx,4) 0x101<br> (%rax,rdx,4) 0x118</p><h3 id="_3-5" tabindex="-1"><a class="header-anchor" href="#_3-5"><span>3.5</span></a></h3><p>函数原型为 void decode1(long *xp,long *yp,long *zp) xp in %rdi yp in %rsi ,zp in % rdx</p><p>long xp1=*xp; long yp1=*xp; long zp1=*zp; *yp=xp1; *zp=yp1; *xp=zp1;</p><h3 id="_3-6" tabindex="-1"><a class="header-anchor" href="#_3-6"><span>3.6</span></a></h3></div><!--[--><!--]--></div><footer class="vp-page-meta"><!----><div class="vp-meta-item git-info"><div class="vp-meta-item last-updated"><span class="meta-item-label">Last Updated: </span><!----></div><div class="vp-meta-item contributors"><span class="meta-item-label">Contributors: </span><span class="meta-item-info"><!--[--><!--[--><span class="contributor" title="email: ImoutoCon1999@outlook.com">Yuzhiy05</span><!----><!--]--><!--]--></span></div></div></footer><!----><!--[--><!--]--></main><!--]--></div><!--[--><!----><!--]--><!--]--></div>
+    <script type="module" src="/assets/app-DrRd5LvD.js" defer></script>
+  </body>
+</html>

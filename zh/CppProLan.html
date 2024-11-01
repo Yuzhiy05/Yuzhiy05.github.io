@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="VuePress 2.0.0-rc.18" />
+    <style>
+      :root {
+        --vp-c-bg: #fff;
+      }
+
+      [data-theme='dark'] {
+        --vp-c-bg: #1b1b1f;
+      }
+
+      html,
+      body {
+        background-color: var(--vp-c-bg);
+      }
+    </style>
+    <script>
+      const userMode = localStorage.getItem('vuepress-color-scheme')
+      const systemDarkMode =
+        'matchMedia' in window
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : false
+
+      if (userMode === 'light') {
+        document.documentElement.dataset.theme = 'light'
+      } else if (userMode === 'dark' || systemDarkMode) {
+        document.documentElement.dataset.theme = 'dark'
+      }
+    </script>
+    <title>c++编程语言第四版 | 你好， VuePress ！</title><meta name="description" content="c++编程语言第四版导读">
+    <link rel="preload" href="/assets/style-DLCVoCaA.css" as="style"><link rel="stylesheet" href="/assets/style-DLCVoCaA.css">
+    <link rel="modulepreload" href="/assets/app-DrRd5LvD.js"><link rel="modulepreload" href="/assets/CppProLan.html-DuCKZqGg.js">
+    <link rel="prefetch" href="/assets/index.html-DwU_zl5G.js" as="script"><link rel="prefetch" href="/assets/程序结构和执行.html-TgsYAE4w.js" as="script"><link rel="prefetch" href="/assets/404.html-CINksRi6.js" as="script"><link rel="prefetch" href="/assets/setupDevtools-7MC2TMWH-vAXyHoMz.js" as="script">
+  </head>
+  <body>
+    <div id="app"><!--[--><div class="vp-theme-container external-link-icon" vp-container><!--[--><header class="vp-navbar" vp-navbar><div class="vp-toggle-sidebar-button" title="toggle sidebar" aria-expanded="false" role="button" tabindex="0"><div class="icon" aria-hidden="true"><span></span><span></span><span></span></div></div><span><a class="route-link" href="/"><!----><span class="vp-site-name" aria-hidden="true">你好， VuePress ！</span></a></span><div class="vp-navbar-items-wrapper" style=""><!--[--><!--]--><!----><!--[--><!--]--><button type="button" class="vp-toggle-color-mode-button" title="toggle color mode"><svg class="light-icon" viewbox="0 0 32 32" style=""><path d="M16 12.005a4 4 0 1 1-4 4a4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6a6 6 0 0 0-6-6z" fill="currentColor"></path><path d="M5.394 6.813l1.414-1.415l3.506 3.506L8.9 10.318z" fill="currentColor"></path><path d="M2 15.005h5v2H2z" fill="currentColor"></path><path d="M5.394 25.197L8.9 21.691l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 25.005h2v5h-2z" fill="currentColor"></path><path d="M21.687 23.106l1.414-1.415l3.506 3.506l-1.414 1.414z" fill="currentColor"></path><path d="M25 15.005h5v2h-5z" fill="currentColor"></path><path d="M21.687 8.904l3.506-3.506l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 2.005h2v5h-2z" fill="currentColor"></path></svg><svg class="dark-icon" viewbox="0 0 32 32" style="display:none;"><path d="M13.502 5.414a15.075 15.075 0 0 0 11.594 18.194a11.113 11.113 0 0 1-7.975 3.39c-.138 0-.278.005-.418 0a11.094 11.094 0 0 1-3.2-21.584M14.98 3a1.002 1.002 0 0 0-.175.016a13.096 13.096 0 0 0 1.825 25.981c.164.006.328 0 .49 0a13.072 13.072 0 0 0 10.703-5.555a1.01 1.01 0 0 0-.783-1.565A13.08 13.08 0 0 1 15.89 4.38A1.015 1.015 0 0 0 14.98 3z" fill="currentColor"></path></svg></button><!----></div></header><!--]--><div class="vp-sidebar-mask"></div><!--[--><aside class="vp-sidebar" vp-sidebar><!----><!--[--><!--]--><ul class="vp-sidebar-items"><!--[--><li><p tabindex="0" class="vp-sidebar-item vp-sidebar-heading">c++编程语言第四版 <!----></p><!----></li><!--]--></ul><!--[--><!--]--></aside><!--]--><!--[--><main class="vp-page"><!--[--><!--]--><div class="theme-default-content" vp-content><!--[--><!--]--><div><h1 id="c-之旅" tabindex="-1"><a class="header-anchor" href="#c-之旅"><span>c++之旅</span></a></h1><h3 id="导言" tabindex="-1"><a class="header-anchor" href="#导言"><span>导言</span></a></h3><p>本文是The Cpp Programming Language 4th edition的学习记录</p><blockquote><p>If you find this &quot;lightning tour&quot; confusing, skip to the more systematic presentation starting in Chapter 6</p></blockquote><p>总的来说前五张只是速览，并不该纠结于细节问题</p><h2 id="the-basics" tabindex="-1"><a class="header-anchor" href="#the-basics"><span>The Basics</span></a></h2><p>首先一如其他编程或计算机书籍一样，一个从源码到可执行文件的流程图介绍。不过这里本老爹也借此重申了所谓<strong>c++的兼容性</strong>。</p><blockquote><p>When we talk about portability of C++ programs, we usually mean portability of source code; that is, the source code can be successfully compiled and run on a variety of systems</p></blockquote><p>也就是说谈论兼容性说的是源码兼容,一份符合c++标准的源码应该可以保证在任何所支持平台和对应版本的编译器编译的。尽管这是常识，不过我还是写这里用作提醒。 然后本老爹引入一个名词<strong>实体</strong>。</p><blockquote><p>The ISO C++ standard defines two kinds of entities:<br> • Core language features, such as built-in types (e.g., char and int) and loops (e.g., for-statements and while-statements)<br> • Standard-library components, such as containers (e.g., vector and map) and I/O operations (e.g., &lt;&lt; and getline())</p></blockquote><p>不过这里和cppreference所述的<a href="https://zh.cppreference.com/w/cpp/language/basic_concepts" target="_blank" rel="noopener noreferrer">实体</a>有些出入。我不知为何*语句(statement)*也被划入实体的范畴。不过相比&quot;<strong>对象</strong>&quot;这个概念，实体确实很少有人去讨论或表述。就我的理解实体就是在c++程序中能被操作或识别的事物。他是真实存在的概念但不必通过占用内存，执行操作之类事件观测他的存在。</p><blockquote><p>C++ is a statically typed language. That is, the type of every entity (e.g., object, value, name, and expression) must be known to the compiler at its point of use. The type of an object determines the set of operations applicable to it</p></blockquote><p>我觉得这是很有用的一句话。因为接受这句话或许能帮助我解决初学c++时期的一些困惑。我个人认为它和我之后所认识到的<strong>严格别名优化</strong>或通过union进行类型转换所造成的UB相关。</p><blockquote><p>Every C++ program must have exactly one global function named main(). The program starts by executing that function. The int value returned by main(), if any, is the program’s return value to &quot;the system.&quot; If no value is returned, the system will receive a value indicating successful completion.</p></blockquote><p>这段话或许能从所有c++相关书籍中都能找到。尽管如此我还是摘抄下来，因为后面本老爹给出了一个有趣的例子。之后本老爹解释了一段经典<em>helloworld</em>程序中每个字符的意思.这里对于稍微接触过C++的人来说应该都没什么好看的。</p><blockquote><p>Every name and every expression has a type that determines the operations that may be performed on it<br> A declaration is a statement that introduces a name into the program. It specifies a type for the named entity:<br> • A type defines a set of possible values and a set of operations (for an object).<br> • An object is some memory that holds a value of some type.<br> • A value is a set of bits interpreted according to a type.<br> • A variable is a named object</p></blockquote><p>这里很清楚的说明了一个&quot;名字&quot;或者说<em>id-expression</em>,和表达式都有其类型来指定它所能执行的操作。<strong>也就是说表达式也有其类型</strong>。声明是向程序中引入一个名字，这个名字指代所声明类型的<strong>实体</strong>.这里更细致的说明可能要引入<a href="https://zh.cppreference.com/w/cpp/language/identifiers" target="_blank" rel="noopener noreferrer">标识符(identifier)</a>的概念，不过对初学者可能没有必要。剩下五句解释很简单，不过其中引入了<strong>对象</strong>的概念，不过这里本老爹似乎是因为前文叙述了阅读此部分的要求而没有解释。</p><blockquote><p>Each fundamental type corresponds directly to hardware facilities and has a fixed size that determines the range of values that can be stored it</p></blockquote><p>这里没什么好说的每个基础类型都有其硬件表示。不过这里如果不是基本类型似乎可以扩展到<strong>值表示</strong>和<strong>对象表示</strong>的概念上。</p><blockquote><p>A char variable is of the natural size to hold a character on a given machine (typically an 8-bit byte), and the sizes of other types are quoted in multiples of the size of a char. The size of a type is implementation-defined (i.e., it can vary among different machines) and can be obtained by the sizeof operator; for example, sizeof(char) equals 1 and sizeof(int) is often 4</p></blockquote><p>这一大段我认为很重要也很容易被人忽略。直接说就是char类型所占用字节数是由实现定义的，不过通常为8。也有例外，有些平台一个char类型占9个字节比如<em>PDP-11</em>。c++为了实现其兼容性这里不作规定似乎是很重要的一点。<strong>每个类型都为char类型大小的整数倍，</strong> 这里似乎能为<strong>unsigned char数组作存储重用</strong>和进行<strong>类型转换</strong>埋下伏笔。</p><p>之后介绍了c++基本类型所能做的操作，也简单的介绍了一下类型转换，即在不同类型进行赋值和计算操作时，类型会做相应的转换。</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">double d = 2.2; //初始化浮点数</span>
+<span class="line">int i = 7; // 初始化整数</span>
+<span class="line">d = d+i; // 求和赋值给d</span>
+<span class="line">i=d∗i; // 将产生的值赋值给i(将双精度浮点数截断转换为整型)</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><blockquote><p>C++ offers a variety of notations for expressing initialization, such as the = used above, and a universal form based on curly-brace-delimited initializer lists</p></blockquote><p>简单的说c++提供了花括号初始化器，是得我们在初始化变量时(定义),可以这么写</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">double d1 = 2.3;</span>
+<span class="line">double d2 {2.3};</span>
+<span class="line">complex&lt;double&gt; z = 1; // a complex number with double-precision floating-point scalars</span>
+<span class="line">complex&lt;double&gt; z2 {d1,d2};</span>
+<span class="line">complex&lt;double&gt; z3 = {1,2}; // the = is optional with { ... }</span>
+<span class="line">vector&lt;int&gt; v {1,2,3,4,5,6};</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>使用花括号初始化器需要注意一点的是它无法窄化转换。同时复制列表初始化器可以通过auto占位符推导到<em>std::initializer_list</em>，而直接列表初始化则不能。</p><blockquote><p>A constant (§2.2.3) cannot be left uninitialized and a variable should only be left uninitialized in extremely rare circumstances</p></blockquote><p>后一句的那种少部分情况应该能在嵌入式中看到。</p><blockquote><p>Don’t introduce a name until you have a suitable value for it.</p></blockquote><p>这里与我所作的一样，不同于c语言在进函数体开头就声明所需要的类型，而是在需要的地方声明他，应该有意识的控制所用变量的作用域。</p><blockquote><p>We use auto where we don’t hav e a specific reason to mention the type explicitly. ‘‘Specific reasons’’ include:<br> • The definition is in a large scope where we want to make the type clearly visible to readers of our code.<br> • We want to be explicit about a variable’s range or precision (e.g., double rather than float)</p></blockquote><p>本老爹给了两种情况对不使用auto的情况，其他情况都是能用则用。不过对于第二种因为重载运算符我们也可以使用auto来自动推导。同时auto也经常被用做泛型编程来避免写很长的类型名。在是否使用auto的问题上推荐herb的一篇文章<a href="https://herbsutter.com/2013/08/12/gotw-94-solution-aaa-style-almost-always-auto/" target="_blank" rel="noopener noreferrer">GotW #94 Solution: AAA Style (Almost Always Auto)</a></p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">//这里需要补充下例子</span>
+<span class="line">auto i=0uz;//c++23可以这样。这样可以使用auto也清楚类型具体的精度(长度)</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div></div></div><blockquote><p>C++ supports two notions of immutability (§7.5):<br> • const: meaning roughly &quot;I promise not to change this value&quot;(§7.5). This is used primarily to specify interfaces, so that data can be passed to functions without fear of it being modified. The compiler enforces the promise made by const.<br> • constexpr: meaning roughly&quot;to be evaluated at compile time&quot;(§10.4). This is used primarily to specify constants, to allow placement of data in memory where it is unlikely to be corrupted, and for performance</p></blockquote><p>尽管本老爹说这是大致意思，不过对初学者来说能够理解避很多错误,比如相当有部分的人喜欢修改常量表达式的值，或使用const_cast转换const引用的指针或引用以为这就可以直接修改所引用或指向的值了(假设所引用或指向对象同样拥有const 修饰)。并且这种和编译器的&quot;承诺&quot;也同时帮助编译器进行常量优化。此外constexpr的限定的函数在c++14之后也更放松，同时也引入了更为严格的constevl关键字来指定必须进行编译器计算。cosntexpr修饰的函数不一定进行编译期求值，这是根据其中所使用的变量和传递的参数是否为常量表达式决定的，因此我们不必同一个功能的函数仅仅因为是否常量求值而写两个版本。在经常使用常量表达式的地方，这里只举了三个例子如模板参数，case标签，数组边界。同时编译期求值是除了性能考虑，不变性的概念是非常的设计考量。关于不变性，后面在关于类的设计中本老爹会叙述。</p><p>2.2.4与2.2.5章节作者的叙述通俗易懂相对简单，不过其中一个例子很重要</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">char  a[6]=&quot;hello&quot;;</span>
+<span class="line">char* p=&amp;a[0];</span>
+<span class="line">char* p2=a;//数组隐式转换到指针 </span>
+<span class="line">//地址相同</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>单看初始化表达式的子表达式也应该知道这两不是得到的不是一个类型，不过数组隐式转化到指针丢失了长度信息。我们不能因为单纯的地址相同，汇编相同等实现原因来直接断言两个抽象的类型或操作是一样的。同时，鉴于之前有人直接将数组复制给另一个数组妄图进行每个元素的复制。书上这个例子也暗示了不能这样做，所以直接写了一个for循环进行赋值。或使用std::array</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">//Consider copying ten elements from one array to another:</span>
+<span class="line">void copy_fct()</span>
+<span class="line">{</span>
+<span class="line">int v1[10] = {0,1,2,3,4,5,6,7,8,9};</span>
+<span class="line">int v2[10]; // to become a copy of v1</span>
+<span class="line">v2=v1 //error</span>
+<span class="line">for (auto i=0; i!=10; ++i) // copy elements</span>
+<span class="line">v2[i]=v1[i];</span>
+<span class="line">// ...</span>
+<span class="line">}</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>同时介绍的这个c++11的范围for循环也很有用，我们可以不用指定边界。对于任意序列我们都可以</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">void print()</span>
+<span class="line">{</span>
+<span class="line">int v[] = {0,1,2,3,4,5,6,7,8,9};</span>
+<span class="line">for (auto x : v) // for each x in v</span>
+<span class="line">cout &lt;&lt; x &lt;&lt; &#39;\n&#39;;</span>
+<span class="line">for (auto x : {10,21,32,43,54,65})</span>
+<span class="line">cout &lt;&lt; x &lt;&lt; &#39;\n&#39;;</span>
+<span class="line">for (auto&amp; x : {10,21,32,43,54,65}) //我不想单纯的复制序列中的元素而是希望引用，使用auto&amp;这样的写法</span>
+<span class="line">cout &lt;&lt; ++x &lt;&lt; &#39;\n&#39;;  </span>
+<span class="line">// ...</span>
+<span class="line">}</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>这里的任意序列可以用很多种形式如std::iota(1,10),std::vector,std::array,std::map等标准库容器都支持范围for语句。</p><p>通常我们需要让声明的指针指向一个有效类型的地址，这样解引用才不会无效。不过有时我们也需要一个不属于任何对象的地址，<strong>nullptr</strong>。nullptr可以对任意指针类型使用,不过在一些老的c风格代码中使用0或NULL表示空指针。</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">double∗ pd = nullptr;</span>
+<span class="line">Link&lt;Record&gt;∗ lst = nullptr; // pointer to a Link to a Record</span>
+<span class="line">int x = nullptr; // error : nullptr is a pointer not an integer</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="像内建类型一样使用自定义类型" tabindex="-1"><a class="header-anchor" href="#像内建类型一样使用自定义类型"><span>像内建类型一样使用自定义类型</span></a></h3><p>当我们使用struct或class构建自定义类型时我更希望像内建类型一样使用,不过为了实现这一步也走过许多弯路</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">struct A {int a,int b};</span>
+<span class="line">A* ptr=(A*)malloc(sizeof(A));</span>
+<span class="line">ptr-&gt;a=10;</span>
+<span class="line">ptr-&gt;b=11;        //c风格写法</span>
+<span class="line"></span>
+<span class="line">class stack{</span>
+<span class="line">/*member*/</span>
+<span class="line">};</span>
+<span class="line">class stack * ptr2 =new stack //c with class 其中new是构建函数不同于现在的new运算符</span>
+<span class="line"></span>
+<span class="line">struct vector{        //一个朴素的想法</span>
+<span class="line">    double*p;</span>
+<span class="line">    int elem;</span>
+<span class="line">void vector_init(vector &amp;v,int s){</span>
+<span class="line">    v.p=new double[s];</span>
+<span class="line">    v.elem=s;</span>
+<span class="line">}</span>
+<span class="line">vector v;</span>
+<span class="line">vector_init(v,5);</span>
+<span class="line">};</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>class和struct关键字的区别仅在于默认的访问控制符和继承时的默认控制。</p><p>尽管将数据与操作分离有一些数据处理的优势，但正如前文所说c++作为静态语言每个类型除了必要的数据还拥有可以对自身执行的操作集合。我们既然希望像内建类型一样使用自定义类这是必不可少的。由此引入的class关键字更像是不单单数据集合而是对某个具体事物的抽象。其中诞生了构造函数，至此我们可以这样声明自定义类型vector:</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">class Vector {</span>
+<span class="line">public:</span>
+<span class="line">Vector(int s) :elem{new double[s]}, sz{s} { } // 构造函数</span>
+<span class="line">double&amp; operator[](int i) { return elem[i]; } // 下标访问</span>
+<span class="line">int size() { return sz; }</span>
+<span class="line">private:</span>
+<span class="line">double∗ elem; </span>
+<span class="line">int sz; s</span>
+<span class="line">};</span>
+<span class="line">Vector vec(6); //像内建类型一样使用。</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>这个和类同名的函数为构造函数，它不用声明返回类型，或者说它的返回类型就是类本身的类型。由此通过构造函数替换上诉例子中的成员函数vector_init()，与普通函数不同的是构造函数保证被用来初始化对象，也就是说想要构造类对象必须经过构造函数完成其初始化。同样的上诉<code>:elem{new double[s]}, sz{s} </code>语法为成员初始化器列表，这样我们不用在函数体内进行初始化操作了。同时注意成员初始化器列表的初始化顺序按成员声明顺序进行，也就是说<code>elme</code>的初始化一定早于<code>sz</code>。同时这里应该引入错误处理的概念，不过为了简化，略过。</p><p>注意:emun和emun class的区别</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">enum class Color { red, blue , green };</span>
+<span class="line">enum  Traffic_light { green, yellow, red };</span>
+<span class="line">int i = Color::red; // 错误不能隐式转换</span>
+<span class="line">Color c = 2; // 错误2不是Color类型</span>
+<span class="line">int b=Traffic_light::red;//可以</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>默认的枚举体enum 只能进行赋值，初始化，相等性比较操作。但用户自定义类型的可以通过重载实现更多操作。</p><div class="language-c++ line-numbers-mode" data-highlighter="prismjs" data-ext="c++" data-title="c++"><pre><code><span class="line">Traffic_light&amp; operator++(Traffic_light&amp; t)</span>
+<span class="line">{</span>
+<span class="line">switch (t) {</span>
+<span class="line">case Traffic_light::green: return t=Traffic_light::yellow;</span>
+<span class="line">case Traffic_light::yellow: return t=Traffic_light::red;</span>
+<span class="line">case Traffic_light::red: return t=Traffic_light::green;</span>
+<span class="line">}</span>
+<span class="line">}</span>
+<span class="line">Traffic_light light=Traffic_light::red;</span>
+<span class="line">Traffic_light next = ++light; // next becomes Traffic_light::green;</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>模块化，分离编译，命名空间，错误处理，异常略过。</p><h3 id="不变式-invariants" tabindex="-1"><a class="header-anchor" href="#不变式-invariants"><span>不变式(Invariants)</span></a></h3><p>程序运行中一直保持为真的前提条件。比如上诉原文异常标题下，使用异常捕获out_of_range。程序运行中数组的索引始终处于[0,size)范围内，或 elme始终是指向 double [size]的指针，类似这样的陈述这就是类中的不变式。不变式的概念是c++中通过构造和析构函数管理内存的基本概念。</p><blockquote><p>Often, a function has no way of completing its assigned task after an exception is thrown.Then, &quot;handling&quot;an exception simply means doing some minimal local cleanup and rethrowing the exception</p></blockquote><p>通常函数无法完成分配任务时需要抛出异常，并且处理剩余的清理工作。异常是RAII的关键概念。</p><p>静态断言略过。</p></div><!--[--><!--]--></div><footer class="vp-page-meta"><!----><div class="vp-meta-item git-info"><div class="vp-meta-item last-updated"><span class="meta-item-label">Last Updated: </span><!----></div><div class="vp-meta-item contributors"><span class="meta-item-label">Contributors: </span><span class="meta-item-info"><!--[--><!--[--><span class="contributor" title="email: ImoutoCon1999@outlook.com">yuzhiy05</span><!----><!--]--><!--]--></span></div></div></footer><!----><!--[--><!--]--></main><!--]--></div><!--[--><!----><!--]--><!--]--></div>
+    <script type="module" src="/assets/app-DrRd5LvD.js" defer></script>
+  </body>
+</html>
