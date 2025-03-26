@@ -28,9 +28,6 @@ cmake -G Ninja -S llvm-project/runtimes -B build  \
 -DCMAKE_SYSROOT="D:\workfile\compiler\clang\x86_64-windows-gnu" \
 -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" 
 
-cmake -G"Ninja" -S llvm-project/runtimes -B build  -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" -DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu" -DLLVM_USE_LINKER=lld  -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld"
-
-
 cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_RUNTIME_TARGETS="x86_64-windows-msvc" -DCMAKE_SYSROOT="D:\workfile\compiler\windows-msvc-sysroot" -DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib"
 
 
@@ -46,10 +43,12 @@ cmake -G Ninja -S llvm-project/runtimes -B build
 -DCMAKE_C_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind -lc++abi -lunwind -lntdll "
 -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind  -lc++abi -lunwind -lntdll -stdlib=libc++ -std=c++23"
 
-cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" -DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu" -DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_C_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind -lc++abi -lunwind -lntdll" -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind  -lc++abi -lunwind -lntdll -stdlib=libc++ -std=c++23"
-
+现在就用这个
 //动态链接 构建libcxx;libcxxabi;libunwind
-cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" -DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu" -DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_C_FLAGS="-rtlib=compiler-rt   -Wno-unused-command-line-argument" -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt   -stdlib=libc++  -Wno-unused-command-line-argument" -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm" -DLIBCXX_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_STATIC=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=ON
+cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DCMAKE_BUILD_TYPE=Release -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" -DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu" -DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -LD:/workfile/compiler/clang/x86_64-windows-gnu/lib" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -LD:/workfile/compiler/clang/x86_64-windows-gnu/lib" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -LD:/workfile/compiler/clang/x86_64-windows-gnu/lib" -DCMAKE_C_FLAGS="-rtlib=compiler-rt -Wno-unused-command-line-argument" -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt -stdlib=libc++ -Wno-unused-command-line-argument" -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm" -DLIBCXX_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_STATIC=ON -DLIBCXXABI_USE_LLVM_UNWINDER=ON -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON -DLIBCXX_INCLUDE_BENCHMARKS=ON -DLIBCXX_CXX_ABI=libcxxabi
+
+-DCMAKE_STATIC_LINKER_FLAGS="-fuse-ld=lld -LD:/workfile/compiler/clang/x86_64-windows-gnu/lib" 
+
 //报错
 /*ld.lld: error: undefined symbol: std::__1::__libcpp_condvar_wait(void**, void**)
 >>> referenced by libcxxabi/src/CMakeFiles/cxxabi_shared_objects.dir/cxa_guard.cpp.obj:(__cxxabiv1::(anonymous namespace)::LibcppCondVar::wait(__cxxabiv1::(anonymous namespace)::LibcppMutex&))
@@ -70,11 +69,6 @@ clang++: error: linker command failed with exit code 1 (use -v to see invocation
 //动态链接
 cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx" -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" -DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu" -DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_C_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind -lc++abi -lunwind -lntdll" -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind  -lc++abi -lunwind -lntdll -stdlib=libc++ -std=c++23" -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm" -DLIBCXX_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_STATIC=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=ON 
 
-//静态库链接
-cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" -DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu" -DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_C_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind  -Wno-unused-command-line-argument" -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind  -stdlib=libc++  -Wno-unused-command-line-argument" -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm" -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_STATIC=ON -DLIBCXXABI_ENABLE_SHARED=ON  -DLIBCXXABI_USE_LLVM_UNWINDER=ON
-
-//新加参数 
-cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi;libunwind" -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" -DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu" -DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_C_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind  -lunwind -lntdll" -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind   -lunwind -lntdll -stdlib=libc++ -std=c++23" -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm" -DLIBCXX_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_STATIC=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=ON 
 
 //单libcxx 动态链接 
 cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_PROJECTS="libcxx" -DLLVM_ENABLE_RUNTIMES="libcxx" -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu" -DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu" -DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib" -DCMAKE_C_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind -lc++abi -lunwind -lntdll" -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt -unwindlib=libunwind  -lc++abi -lunwind -lntdll -stdlib=libc++ -std=c++23" -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm" -DLIBCXX_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_STATIC=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=ON
@@ -86,7 +80,7 @@ cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_PROJECTS="libcxx"
 
 
 
-cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DLLVM_RUNTIME_TARGETS="x86_64-windows-gnu"-DCMAKE_SYSROOT="D:/workfile/compiler/clang/x86_64-windows-gnu"-DLLVM_USE_LINKER=lld -DCMAKE_LINKER="D:/workfile/compiler/clang/llvm/bin/lld" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib -Wl,-lkernel32" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib -Wl,-lkernel32" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -L${CMAKE_SYSROOT}/lib -Wl,-lkernel32" -DCMAKE_C_FLAGS="-rtlib=compiler-rt -Wno-unused-command-line-argument" -DCMAKE_CXX_FLAGS="-rtlib=compiler-rt -stdlib=libc++ -D_WIN32_WINNT=0x0600 -Wno-unused-command-line-argument" -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm" -DLIBCXX_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_SHARED=ON -DLIBCXXABI_ENABLE_STATIC=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=ON
+
 ```
 
 
