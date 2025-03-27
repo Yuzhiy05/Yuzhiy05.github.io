@@ -83,4 +83,56 @@ cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_PROJECTS="libcxx"
 
 ```
 
+构建toolchain
+```cmake
+# 基础配置
+set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
+# 工具链路径配置（根据实际路径修改）
+set(TOOLCHAIN_DIR "D:/workfile/toolchain/compiler/x86_64-windows-gnu")
+set(LLVM_DIR "${TOOLCHAIN_DIR}/llvm")
+
+# 编译器路径
+set(CMAKE_C_COMPILER "${LLVM_DIR}/bin/clang.exe" CACHE STRING "C compiler" FORCE)
+set(CMAKE_CXX_COMPILER "${LLVM_DIR}/bin/clang++.exe" CACHE STRING "C++ compiler" FORCE)
+
+# 系统根目录
+set(CMAKE_SYSROOT "${TOOLCHAIN_DIR}/x86_64-windows-gnu" CACHE STRING "Sysroot path" FORCE)
+
+# 链接器配置
+set(LLVM_ENABLE_LTO thin)
+set(LLVM_ENABLE_LLD On)
+set(CMAKE_LINKER_TYPE LLD)
+set(LLVM_USE_LINKER lld CACHE STRING "Linker selection")
+set(CMAKE_LINKER "${LLVM_DIR}/bin/lld" CACHE STRING "Linker executable" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld -flto=thin -lc++abi -L${CMAKE_SYSROOT}/lib" CACHE STRING "Executable linker flags" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=lld -flto=thin -lc++abi -L${CMAKE_SYSROOT}/lib" CACHE STRING "Shared library linker flags" FORCE)
+
+# 编译选项
+set(CMAKE_C_FLAGS "-rtlib=compiler-rt -Wno-unused-command-line-argument" CACHE STRING "C flags" FORCE)
+set(CMAKE_CXX_FLAGS 
+    "-rtlib=compiler-rt -stdlib=libc++ -unwindlib=libunwind -Wno-unused-command-line-argument"
+    CACHE STRING "C++ flags" FORCE)
+
+# 运行时库配置
+set(LLVM_ENABLE_RUNTIMES "libcxx;libcxxabi;libunwind" CACHE STRING "LLVM runtimes")
+set(LIBCXX_ENABLE_SHARED ON CACHE BOOL "Build shared libc++")
+set(LIBCXXABI_ENABLE_SHARED OFF CACHE BOOL "Build static libc++abi")
+set(LIBCXX_ENABLE_STATIC_ABI_LIBRARY ON CACHE BOOL "Enable static ABI library")
+set(LIBCXXABI_USE_LLVM_UNWINDER ON CACHE BOOL "Use LLVM unwinder")
+set(LIBCXX_CXX_ABI libcxxabi CACHE STRING "C++ ABI library")
+
+# 安装路径
+set(CMAKE_INSTALL_PREFIX "D:/workfile/lib/llvm" CACHE PATH "Installation directory")
+
+# 禁用native编译检测
+set(CMAKE_CROSSCOMPILING ON CACHE BOOL "Enable cross-compilation")
+
+# 查找工具链程序
+find_program(CLANG_PATH clang++ HINTS "${LLVM_DIR}/bin")
+find_program(LLD_PATH lld HINTS "${LLVM_DIR}/bin")
+if(NOT CLANG_PATH OR NOT LLD_PATH)
+    message(FATAL_ERROR "Toolchain components not found in ${LLVM_DIR}/bin")
+endif()
+```
