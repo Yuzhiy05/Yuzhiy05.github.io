@@ -1,8 +1,13 @@
+---
+title: prTollvm
+createTime: 2025/03/27 22:19:44
+permalink: /article/hz1oz1zb/
+---
 # 给llvm提交pr
 
 
 ### clone llvm 项目
-
+```git
 1.git clone --depth=1 --filter=blob:none --branch main git@github.com:Yuzhiy05/llvm-project.git
 
 在Git中，blob是指文件的内容。当你在Git仓库中对文件进行更改时，Git会创建一个新的blob对象来表示文件的新内容。
@@ -18,8 +23,9 @@
 添加更多模块
 
  tips: ai给的答案里 git sparse-checkout init --cone 这条不需要了查文档这个要废弃了 直接set 路径 不需要/libcxx
+4.git pull --depth=1 --update-shallow  # 保持浅层历史
 
-
+```
 
 ### 构建libcxx
 ```c++
@@ -84,6 +90,7 @@ cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_PROJECTS="libcxx"
 ```
 
 构建toolchain
+
 ```cmake
 # 基础配置
 set(CMAKE_SYSTEM_NAME Windows)
@@ -135,4 +142,26 @@ find_program(LLD_PATH lld HINTS "${LLVM_DIR}/bin")
 if(NOT CLANG_PATH OR NOT LLD_PATH)
     message(FATAL_ERROR "Toolchain components not found in ${LLVM_DIR}/bin")
 endif()
+
+cmake -G Ninja \
+  -S llvm-project/runtimes \
+  -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE=/toolchaincmake/x86_64-windows-gnu/runtimes.cmake
+
+  cmake -G Ninja -S llvm-project/runtimes -B build -DCMAKE_CROSSCOMPILING=ON -DCMAKE_TOOLCHAIN_FILE=D:/workfile/compiler/toolchaincmake/x86_64-windows-gnu/runtimes.cmake -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm"
+
+   cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=D:/workfile/compiler/toolchaincmake/buildlibcxx.cmake -S llvm-project/runtimes -B build
+
+
+
+   clang++ -o main.exe main.cpp --target=x86_64-windows-gmu --sysroot=D:\workfile\compiler\clang\libcxx -fuse-ld=lld -flto=thin  -rtlib=compiler-rt -stdlib=libc++ -std=c++20 -lc++  -unwindlib=libunwind  -lc++abi -lunwind -lntdll 
+
+
+build llvm时可能报错
+>>The imported target “clangBasic"references the file “/usr/lib/llvm-10/lib/libclangBasic.a"
+>>
+sudo apt install libclang-20-dev
+
 ```
+
