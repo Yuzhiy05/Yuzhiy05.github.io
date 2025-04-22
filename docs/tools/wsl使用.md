@@ -61,6 +61,84 @@ tar -xZvf file.tar.Z   //解压tar.Z
 unrar e file.rar //解压rar
 
 unzip file.zip //解压zip
+
+#ls 查找
+ls -1 --format=single-column //单列输出
+ls -a  --all  //列出所有文件包括以. 开头的文件
+ls -1 /usr/bin | grep '^c' //列出所有c开头的文件
+ls /usr/bin/c* 列出该路径下c为首字母的文件，但是非首字母的文件也会输出，只是c开头的会强调
+
+#grep Global Regular Expression Print 其实就是文本查找
+grep [options] pattern [files]
+^    # 锚定行的开始 如：'^grep'匹配所有以grep开头的行
+grep ^c file //其中文件可以时多文件，如果不指定则为默认输入stdin
+grep ^c file1 file2 file3 ...
+^    # 锚定行的开始 如：'^grep'匹配所有以grep开头的行。    
+$    # 锚定行的结束 如：'grep$' 匹配所有以grep结尾的行。
+.    # 匹配一个非换行符的字符 如：'gr.p'匹配gr后接一个任意字符，然后是p。    
+*    # 匹配零个或多个先前字符 如：'*grep'匹配所有一个或多个空格后紧跟grep的行。    
+.*   # 一起用代表任意字符。   
+[]   # 匹配一个指定范围内的字符，如'[Gg]rep'匹配Grep和grep。    
+[^]  # 匹配一个不在指定范围内的字符，如：'[^A-FH-Z]rep'匹配不包含A-R和T-Z的一个字母开头，紧跟rep的行。    
+(..)  # 标记匹配字符，如'(love)'，love被标记为1。    
+<      # 锚定单词的开始，如:'<grep'匹配包含以grep开头的单词的行。    
+>      # 锚定单词的结束，如'grep>'匹配包含以grep结尾的单词的行。    
+x{m}  # 重复字符x，m次，如：'0{5}'匹配包含5个o的行。    
+x{m,}   # 重复字符x,至少m次，如：'o{5,}'匹配至少有5个o的行。    
+x{m,n}  # 重复字符x，至少m次，不多于n次，如：'o{5,10}'匹配5--10个o的行。   
+\w    # 匹配文字和数字字符，也就是[A-Za-z0-9]，如：'G\w*p'匹配以G后跟零个或多个文字或数字字符，然后是p。   
+\W    # \w的反置形式，匹配一个或多个非单词字符，如点号句号等。   
+\b    # 单词锁定符，如: '\bgrep\b'只匹配grep。 
+
+#查找多模式时需要用到\做转义字符
+例如 
+grep '^\(c\|b\|d\)' file1 
+需要添加转义字符 | 表示或逻辑 此处输出 有所有以c或b或d开头的查找内容
+也可以使用-E 扩展
+grep -E '^(c|b|d)'  file1  此处表达和上述相同的逻辑
+
+echo this is a test line. | grep -o -E "[a-z]+."
+this
+is
+a
+test
+line.
+
+ history | grep ls
+```
+以下文件为file1
+```c++
+#include <cstddef>
+#include <mdspan>
+#include <print>
+#include <vector>
+ 
+int main()
+{
+    std::vector v{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+ 
+    // 将数据视作表示 2 行每行 6 个 int 的连续内存
+    auto ms2 = std::mdspan(v.data(), 2, 6);
+    // 将相同数据视作 2 x 3 x 2 的三维数组
+    auto ms3 = std::mdspan(v.data(), 2, 3, 2);
+ 
+    // 使用二维视图写入数据
+    for (std::size_t i = 0; i != ms2.extent(0); i++)
+        for (std::size_t j = 0; j != ms2.extent(1); j++)
+            ms2[i, j] = i * 1000 + j;
+ 
+    // 使用三维视图读回数据
+    for (std::size_t i = 0; i != ms3.extent(0); i++)
+    {
+        std::println("slice @ i = {}", i);
+        for (std::size_t j = 0; j != ms3.extent(1); j++)
+        {
+            for (std::size_t k = 0; k != ms3.extent(2); k++)
+                std::print("{} ", ms3[i, j, k]);
+            std::println("");
+        }
+    }
+}
 ```
 
 ## 配环境

@@ -19,7 +19,7 @@ permalink: /article/hz1oz1zb/
 --depth=1 只clone 最新提交
 
 2. git sparse-checkout set libcxx libcxxabi libunwind runtimes cmake libc llvm 
-3. git sparse-checkout add llvm  
+3. git sparse-checkout add third-party  
 添加更多模块
 
  tips: ai给的答案里 git sparse-checkout init --cone 这条不需要了查文档这个要废弃了 直接set 路径 不需要/libcxx
@@ -163,5 +163,11 @@ build llvm时可能报错
 >>
 sudo apt install libclang-20-dev
 
-```
 
+cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20
+
+
+
+//编译完成后使用修改后的库 linux下
+clang++-20  libcxx/llvm-project/libcxx/test/libcxx/ranges/range.utility/range.utility.conv/to.verify.cpp -o test -std=c++23 -stdlib=libc++ -I ~/libcxx/build/include/c++/v1
+```
