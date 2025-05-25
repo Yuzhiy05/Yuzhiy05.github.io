@@ -283,6 +283,42 @@ var group = table.AsEnumerable()
 ```
 
 
+ C#的String被视为基元类型,直接使用字面值构造
+ 但是CLR via c#与微软的copilt ai都和编译器有一些出入
+ 在书中这段代码是会报错的
+ ```c#
+ String str2 = new String("hi aaaa.");
+ ```
+ 书中直接声明
+ >C#不允许使用new操作符从字面值字符串构造String对象
+ 但在编译器上试了下是可行的，并且并没有提示
+ 我在godbolt上使用.net6 coro指定了/langversion:6 c#6标准发现也是可行了。
+ Ai说.net8 为String添加了String(string)构造器。我查了一下msdn根本没有。哎ai也喜欢扯淡
+
+ 不过差不多可以确定这句可以允许是因为这个构造器,不过这个构造器.net Core 2.1就加了;godbolt也没有也就没法验证了。我到时候找一下CLR via c#(第四版)这本书的c#标准?
+ ```C#
+ public String (ReadOnlySpan<char> value);
+ ```
+
+ 第二问题
+ 字面量使用+ 操作符相连时是在编译期进行的。对非字面量字符串相加实在编译期进行的。这需要在堆上创建存储
+
+ 3.使用逐子字符串包含转义符号时
+ 一个例子说明
+ ```c#
+stirng filePath="C:\\Windos\\System32\\xxx";
+stirng filePath2=@"C:\Windos\System32\xxx";
+ ```
+ 这两结果一样
+
+ 4.忽略语言文化的字符串比较
+ 需要在使用Compare函数添加StringComparison参数 Ordinal,OrdinalIgnoreCase。
+ 加了这个比较有多快我要测一下?
+ 书中有个notice
+ 要我们在进行字符串比较前提升字符串大小写(ToUpperInvariant/ToLowerInvariant)
+ 书中说微软对大写字符串比较的代码进行的优化,且进行没有区分大小写的比较时FCL(.net类库)会自动转换成大写。且ToUpper对语言文化敏感(这里的说法还没验证)
+
+
 
 
 
