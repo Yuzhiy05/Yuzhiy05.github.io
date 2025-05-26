@@ -282,6 +282,7 @@ var group = table.AsEnumerable()
                });               
 ```
 
+# string 字符串类型
 
  C#的String被视为基元类型,直接使用字面值构造
  但是CLR via c#与微软的copilt ai都和编译器有一些出入
@@ -317,6 +318,27 @@ stirng filePath2=@"C:\Windos\System32\xxx";
  书中有个notice
  要我们在进行字符串比较前提升字符串大小写(ToUpperInvariant/ToLowerInvariant)
  书中说微软对大写字符串比较的代码进行的优化,且进行没有区分大小写的比较时FCL(.net类库)会自动转换成大写。且ToUpper对语言文化敏感(这里的说法还没验证)
+
+5.语言文化的字符串比较CompareInfo,暂时不用也不想看
+
+6.StringCompare进行比较:大量不同字符串反复执行同一比较
+
+## 字符串留用
+程序中多个相同字符串引用同一个对象
+```c#
+string str = "Hello";
+string str2= "Hello";
+
+Console.WriteLine($"str == str2: {str == str2}"); //true
+Console.WriteLine(Object.ReferenceEquals(str, str2)); //按道理是false，但是在.net8上跑是true 被留用了
+
+str=String.Intern(str); // 显式留用
+str2=String.Intern(str2); // 显式留用
+Console.WriteLine(Object.ReferenceEquals(str, str2)); // True
+```
+
+## stringInfro 不想看
+
 
 
 
