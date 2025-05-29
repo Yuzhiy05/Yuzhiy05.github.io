@@ -342,7 +342,7 @@ Console.WriteLine(Object.ReferenceEquals(str, str2)); // True
 
 
 
-格式符号说明
+### 格式修饰符符说明
 数值类型常用格式说明符
 | 说明符 | 含义         | 示例输出（1234.56） |
 | ------ | ------------ | ------------------- |
@@ -355,6 +355,7 @@ Console.WriteLine(Object.ReferenceEquals(str, str2)); // True
 | P/p    | 百分比       | 123,456.00 %        |
 | X/x    | 十六进制整数 | 4D2                 |
 | B/b    | 二进制数     | 超了                |
+| R/r    | 往返历程     | 还没测              |
 注意：D 和 X 只适用于整数类型。
 日期和时间类型常用格式说明符
 | 说明符 | 含义           | 示例输出               |
@@ -368,6 +369,33 @@ Console.WriteLine(Object.ReferenceEquals(str, str2)); // True
 | g      | 常规短日期时间 | 2025/5/29 14:30        |
 | G      | 常规长日期时间 | 2025/5/29 14:30:15     |
 
+## 格式字符串
+```c#
+{参数位置,对其:格式修饰符|精度}
+//例如 首个参数,打印时10个字符对齐,打印货币类型,保留两位小数
+{0,10:C2}
+//这玩意打印出来是 
+// ¥123.000
+//注意¥前还有一个空格用于对齐。¥123.000有8个字符,按要求左对齐9个字符,不够就用空格补充。
+var str=string.Format("{0,9:C3}", 123);
+Console.WriteLine(str);
+//抄的msdn例子
+decimal[] amounts = { 16305.32m, 18794.16m };
+Console.WriteLine("   Beginning Balance           Ending Balance");
+Console.WriteLine("   {0,-28:C2}{1,14:C2}", amounts[0], amounts[1]);
+// Displays:
+//        Beginning Balance           Ending Balance
+//        $16,305.32                      $18,794.16
+```
+
+:::tip
+```c#
+var sb=new StringBuilder("AAA");
+ Console.WriteLine($"StringBuilder: {sb}");
+ sb.Length = 0; // 这里能清掉sb的对象的内容
+ Console.WriteLine($"StringBuilder after clearing: {sb}");
+ ```
+::: 
 
 
 
