@@ -23,11 +23,11 @@ public bool IsBackground { get; set; }
 :::
 
 :::info
-|类型|版本|
-|----|-----|
-|.NET|Core 1.0, Core 1.1, Core 2.0, Core 2.1, Core 2.2, Core 3.0, Core 3.1, 5, 6, 7, 8, 9|
-.NET Framework|1.1, 2.0, 3.0, 3.5, 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1, 4.7.2, 4.8, 4.8.1|
-.NET Standard|2.0, 2.1|
+| 类型           | 版本                                                                                         |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| .NET           | Core 1.0, Core 1.1, Core 2.0, Core 2.1, Core 2.2, Core 3.0, Core 3.1, 5, 6, 7, 8, 9          |
+| .NET Framework | 1.1, 2.0, 3.0, 3.5, 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1, 4.7.2, 4.8, 4.8.1 |
+| .NET Standard  | 2.0, 2.1                                                                                     |
 :::
 
 ```c#
@@ -168,3 +168,124 @@ ContinueWith 在任务执行完成后启动，回到UI线程的上下文调用�
 Console.WriteLine("Task Method : Task {0} is running on a thread id: {1}. Is thread pool thread: {2}",
             name, Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.IsThreadPoolThread);
             Thread.Sleep(TimeSpan.FromSeconds(seconds));
+
+
+
+# C#的异常
+
+不同表达式 CLR会记录不同的异常起点
+
+```c#
+try{
+    ///
+}
+catch(Exception e){
+  throw;            //clr不会改变异常抛出点的认识
+}
+//
+try{
+    ///
+}
+catch(Exception e){
+  throw e;            //clr会认为这是异常起点
+}
+```
+CLR via c# 一书中说了这么一种情况，我感觉不对
+>不管抛出还是重新抛出异常,但是windows会重置堆栈起点。如果一个异常成为一个未处理的异常,那么向windows error reporting 报告的栈位置就是最后一次抛出或重新抛出的位置(即使CLR知道异常的原始抛出位置)。假如应用程序在字段(?,什么字段这里书上没说明),会使调试工作变的异常困难
+问copilot，他给了个例子，他说下面例子:
+•	异常包装：如果静态字段初始化失败，CLR 会抛出 TypeInitializationException，它只告诉你“类型初始化失败”，但不会直接告诉你是哪个字段、哪一行代码出错。
+•	堆栈丢失细节：未处理异常被 WER 捕获时，堆栈信息只显示“最后一次抛出或重新抛出”的位置（如类型构造器、构造函数），而不是字段初始化的具体表达式。
+•	自动生成代码：字段初始化代码通常被编译器插入到构造函数或类型构造器（.cctor）中，堆栈信息只显示到这些自动生成的方法，缺少具体字段名和初始化表达式的上下文。
+•	定位困难：如果一个类有多个字段初始化，异常信息不会告诉你是哪个字段出错，只能靠排查或代码审查。
+
+我在vs跑了一下，能定位到 x = GetValue()这一行啊,纯扯淡
+```c#
+class test{
+ static int x = GetValue(); // 静态字段初始化
+ static int GetValue() => throw new Exception("fail");
+}
+//clr via c# 给出一个写法
+private void somedemo()
+{
+    bool trysuceeeds = false;
+    try
+    {
+        //
+        trysuceeeds = true;
+    }
+    finally
+    {
+        if ( !trysuceeeds)
+        {
+            /*捕获代码放这里*/
+        }
+    }
+}
+```
+tips c# 构造函数 成员初始化列表 只允许this,和base? 没找到资料
+抄书自定义异常类
+
+
+一些作者认为的异常处理原则
+
+作者举了一个例子
+```c#
+private static Object OneStatement(Stream stream_,char charToFind)
+{
+    return (charToFind+":"+stream_.GetType()+string.Empty+(stream_.Position+512m))
+        .Where(c => c == charToFind).ToArray();
+}
+```
+这里需要看一下生成IL
+有许多抛异常的地方,这里抛的异常都是不是代码编写者能控制的，我们不可能预料掉所有的异常，所以不可能catch所有的异常。像OutOfMemoryException 这种异常很少发生就不需要管。牺牲一些代码的可靠性换取开发效率。同时用Exception更广泛基类异常去catch派生类的异常也不对，每个错误的恢复处理都不同，所以具体的错误要更具体的处理
+
+### 错误状态
+使用异常会中止执行，导致状态被破坏，例如如一个转账函数，一方扣钱，另一方加钱，中间发生了异常就会导致状态错误。这种严重的状态错误就不可能catch异常后让他继续执行了。
+关于回滚,上述问题触发时，一个解决办法是使用回滚操作把状态回退，但回滚操作必须简单到不抛出异常，不然状态会变得更遭
+1.执行catch或finllay中的代码时,CLR不允许线程终止
+[Thread.Abort Method](https://learn.microsoft.com/en-us/dotnet/api/system.threading.thread.abort?view=net-9.0)
+Remarks
+>Unexecuted finally blocks are executed before the thread is aborted.
+
+这里是说finally不执行只有在某些立即终止的异常的情况下
+[try-finally](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/exception-handling-statements#the-try-finally-statement)
+>Execution of the finally block depends on whether the operating system chooses to trigger an exception unwind operation. The only cases where finally blocks aren't executed involve immediate termination of a program. For example, such a termination might happen because of the Environment.FailFast call or an OverflowException or InvalidProgramException exception. Most operating systems perform a reasonable resource clean-up as part of stopping and unloading the process.
+
+
+```c#
+public static void Transfer(int from,int to,Decimal amount)
+    {
+        try
+        {
+            //do nothing
+        }
+        finally
+        {
+            from-= (int)amount;
+            //这里不可能因为•	Thread.Abort()中止，当然手动调用会，线程在执行 finally 块时收到中止请求，CLR 会延迟中止
+            to += (int)amount;
+        }
+
+    }
+```
+
+2.使用契约 System.Diagnostics.Contracts.Contract
+验证参数的状态,不满足状态的参数在代码执行前抛出异常
+//这部分我还没看得参考msdn
+
+3.约束执行区域 CER
+消除潜在的异常
+//这部分我也没看
+4.使用事务 System.Transactions.Transaction
+如数据库，数据要么修改要么不修改
+
+5.使用Monitor 获取释放线程同步锁
+//没看，这是多线程内容我会安排尽早阅读
+
+6.如果状态无法修复了就该直接中止，不要让错误状态蔓延，然后重启应用
+使用AppDomian Unload卸载整个应用域或者使用Environment.FailFast强行中止线程。这个方法把错误写入windows application 事件日志,生成错误报告,创建dump，中止程序
+
+### 异常使用和设计规范
+
+
+
