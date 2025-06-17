@@ -283,9 +283,287 @@ public static void Transfer(int from,int to,Decimal amount)
 //没看，这是多线程内容我会安排尽早阅读
 
 6.如果状态无法修复了就该直接中止，不要让错误状态蔓延，然后重启应用
-使用AppDomian Unload卸载整个应用域或者使用Environment.FailFast强行中止线程。这个方法把错误写入windows application 事件日志,生成错误报告,创建dump，中止程序
+不要catch(System.Expection ex)捕获所有异常，把异常吞掉,不能无视错误。同时捕获后重新抛会改变异常抛出点，不利于debug。
+例外在进行回滚操作时可能需要捕获所有异常,一旦发生异常状态将所作操作进行回滚。并重抛异常。
+tips:读者注:不过这个回滚要看异常发生的频率，高频的抛异常然后回滚可能是程序bug，要赶紧debug，异常从来不是在热路径(高频发生)
+只捕获预期到的异常。作者举的例子其实不好，有些时候验证函数参数应该用契约而不是等异常发生时抛异常
+不过CLR允许异步的异常也就是一个线程抛异常被接到后返回线程池由另一个线程重新抛出(需要使用某些方法)
+错误的程序该中止时就要立即中止:使用AppDomian Unload卸载整个应用域或者使用Environment.FailFast强行中止线程。这个方法把错误写入windows application 事件日志,生成错误报告,创建dump，中止程序
+
+该书的20.8.5一节 作者谨慎的介绍了
+几种场景,捕获异常后重新抛一个新异常,谨慎使用
+1.隐藏具体实现。把原先抛出的异常(非用户预期的)catch后重抛一个用户能理解/预期的新异常。用户不需要关心实现细节。
+2.在异常中添加额外的上下文和内容
+```c#
+private static void do()
+{
+  try{
+    //dosmting
+  }
+  catch(IOExpection ex){
+    //将文件名添加到异常对象中
+    ex.Data.Add("Filename",filename);
+    throw //重抛同一个对象
+  }
+}
+```
+
+3.编译器会隐式调用类型构造器,假设类型构造器中抛出异常并且没有在类型构造器中捕获(预期之外的异常如DivideByZeroException).编译器会捕获,并重抛一个TypeInitializationException异常。这将告诉你异常发生在类型构造器而不是你的代码。DivideByZeroException之类的异常可能被其他的地方捕获从而恢复了，你甚至不知道你调用了类型构造器(这是编译器隐式调用的)
+//这个我还没写代码测试
+
+4.还有一个是使用反射的例子在书429页 20.8.2节我不想看2
+20.9节介绍一些如何查看未处理异常和对待未处理异常的态度
+
+5.Vistual studio对异常调试的支持
+点击*调试*-*窗口*-*异常设置*
+在下方显示勾选框中 *Common Lanuage Runtime Exception* 项 的展开项中
+可以勾选指定的异常,在该异常出触发时直接中断不会匹配任意的可被捕获的catch块。只要你怀疑库或组件吞异常了但是不知道在哪里打断点这个方法很有用
+
+一个小趣事
+Microsoft 从用户那了解到调用Int32的Prase方法时用户可能经典调用无法解析的数据,频繁调用Parse方法抛出和捕获异常对性能造成了很大的损失。所以微软搞了个TryParse `public static bool TryParse(string? s, out int result);` 这个方法重载很多以这个举例。返回值表示成功或失败,result 的出参在成功时为结果,失败时为0. 不过某些重载中需要提供`System.Globalization.NumberStyles `类型的参数 如果提供的参数不满足要求同样会抛出*ArgumentException*错误
+
+20.12,20.13节分别介绍了CRE约束执行区域(大概意思是划定一块代码finally最好执行，如果不能执行那么在进入try之前就中止--抛异常)契约(书中翻译为协定)不想看
+
+
 
 ### 异常使用和设计规范
+
+1.c#的一些语法糖会自带finally 语句
+
+[lock语句](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/lock)
+下面这玩意看不出来
+```c#
+public static void MLockTest()
+{
+    int count = 0;
+    object syncObj = new object();
+
+    var t1 = Task.Run(() =>
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            lock (syncObj)
+            {
+                count++;
+                Console.WriteLine($"[线程1] Count is now {count}");
+            }
+            Thread.Sleep(10);
+        }
+    });
+
+    var t2 = Task.Run(() =>
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            lock (syncObj)
+            {
+                count++;
+                Console.WriteLine($"[线程2] Count is now {count}");
+            }
+            Thread.Sleep(10);
+        }
+    });
+
+    t1.Wait();
+    t2.Wait();
+
+}
+
+//缩减一下
+public static void ForIL1()
+{
+    int count = 0;
+    var lockObj = new System.Threading.Lock();
+    lock (lockObj)
+    {
+        count++;
+        Console.WriteLine($"Count is now {count}");
+    }
+}
+//下面这是生成Il
+.method public hidebysig static void  ForIL1() cil managed
+{
+  // 代码大小       78 (0x4e)
+  .maxstack  2
+  .locals init (int32 V_0,
+           class [System.Runtime]System.Threading.Lock V_1,
+           valuetype [System.Runtime]System.Threading.Lock/Scope V_2,
+           valuetype [System.Runtime]System.Runtime.CompilerServices.DefaultInterpolatedStringHandler V_3)
+  IL_0000:  nop
+  IL_0001:  ldc.i4.0
+  IL_0002:  stloc.0
+  IL_0003:  newobj     instance void [System.Runtime]System.Threading.Lock::.ctor()
+  IL_0008:  stloc.1
+  IL_0009:  ldloc.1
+  IL_000a:  callvirt   instance valuetype [System.Runtime]System.Threading.Lock/Scope [System.Runtime]System.Threading.Lock::EnterScope()
+  IL_000f:  stloc.2
+  .try
+  {
+    IL_0010:  nop
+    IL_0011:  ldloc.0
+    IL_0012:  ldc.i4.1
+    IL_0013:  add
+    IL_0014:  stloc.0
+    IL_0015:  ldc.i4.s   13
+    IL_0017:  ldc.i4.1
+    IL_0018:  newobj     instance void [System.Runtime]System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::.ctor(int32,
+                                                                                                                               int32)
+    IL_001d:  stloc.3
+    IL_001e:  ldloca.s   V_3
+    IL_0020:  ldstr      "Count is now "
+    IL_0025:  call       instance void [System.Runtime]System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendLiteral(string)
+    IL_002a:  nop
+    IL_002b:  ldloca.s   V_3
+    IL_002d:  ldloc.0
+    IL_002e:  call       instance void [System.Runtime]System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::AppendFormatted<int32>(!!0)
+    IL_0033:  nop
+    IL_0034:  ldloca.s   V_3
+    IL_0036:  call       instance string [System.Runtime]System.Runtime.CompilerServices.DefaultInterpolatedStringHandler::ToStringAndClear()
+    IL_003b:  call       void [System.Console]System.Console::WriteLine(string)
+    IL_0040:  nop
+    IL_0041:  nop
+    IL_0042:  leave.s    IL_004d
+  }  // end .try
+  finally
+  {
+    IL_0044:  ldloca.s   V_2
+    IL_0046:  call       instance void [System.Runtime]System.Threading.Lock/Scope::Dispose()
+    IL_004b:  nop
+    IL_004c:  endfinally
+  }  // end handler
+  IL_004d:  ret
+} // end of method Program::ForIL1
+```
+可以看到使用try和finally
+根据MSDN的说法Lock(x) x是System.Threading.Lock时是
+```c#
+using (x.EnterScope())
+{
+    // Your code...
+}
+```
+的语法糖，而using语句又是try-finally的语法糖
+顺便说一下Lock类是.net9 C#13 新加的
+
+2.使用using 语句 结束时调用对象的Dispose方法
+比较典型的例子 是使用文件流的类 FileStream
+
+3.foreach 语句结束后调用枚举器 的Dispose方法释放资源
+
+4.析构器,对象销毁时在finally块中调用基类的Finalize方法
+```c#
+public static void ForIL1()
+{
+    var numbers = new List<int>();
+    using (StreamReader reader = File.OpenText("C:/Users/Yuzhiy/Desktop/111.txt"))
+    {
+        string line;
+        while ((line = reader.ReadLine()) is not null)
+        {
+            if (int.TryParse(line, out int number))
+            {
+                numbers.Add(number);
+            }
+        }
+    }
+    foreach (var number in numbers)
+    {
+        Console.WriteLine(number);
+    }
+}
+//下面是生成的IL
+.method public hidebysig static void  ForIL1() cil managed
+{
+  // 代码大小       138 (0x8a)
+  .maxstack  2
+  .locals init (class [System.Collections]System.Collections.Generic.List`1<int32> V_0,
+           class [System.Runtime]System.IO.StreamReader V_1,
+           string V_2,
+           int32 V_3,
+           bool V_4,
+           bool V_5,
+           valuetype [System.Collections]System.Collections.Generic.List`1/Enumerator<int32> V_6,
+           int32 V_7)
+  IL_0000:  nop
+  IL_0001:  newobj     instance void class [System.Collections]System.Collections.Generic.List`1<int32>::.ctor()
+  IL_0006:  stloc.0
+  IL_0007:  ldstr      "C:/Users/Yuzhiy/Desktop/111.txt"
+  IL_000c:  call       class [System.Runtime]System.IO.StreamReader [System.Runtime]System.IO.File::OpenText(string)
+  IL_0011:  stloc.1
+  .try
+  {
+    IL_0012:  nop
+    IL_0013:  br.s       IL_002f
+    IL_0015:  nop
+    IL_0016:  ldloc.2
+    IL_0017:  ldloca.s   V_3
+    IL_0019:  call       bool [System.Runtime]System.Int32::TryParse(string,
+                                                                     int32&)
+    IL_001e:  stloc.s    V_4
+    IL_0020:  ldloc.s    V_4
+    IL_0022:  brfalse.s  IL_002e
+    IL_0024:  nop
+    IL_0025:  ldloc.0
+    IL_0026:  ldloc.3
+    IL_0027:  callvirt   instance void class [System.Collections]System.Collections.Generic.List`1<int32>::Add(!0)
+    IL_002c:  nop
+    IL_002d:  nop
+    IL_002e:  nop
+    IL_002f:  ldloc.1
+    IL_0030:  callvirt   instance string [System.Runtime]System.IO.TextReader::ReadLine()
+    IL_0035:  dup
+    IL_0036:  stloc.2
+    IL_0037:  ldnull
+    IL_0038:  ceq
+    IL_003a:  ldc.i4.0
+    IL_003b:  ceq
+    IL_003d:  stloc.s    V_5
+    IL_003f:  ldloc.s    V_5
+    IL_0041:  brtrue.s   IL_0015
+    IL_0043:  nop
+    IL_0044:  leave.s    IL_0051
+  }  // end .try
+  finally
+  {
+    IL_0046:  ldloc.1
+    IL_0047:  brfalse.s  IL_0050
+    IL_0049:  ldloc.1
+    IL_004a:  callvirt   instance void [System.Runtime]System.IDisposable::Dispose()
+    IL_004f:  nop
+    IL_0050:  endfinally
+  }  // end handler
+  IL_0051:  nop
+  IL_0052:  ldloc.0
+  IL_0053:  callvirt   instance valuetype [System.Collections]System.Collections.Generic.List`1/Enumerator<!0> class [System.Collections]System.Collections.Generic.List`1<int32>::GetEnumerator()
+  IL_0058:  stloc.s    V_6
+  .try
+  {
+    IL_005a:  br.s       IL_006f
+    IL_005c:  ldloca.s   V_6
+    IL_005e:  call       instance !0 valuetype [System.Collections]System.Collections.Generic.List`1/Enumerator<int32>::get_Current()
+    IL_0063:  stloc.s    V_7
+    IL_0065:  nop
+    IL_0066:  ldloc.s    V_7
+    IL_0068:  call       void [System.Console]System.Console::WriteLine(int32)
+    IL_006d:  nop
+    IL_006e:  nop
+    IL_006f:  ldloca.s   V_6
+    IL_0071:  call       instance bool valuetype [System.Collections]System.Collections.Generic.List`1/Enumerator<int32>::MoveNext()
+    IL_0076:  brtrue.s   IL_005c
+    IL_0078:  leave.s    IL_0089
+  }  // end .try
+  finally
+  {
+    IL_007a:  ldloca.s   V_6
+    IL_007c:  constrained. valuetype [System.Collections]System.Collections.Generic.List`1/Enumerator<int32>
+    IL_0082:  callvirt   instance void [System.Runtime]System.IDisposable::Dispose()
+    IL_0087:  nop
+    IL_0088:  endfinally
+  }  // end handler
+  IL_0089:  ret
+} // end of method Program::ForIL1
+```、
+可以看到分别为using语句和foreach语句分别生成的try-finally块并执行对应的Dispoe方法
 
 
 
