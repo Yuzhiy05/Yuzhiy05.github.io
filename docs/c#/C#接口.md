@@ -50,3 +50,11 @@ interface_method_header
      }
  }
 ```
+
+类中不可声明相同名字的属性,但是可以实现参数不同相同名称的索引器,其中索引器在被编译为IL后名字为Item
+
+### 实现Ilist接口
+
+
+### 实现IEnumerable 接口
+
