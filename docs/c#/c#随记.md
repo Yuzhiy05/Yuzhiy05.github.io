@@ -565,5 +565,46 @@ public static void ForIL1()
 ```、
 可以看到分别为using语句和foreach语句分别生成的try-finally块并执行对应的Dispoe方法
 
+## c#中的记时功能
+很多时候程序需要计时,需要个now,timespan之类的东西
 
+Stopwatch 这玩意说三个属性
+
+```c#
+跑了从start到stop 经过多少秒返回的TimeSpan
+public TimeSpan Elapsed { get; }
+//返回值为毫秒
+public long ElapsedMilliseconds { get; }
+//返回时钟周期
+public long ElapsedTicks { get; }
+//这两有关联
+public static readonly long Frequency;
+```
+Stopwatch.Frequency 表示一个频率。计时器测量时间的最小单位。tick这玩意就表示时钟的"滴答"
+假设Frequency=10,000,000。说明计时器一秒跳1千万次，以这个频率计时。
+由于1秒=1,000,000,000纳秒(10亿) 。这样算每tick一下过了
+1,000,000,000ns/10,000,000 tick=100 ns/tick.说明这个时钟每跳动一下走了100ns.
+将该值转换为其他单位时
+```c#
+var second=(double)stopwatch.ElapsedTicks / Stopwatch.Frequency;
+var nanosecond=(double)stopwatch.ElapsedTicks / Stopwatch.Frequency*1000L;
+```
+几个常用方法解释
+Start 计数器开始计数
+Stop  停止计数
+Restart 停止计时并删除已经累计时间,并重新开始计时
+Reset  停止计时,累计时间清零
+StartNew 这玩意和其他不一样他是静态函数,调用他返回一个新StopWatch实例并使用Start()
+还有两个静态方法
+```c#
+var start=Stopwatch.GetTimestamp();
+ Thread.Sleep(100); // 模拟一些耗时操作
+var end = Stopwatch.GetTimestamp();
+
+Console.WriteLine(Stopwatch.GetElapsedTime(start,end));
+//或者没end，GetElapsedTime还有重载
+//Stopwatch.GetElapsedTime(start)获取时间戳到现在经过的时间.
+
+```
+使用GetElapsedTime不用自己end-start再转换,这个方法直接返回一个Timespan,GetTimestamp返回一个long类型的当前时间刻度(tick)
 

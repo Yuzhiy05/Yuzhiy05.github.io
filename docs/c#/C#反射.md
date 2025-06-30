@@ -200,6 +200,8 @@ public static object? CreateInstance (Type type, params object?[]? args);
 
 public static object? CreateInstance (Type type, bool nonPublic);
 
+
+//这个重载返回ObjectHandle必须用 Unwrap ()解包。因为这关乎创建在其他可能没被加载的程序集中类的实例
 public static System.Runtime.Remoting.ObjectHandle? CreateInstance (string assemblyName, string typeName);
 
 public static object? CreateInstance (Type type);
@@ -219,5 +221,166 @@ public static System.Runtime.Remoting.ObjectHandle? CreateInstanceFrom (string a
 这里有一些[示例](https://learn.microsoft.com/zh-cn/dotnet/api/system.activator.createinstance?view=net-8.0#system-activator-createinstance-1)
 比较常用的
 ```c#
+//要被反射的类
+//该类在testInfo.dll 程序集中
+public class test
+{
+    private int a = 10;
+    public  test() { }
+    public  test(int a_) => this.a = a_;
+
+    public int A { get => a; set => a = value; }
+
+    public override string ToString()=>a.ToString();
+}
+
+public static void CreatInstanceWiteRef(){
+    //方法1,类型定义已知 已经加载程序集
+      ObjectHandle handle = Activator.CreateInstance("testInfo", "Person");
+      Person p = (Person) handle.Unwrap();
+      p.Name = 1;
+    //应用插件等场景，只知道类型不知道类型具体定义，继承接口的类型通常是使用者定义的，程序动态加载
+      ObjectHandle handle = Activator.CreateInstance("PersonInfo", "Person");
+      object p = handle.Unwrap();
+      Type t = p.GetType();
+      PropertyInfo prop = t.GetProperty("Name");
+        if (prop != null)
+      prop.SetValue(p, "Samuel");
+
+      MethodInfo method = t.GetMethod("ToString");
+      object retVal = method.Invoke(p, null);
+        if (retVal != null)
+         Console.WriteLine(retVal);
+    //最简单的重载
+      var instance = Activator.CreateInstance(typeof(test), new object[] { 20 });
+
+      var peoinfo = typeof(test).GetProperty("A");
+      peoinfo.SetValue(instance,15);
+      var a = peoinfo.GetValue(instance);
+      Console.WriteLine($"Property A value: {a}");
+}
+```
+tips 不管是CreateInstance还是CreateInstanceFrom都需要加载对应程序集才能创建其中类型的实例
+
+Assembly.CreateInstance
+```c#
+//typename为类型的完全限定名(namesapce.class_name,对应类型Type的Fullname属性),此重载会在以BindingFlags 设置为 Public 或 Instance为条件在当前程序集查找，并且不忽视大小写
+public object? CreateInstance (string typeName);
+
+//bool参数指定是否忽视大小写
+public object? CreateInstance (string typeName, bool ignoreCase);
+
+//带搜索具体搜索的条件的重载
+public virtual object? CreateInstance (string typeName, bool ignoreCase, System.Reflection.BindingFlags bindingAttr, System.Reflection.Binder? binder, object[]? args, System.Globalization.CultureInfo? culture, object[]? activationAttributes);
+```
+tips 关于 CultureInfo 参数默认是当前类型的CultureInfo。不同区域,表示1000的字符串不同转化double自然不同。
+简单的用法
+```c#
+public static void CreatInstanceWiteAssembly()
+{    //仅仅是为了介绍用法,实际这样写属于脱裤子放屁
+    var assembil_=typeof(test).Assembly;
+    string fullname_= typeof(test).FullName;
+    var instance = assembil_.CreateInstance(fullname_);
+    if (instance is test testInstance)
+    {
+        Console.WriteLine($"Created instance of {testInstance.GetType().FullName} with A = {testInstance.A}");
+        testInstance.A = 30;
+        Console.WriteLine($"Updated A = {testInstance.A}");
+    }
+    else
+    {
+        Console.WriteLine("Failed to create instance.");
+    }
+}
+```
+
+ConstructorInfo.Invoke 方法
+
+
+
+
+### 反射创建数组,委托,泛型类型
+使用反射创建这三种类型需要各自类型中的方法
+
+
+### 设计可拓展程序
+一般由三个步骤
+
+1.创建宿主SDK程序集,其中使用接口或抽象基类.所有插件都要实现该接口或类型。其中使用的类型(返回类型或参数)中最好是MsCorLib.dll定义的类型,因为CLR总是加载与自身匹配版本的程序集,并且只加载一个版本? 。其中需要的自定义类型也在其中定义,因为所有的插件都要引用他.
+
+2.插件实现者引用宿主sdk程序集,实现其中的类型。插件开发者可以所以更新版本
+
+3.创建宿主应用程序集，他引用宿主sdk程序集定义类型实现接口,并且和插件实现不会引用该程序集，所以可以自由更新版本.
+
+tips 跨程序集使用类型时需要关注程序集的版本控制问题
+
+从C# via CLR一书中摘抄的例子?这个例子还没验证在.net9下是否有效
+```c#
+hostSdk.dll
+
+using System
+
+namespace Wintellect.HostSdk{
+    public interface IAddIn{
+        string Dosthing(int x);
+    }
+}
+
+AddInTypes.dll,引用hostSdk.dll
+
+using System;
+using  Wintellect.HostSdk;
+
+public sealed class AddIn_A:IAddIn{
+    public AddIn_A(){}
+
+    public string Dosthing(int x)=>"AddIn_A:"+x.ToString();
+}
+
+public sealed class AddIn_B:IAddIn{
+    public AddIn_B(){}
+
+    public string Dosthing(int x)=>"AddIn_B:"+(x*2).ToString();
+}
+
+宿主Host.exe 代码 引用HostSDk.dll 
+
+using Systeam;
+using Systeam.IO;
+using System.Reflection;
+using System.Collections.Generic;
+using Wintellect.HostSdk
+
+public static class Program{
+    static void  Main(string[] args){
+      //查找宿主exe所在目录
+       String AddInDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+//假定加载程序集和宿主exe在同一个目录下
+var AddInAssemblies = Directory.EnumerateFiles(AddInDir, "*.dll");
+//创建可由宿主使用的所有Type的集合
+var AddInTypes = from file in AddInAssemblies
+                    let assembly = Assembly.LoadFrom(file)
+                    from type in assembly.ExportedTypes
+                        //如果类实现了IAddIn接口，该类型就可以被宿主使用
+                 where type.IsPublic && typeof(IAddIn).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo())
+                 select type;
+//宿主发现所有可用的加载项
+//构造加载项并使用他们
+foreach (var type in AddInTypes)
+{
+    Console.WriteLine($"Found add-in type: {type.FullName}");
+    //可以创建实例或调用方法等操作
+    var instance_ = Activator.CreateInstance(type);
+    if (instance_ is IAddIn addIn)
+    {
+        Console.WriteLine(instance_.Dosthing(5));
+    }
+}
+    }
+}
 
 ```
+
+学习一下MEF?
+
+
