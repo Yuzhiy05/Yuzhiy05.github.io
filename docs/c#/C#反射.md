@@ -39,7 +39,7 @@ C# 这个typeof和C++ decltype与C typeof相比有些诡谲。他接受类型名
 同时根据类型定义的范围，还有Assembly.GetType,与 Module.GetType 方法在对应范围内查找类型
 
 tips
-C# via CLR一书中介绍的获得类型的api在.net9已过时
+CLR via C# 一书中介绍的获得类型的api在.net9已过时
 Type.ReflectionOnlyGetType(String, Boolean, Boolean) 方法
 ### 使用反射查找类型
 类型的元数据都存储在程序集元数据表中
@@ -314,7 +314,7 @@ ConstructorInfo.Invoke 方法
 
 tips 跨程序集使用类型时需要关注程序集的版本控制问题
 
-从C# via CLR一书中摘抄的例子?这个例子还没验证在.net9下是否有效
+从CLR via C# 一书中摘抄的例子?这个例子还没验证在.net9下是否有效
 ```c#
 hostSdk.dll
 
@@ -382,5 +382,66 @@ foreach (var type in AddInTypes)
 ```
 
 学习一下MEF?
+
+### 成员的具体信息
+MemberInfo 类是所有其他表示程序具体信息类 如表示成员方法的 MethodBase和MethodInfo 表示 属性的 PropertyInfo 类型的抽象基类
+
+CLR via C# 一书的中图示 各个Info类由 MemberInfo继承, 在 .net 9中已经不适用
+MemberInfo
+
+System.Reflection.EventInfo
+System.Reflection.FieldInfo
+System.Reflection.MethodBase
+        System.Reflection.ConstructorInfo
+        System.Reflection.MethodInfo
+System.Reflection.PropertyInfo
+System.Type
+         System.Reflection.TypeInfo
+
+MSDN 有一个[例子](https://learn.microsoft.com/zh-cn/dotnet/api/system.reflection.memberinfo?view=net-8.0)显示程序集的全部类型的信息
+
+
+MemberInfo 有以下公共属性
+
+| 属性名           | 修饰符   | 类型                                               |
+| ---------------- | -------- | -------------------------------------------------- |
+| Name             | abstract | string                                             |
+| DeclaringType    | abstract | Type?                                              |
+| Module           | virtual  | Module                                             |
+| CustomAttributes | virtual  | IEnumerable<System.Reflection.CustomAttributeData> |
+
+ tips namespace 是语法相关 对 CLR是透明的
+
+ 调用成员
+
+
+ | 类型                       | 调用方法                           | 说明                                                     |
+ | -------------------------- | ---------------------------------- | -------------------------------------------------------- |
+ | FieldInfo                  | GetValue/SetValue                  | 设置字段的值，对于静态字段两个方法的参数都是null(被忽略) |
+ | PropertyInfo               | GetValue/SetValue                  | 设置属性值,分别调用对应的set,get访问器                   |
+ | MethodBase/ConstructorInfo | Invoke                             | 调用对应构造函数                                         |
+ | MethodBase/MethodInfo      | Invoke                             | 调用指定实例表示的函数                                   |
+ | EventInfo                  | AddEventHandler/RemoveEventHandler | 分别添加和删除事件处理程序                               |
+
+
+ PropertyInfo 
+该类型还提供了 GetGetMethod,GetSetMethod 用来对应访问器的MethodInfo,重所周知 访问器其实就是函数set_backfiled和get_backiled 函数的语法糖,这个就是获取这个函数的类型info
+
+GetDeclaredProperty 该对象表示由当前类型声明的指定属性 不包括上下继承链
+GetProperty  搜索该类的继承链
+```c# 
+public virtual System.Reflection.PropertyInfo? GetDeclaredProperty(string name);
+
+public System.Reflection.PropertyInfo? GetProperty (string name);
+```
+
+EventInfo 
+提供了两个属性(这里回去要看下委托)
+AddMethod =GetAddMethod 值为 的 true(返回非公共方法)
+RemoveMethod=GetRemoveMethod 值为 的 true
+
+
+
+
 
 
