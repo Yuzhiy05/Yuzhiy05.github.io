@@ -296,6 +296,42 @@ public static void CreatInstanceWiteAssembly()
 
 ConstructorInfo.Invoke 方法
 
+用法实例
+```c#
+//待测试的类 他有个引用的构造函数
+ public class testConstructWithRef {
+     private int a = 10;
+
+     public int A { get { return a; }set { a = value; } }
+     public testConstructWithRef() { }
+     public testConstructWithRef(ref int a_) => this.a = a_;
+     public testConstructWithRef(int a, ref int b)
+     {
+         Console.WriteLine($"a = {a}, b = {b}");
+         b += 10; 
+     }
+     public static void MReflectTestConstructWithRef()
+     {
+       int a = 20;
+       var constuctparms=Type.GetType("System.Int32").MakeByRefType();
+       var type= typeof(testConstructWithRef);
+       //找参数为ref int的构造函数
+       ConstructorInfo cotr=type.GetConstructor(new Type[] { constuctparms });
+       var instance = cotr.Invoke(new object[] {2});
+       var test = instance as testConstructWithRef;
+       Console.WriteLine($"a after construction: {test.A}"); 
+       // CLR via C# 原书有一些东西不必要,例如使用Linq找到参数为int&的构造函数,GetConstructor有重载干这个事
+       ConstructorInfo ctor = type.GetTypeInfo().DeclaredConstructors.First(
+       c => c.GetParameters()[0].ParameterType == constuctparms);
+    }
+
+ }
+```
+tips 函数参数里的ref 在IL看来就是`&` 在IL DASM看
+`public static string ff(ref int _)=>$"字符{_}";` 的声明就是这个
+`.method public hidebysig static string  ff(int32& _) cil managed`
+所以 CLR via c# 一书中使用
+`Type t=Type.GetType("System.Int32&")` 也能用
 
 
 
@@ -441,7 +477,169 @@ AddMethod =GetAddMethod 值为 的 true(返回非公共方法)
 RemoveMethod=GetRemoveMethod 值为 的 true
 
 
+MethodBase
+
+MethodInfo
+CreateDelgete 方法
+
+//创建指定类型的委托类型的委托,Object 指定实例对象,用的时候需要转型
+CreateDelegate(Type delegateType)	
+CreateDelegate(Type, Object)	
+
+//泛型方法,相当于原本填在形参中的类型填到泛型参数里了
+CreateDelegate<T>()	
+CreateDelegate<T>(Object)
+
+用法
+```c#
+public class test
+{
+    private int a = 10;
+    public test() { }
+    public test(int a_) => this.a = a_;
+
+    public int A { get => a; set => a = value; }
+
+    public override string ToString() => a.ToString();
+
+    public void ff(string str)=> Console.WriteLine($"ff called with {str+a}");
+
+    public static void showMemberMethod(){
+         
+        var type = typeof(test);
+        var method=type.GetMethod("ff");
+        var coninfo= type.GetConstructor(Type.EmptyTypes);
+        var instance = coninfo.Invoke(null); // ff是成员函数需要绑定的对应实例
+        //这里不需要转型
+        var del=method.CreateDelegate<Action<string>>(instance);
+        del("hello world!11111");
+    }
+     public static void showMemberMethod(){
+         
+        var type = typeof(test);
+        var method=type.GetMethod("ff");
+        var coninfo= type.GetConstructor(Type.EmptyTypes);
+        var instance = coninfo.Invoke(null); // ff是成员函数需要绑定的对应实例
+        //这里需要转型
+        var del=(Action<string>)method.CreateDelegate(typeof(Action<string>),instance);
+        del("hello world!11111");
+    }
+
+}
+```
+泛型与非泛型的方法就这点区别
+tips
+在这里反射的函数ff引用了test的成员字段a,若是不引用类成员的非静态字段,那么
+`var del=(Action<string>)method.CreateDelegate(typeof(Action<string>));del("hello world!11111");`
+这里也可以编译成功,这和c++的成员函数(没有引用任何非静态成员),使用空指针调用尽管是ub但不crash有一些相似。
+
+### 运行时句柄
+TypeInfo 和MethodInfo 作为Type和MethodBase 的派生类型包含的信息更多,但是占用更多的内存，如果只是偶尔用那么内存占用就会划不来。C#提供了几个个运行时Handel类型,都是值类型只包含IntPtr字段,指向原类型,减少占用
+
+RuntimeTypeHandle
+Type类型的静态方法 GetTypeHandle ,该类型转到Type。GetTypeFromHandle·
+
+
+RuntimeMethodHandle
+MethodHandle从MethodBase继承来的属性
+GetMethodFromHandle 静态方法
+
+
+RuntimeFieldHandle
+FeildInfo 的FieldHandle属性获取 
+```c#
+public class MyClass{
+  public  int mfield=10;
+  public int ff(int a)=>a+10;
+}
+MyClass1 myClass1 = new MyClass1();
+//获取
+RuntimeTypeHandle myRTHFromObject = Type.GetTypeHandle(myClass1);
+       
+RuntimeTypeHandle myRTHFromType = typeof(MyClass1).TypeHandle;
+转换回去
+Type t=Type.GetTypeFromHandle(myRTHFromObject);
+
+//获取 FieldInfo
+FieldInfo myFieldInfo = t.GetField("mfield");
+
+RuntimeFieldHandle myFieldHandle=myFieldInfo.FieldHandle;
+//转换
+FileInfo myFieldInfo2=FieldInfo.GetFieldFromHandle(myFieldHandle);
+
+//
+ MethodInfo methinfo = typeof(test).GetMethod("ff");
+
+ RuntimeMethodHandle handle_me = methinfo.MethodHandle;
+
+ var methinfo2 = MethodInfo.GetMethodFromHandle(handle_me);
+ Console.WriteLine(methinfo2.Name);
+
+```
+
+本书中有一个例子展示内存占用的大小 
+这个例子在.net9跑有点问题
+```c#
+private const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance
+    | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy;
+
+//反射加gc的例子
+public static void MGCHandleTest2()
+{
+    Show("Before doing anthing");
+
+    //缓存所有MethodInfo对象
+    List<MethodBase> methodinfos=new List<MethodBase>();
+    foreach(Type t in typeof(Object).Assembly.GetExportedTypes())
+    {
+        if (t.IsGenericType) continue;
+
+        MethodBase[] mb=t.GetMethods(bindingFlags);
+        methodinfos.AddRange(mb);
+    }
+    Console.WriteLine("# of methods={0:N0}",methodinfos.Count);
+    Show("After building cache  of MethodInfo Object");
+
+    //为所有Method创建RuntimeMethodHandle缓存
+
+    List<RuntimeMethodHandle> methohandles=methodinfos.ConvertAll<RuntimeMethodHandle>
+        (mb=>mb.MethodHandle);
+
+    Show("Holding MethodInfo and RuntimeMethodHandle cache");
+
+    GC.KeepAlive(methohandles);
+
+    methodinfos = null;
+
+    Show("After freeing MethodInfo object");
+    
+    //这里在.net9 报错,我估计和泛型类型有关,需要改改
+    methodinfos = methohandles.ConvertAll<MethodBase>
+        (rmh=> MethodBase.GetMethodFromHandle(rmh));
+
+    Show("Size of heap  after re-creating MethodInfo Object ");
+    GC.KeepAlive (methohandles);
+    GC.KeepAlive (methodinfos);
+
+    methohandles = null;
+    methodinfos =null;
+
+    Show("After freeing MethodInfos and RuntimeMethodHandles");
+    
+}
+private static void Show(string str)
+{
+    Console.WriteLine("Heap size={0,12:N0}-{1}",GC.GetTotalMemory(true),str);
+}
+```
+待做
+测一下list的Addrange 的Il 
+看一下api convertall  
 
 
 
+
+
+
+ 
 
