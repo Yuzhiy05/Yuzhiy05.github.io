@@ -21,6 +21,8 @@ permalink: /article/wpu7x9jw/
 5.下载c++插件
 ![alt text](/images/note/vscodetool/pluge.png)
 
+安装编译器需要统一前缀路径
+后期配置vscode时  多台电脑登录同一个账户 配置的路径不一致需要改
 
 ##  Vscode搭配Cmake
 首先需要了解Vscode配置的三个重要的json文件，当然你也可以选择手动在命令行输入编译指令与构建命令.
