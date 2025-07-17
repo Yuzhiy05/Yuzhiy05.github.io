@@ -336,6 +336,64 @@ cmake .
 ```
 
 
+### cmake add_custom_command 命令
+还有一个相关的函数 `add_custtom_target`
+add_custom_command 有一些典型用法
+见cmake文档里的[链接](https://cmake.org/cmake/help/latest/command/add_custom_command.html#examples-generating-files)
+典型用法
+1.构建动态库前使用代码生成工具生成源文件参与构建
+2.在构建事件后执行复制dll到可执行文件夹下，或在构建后执行清理操作
+
+函数原型就不列出了
+之说几个重要的参数
+第一个重载 :生成文件
+第二个重载:构建事件
+```C
+add_custom_command (OUTPUT output1 [output2 ...]
+                   COMMAND command1 [ARGS] [args1...]
+                   ...其他参数
+                   )
+
+add_custom_command(TARGET <target>
+                   PRE_BUILD | PRE_LINK | POST_BUILD
+                   COMMAND command1 [ARGS] [args1...]
+                   ...其他参数
+                   )
+```
+OUTPUT 指定生成的文件创建在和当前cmakelist同一路径中 只要没有这些文件就会执行命令
+COMMAND 后跟实绩需要执行的执行，一般是命令行指令，也可以是可执行文件,python命令，自定义脚本凡是能在命令行执行的都能在这里设置
+DEPENDS 指定依赖项 当依赖项变动时才会执行该命令。只要这里显示的依赖文件比OUTPUT的输出文件更新就会执行。依赖项除了文件还能是由add_custom_target 或 add_library/add_executable  创建的目标。
+
+如果依赖了
+目标target  那么此命令会在任何依赖的目标生成前执行。这建立了一个执行命令/生成文件->构建目标的依赖关系
+
+可执行文件或库 则建立文件级别依赖。那么只要重新编译了那么就会执行改命令
+
+已经添加到生成目标的源文件 如`add_executable(cmakestudy main.cpp )` 里的main.cpp 也会建立文件级别依赖
+
+依赖绝对路径和相对路径的化也会建立文件级别依赖 
+
+如果未指定DEPENDS,则命令将在OUTPUT缺失时运行；如果命令实际上没有创建 OUTPUT, 则规则将始终运行
+
+
+COMMENT 在构建时在执行命令之前输出注释
+
+VERBATIM 告诉cmake 执行的命令的参数不要转义，原样传递给命令
+
+WORKING_DIRECTORY 执行命令前会从cd到该参数指定的路径下
+
+用的少的参数
+APPEND  在COMMAND后添加命令 注意COMMAND 可以加很多行
+
+USES_TERMINAL 指定使用的终端 和APPEND 不能一起使用。对于Ninja生成器这会把命令放在console pool中(因为ninja可以并发构建)
+
+JOB_POOL 任务池 Ninja专用的
+
+JOB_SERVER_AWARE 给makefile用的 
+
+
+### 生成器表达式
+用于在生成阶段而不是配置阶段生成数据,一般用来生成路径
 
 
 

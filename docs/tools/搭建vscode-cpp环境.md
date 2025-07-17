@@ -262,8 +262,3 @@ cmake -Bbuild -GNinja -S.. 在build文件夹下执行
 
 ninja 在build文件夹下执行
 
-
-### cmake add_custom_command 命令
-
-
-
