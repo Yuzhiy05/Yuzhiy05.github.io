@@ -361,8 +361,16 @@ add_custom_command(TARGET <target>
                    )
 ```
 OUTPUT 指定生成的文件创建在和当前cmakelist同一路径中 只要没有这些文件就会执行命令
-COMMAND 后跟实绩需要执行的执行，一般是命令行指令，也可以是可执行文件,python命令，自定义脚本凡是能在命令行执行的都能在这里设置
-DEPENDS 指定依赖项 当依赖项变动时才会执行该命令。只要这里显示的依赖文件比OUTPUT的输出文件更新就会执行。依赖项除了文件还能是由add_custom_target 或 add_library/add_executable  创建的目标。
+
+COMMAND 后跟实际需要执行的执行，一般是命令行指令，也可以是可执行文件,python命令，自定义脚本凡是能在命令行执行的都能在这里设置
+
+DEPENDS 指定依赖项 当依赖项变动时会执行命令。
+
+graph LR
+    D[DEPENDS 指定的目标/文件] --> C[自定义命令]
+    C --> O[OUTPUT 生成的文件]
+
+依赖项除了文件还能是由add_custom_target 或 add_library/add_executable  创建的目标。
 
 如果依赖了
 目标target  那么此命令会在任何依赖的目标生成前执行。这建立了一个执行命令/生成文件->构建目标的依赖关系
@@ -382,8 +390,16 @@ VERBATIM 告诉cmake 执行的命令的参数不要转义，原样传递给命�
 
 WORKING_DIRECTORY 执行命令前会从cd到该参数指定的路径下
 
+第二个重载
+
+TARGET 依赖的目标 依赖目标变动(该命令会被当做目标构建的一部分)才会执行,换句话说只有目标被构建的时候才会执行,如果目标源文件不变
+`cmake --build .  --target hello` 这个命令执行第一次会执行一次命令。再次生成目标，因为源代码没变不需要重新构建所以该命令不会执行。
+
+PRE_BUILD | PRE_LINK | POST_BUILD 命令执行的时机 构建前 链接前 构建后 
+
+
 用的少的参数
-APPEND  在COMMAND后添加命令 注意COMMAND 可以加很多行
+APPEND  在COMMAND后添加命令 注意COMMAND 可以加很多行 没用过
 
 USES_TERMINAL 指定使用的终端 和APPEND 不能一起使用。对于Ninja生成器这会把命令放在console pool中(因为ninja可以并发构建)
 
