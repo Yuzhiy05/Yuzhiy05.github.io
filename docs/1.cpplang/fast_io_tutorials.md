@@ -86,11 +86,11 @@ inline constexpr void print_define(fast_io::io_reserve_type_t<char_type, test_t>
 }
 int main(){
     std::vector v3{test_t{3}, test_t{4}, test_t{5}};
-	println("-----");
+	print("-----\n");
 
 	v3.insert(v3.begin(), 3);
-	println(fast_io::mnp::rgvw(v3, " "));
-	println("-----");
+	print(fast_io::mnp::rgvw(v3), " \n"
+	"-----");
 }
 
 ```
