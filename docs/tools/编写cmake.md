@@ -334,7 +334,9 @@ cmake .
 // 执行结果
 -- mymath library found in /XXX/lib64/libmymath.a
 ```
+### cmake的构建命令
 
+如果你使用 cmake --build 而不是直接调用更底层的构建系统（译者注：比如直接使用 make），你可以用 -v 参数在构建时获得详细的输出（CMake 3.14+），用 -j N 指定用 N 个 CPU 核心并行构建项目（CMake 3.12+），以及用 --target（任意版本的 CMake）或 -t（CMake 3.15+）来选择一个目标进行部分地构建。这些命令因不同的构建系统而异，例如 VERBOSE=1 make 和 ninja -v。你也可以使用环境变量替代它们，例如 CMAKE_BUILD_PARALLEL_LEVEL (CMake 3.12+) 和 VERBOSE (CMake 3.14+)。
 
 ### cmake add_custom_command 命令
 还有一个相关的函数 `add_custtom_target`
