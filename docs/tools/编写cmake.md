@@ -383,6 +383,7 @@ graph LR
 
 如果未指定DEPENDS,则命令将在OUTPUT缺失时运行；如果命令实际上没有创建 OUTPUT, 则规则将始终运行
 
+BYPRODUCTS 非主要构建产物(副产品) ninja明确支持
 
 COMMENT 在构建时在执行命令之前输出注释
 
@@ -407,6 +408,36 @@ JOB_POOL 任务池 Ninja专用的
 
 JOB_SERVER_AWARE 给makefile用的 
 
+例子
+```c
+add_custom_command(
+    TARGET cmakestudy
+    PRE_LINK
+    COMMAND ${CMAKE_COMMAND} -E echo "testfile2\n" > output2.txt
+    COMMENT "test for pre_link output file2"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    VERBATIM
+)
+```
+
+
+关于这个命令我搜到一个[问题](https://discourse.cmake.org/t/define-a-pre-build-command-without-creating-a-new-target/1623/3)
+利用
+>If `DEPENDS` is not specified, the command will run whenever the `OUTPUT` is missing; if the command does not actually create the OUTPUT, the rule will always run.
+
+OUTPUT 指定一个虚拟文件,实际命令中不生成他,以此来每次构建时都执行该命令
+
+```
+add_custom_command(OUTPUT "foo" "${VisualT_BINARY_DIR}/src/buildDate.h"
+                   COMMAND ${CMAKE_COMMAND} -P "${VisualT_BINARY_DIR}/cmake/ConfigureBuildDate.cmake"
+                   COMMENT "generating build date header"
+                   )
+add_library(VisualT_library SHARED "${private_headers}" "${public_headers}" "${sources}") #buildDate.h is contained in "private_headers"
+```
+这里不生产foo 让每次构建VisualT_library 时都执行ConfigureBuildDate脚本
+实际确实有时候执行有时候不执行。有时候执行两次
+这个问题和Makefile相关
+[解决方案](https://gitlab.kitware.com/cmake/cmake/-/issues/21061)
 
 ### 生成器表达式
 用于在生成阶段而不是配置阶段生成数据,一般用来生成路径
