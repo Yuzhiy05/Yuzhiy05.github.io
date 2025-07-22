@@ -366,7 +366,9 @@ OUTPUT 指定生成的文件创建在和当前cmakelist同一路径中 只要没
 
 COMMAND 后跟实际需要执行的执行，一般是命令行指令，也可以是可执行文件,python命令，自定义脚本凡是能在命令行执行的都能在这里设置
 
-DEPENDS 指定依赖项 当依赖项变动时会执行命令。
+DEPENDS 指定依赖项 当依赖项变动时会执行命令。时间戳
+>If DEPENDS is not specified, the command will run whenever the OUTPUT is missing
+不指定DEPENDS 那么OUTPUT缺失每次都会执行
 
 graph LR
     D[DEPENDS 指定的目标/文件] --> C[自定义命令]
@@ -386,6 +388,8 @@ graph LR
 如果未指定DEPENDS,则命令将在OUTPUT缺失时运行；如果命令实际上没有创建 OUTPUT, 则规则将始终运行
 
 BYPRODUCTS 非主要构建产物(副产品) ninja明确支持
+>Specify the files the command is expected to produce but whose modification time may or may not be newer than the dependencies.
+指定生成的文件可能会比依赖项更新，或者不更新。这个解释好拗口，大致意思是，这是副产品有时候生成有时候不生成，这时候依赖副产品的构建可能就会出问题,你指定了这是副产品，那么Ninja生成器就能处理正确依赖，在你不能保证生成最新的文件时候依然能构建。
 
 COMMENT 在构建时在执行命令之前输出注释
 
@@ -399,7 +403,39 @@ TARGET 依赖的目标 依赖目标变动(该命令会被当做目标构建的�
 `cmake --build .  --target hello` 这个命令执行第一次会执行一次命令。再次生成目标，因为源代码没变不需要重新构建所以该命令不会执行。
 
 PRE_BUILD | PRE_LINK | POST_BUILD 命令执行的时机 构建前 链接前 构建后 
+>This option has unique behavior for the Visual Studio Generators. When using one of the Visual Studio generators, the command will run before any other rules are executed within the target. With all other generators, this option behaves the same as PRE_LINK instead. Because of this, it is recommended to avoid using PRE_BUILD except when it is known that a Visual Studio generator is being used
+这里单独解释了 PRE_BUILD  对于vs生成器来说,使用此参数会在任意构建行为前执行，对其他生成器,PRE_BUILD和PRE_LINK效果一样,别生成器可能不支持此参数,我用Ninja是这样的
 
+```shell
+add_custom_command(
+    TARGET hello
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "This is a pre-build command for hello target"
+    COMMENT "Pre-build command for hello target"
+)
+
+[proc] 正在执行命令: D:...\cmake\bin\cmake.EXE --build C:.../deve_env/build/clang-msvc-clangd-debug --target hello --
+[build] [1/5] generate_time-alawys
+[build] [2/5] Generating output files-DEPENDS
+[build] [3/5] Generating CXX dyndep file CMakeFiles/hello.dir/CXX.dd
+[build] [4/4] Linking CXX executable C:...deve_env\out\hello.exe
+[build] This is a pre-build command for hello target
+[driver] 生成完毕: 00:00:02.193
+[build] 生成已完成，退出代码为 0
+//换成PRE_LINK
+[proc] 正在执行命令: D:..\cmake\bin\cmake.EXE --build C:.../deve_env/build/clang-msvc-clangd-debug --target hello --
+[build] [1/5] generate_time-alawys
+[build] [2/5] Generating output files-DEPENDS
+[build] [3/5] Generating CXX dyndep file CMakeFiles/hello.dir/CXX.dd
+[build] [4/4] Linking CXX executable C:...\deve_env\out\hello.exe
+[build] This is a pre-link command for hello target
+[driver] 生成完毕: 00:00:01.963
+[build] 生成已完成，退出代码为 0
+```
+很奇怪的是这里COMMENT没打印出来,而且echo消息都是在链接后打印出来的,可能Ninja编译期都不支持此参数？这个需要查一下文档
+
+这个重载用法基本上就是
+构建后复制、签名、打包
 
 用的少的参数
 APPEND  在COMMAND后添加命令 注意COMMAND 可以加很多行 没用过
@@ -408,7 +444,7 @@ USES_TERMINAL 指定使用的终端 和APPEND 不能一起使用。对于Ninja�
 
 JOB_POOL 任务池 Ninja专用的
 
-JOB_SERVER_AWARE 给makefile用的 
+JOB_SERVER_AWARE 给makefile用的 没去了解
 
 例子
 ```c
@@ -440,6 +476,92 @@ add_library(VisualT_library SHARED "${private_headers}" "${public_headers}" "${s
 实际确实有时候执行有时候不执行。有时候执行两次
 这个问题和Makefile相关
 [解决方案](https://gitlab.kitware.com/cmake/cmake/-/issues/21061)
+
+
+在学习此命令时,我问了deepseek：add_custom_command 什么时候才会执行
+他告诉我三种情况
+1.OUTPUT 生成的文件不存在时
+2.DEPENDS 中依赖的文件比OUTPUT文件更新时
+3.
+
+例一
+一开始我写一个规则
+```c
+add_custom_command(
+    OUTPUT ${OUTPUT2}
+    COMMAND ${CMAKE_COMMAND} -P echo "hello" > ${OUTPUT2}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating output files-DEPENDS"
+    VERBATIM
+)
+```
+然后没有指定任何依赖,配置后点击生成,构建时COMMENT没打印，也没文件生成,后来我才明白要让生成文件参与目标的构建，被构建目标依赖命令才会执行。按照cmake文档的实例,文档中依靠工具生成模板.c文件然后添加到构建目标的依赖中,在构建目标生成之前,该命令会执行。
+```c
+add_executable(hello main.cpp ${OUTPUT2})
+add_library(lib xx.cpp ${OUTPUT2})
+//这样不行,添加依赖只能添加目标的依赖而不能是文件
+add_dependencies(hello ${OUTPUT2})
+//但是自定义创建一个目标再令其依赖${OUTPUT2}
+add_custom_target(
+    test1
+    DEPENDS ${OUTPUT2}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "generate_time2-alawys"
+    VERBATIM
+)
+//再令该目标与生成的目标建立依赖
+add_dependencies(hello test1)
+//或手动构建该目标
+cmake -build. --target test1
+
+```
+都可以执行生成${OUTPUT2}的命令
+注意需要在构建目标的过程中形成依赖,我一开始的错误是即使没有将依赖连接到构建目标上,所以命令根本不会执行
+
+例2
+这个例子是我当初想要试试`add_custom_command` 是否真的依赖DEPENDS 声明的文件或目标;根据依赖比OUTPUT生成文件要新从而生成文件,我写了如下测试
+```c
+set(OUTPUT1 ${CMAKE_CURRENT_SOURCE_DIR}/log.txt)
+set(OUTPUT2 ${CMAKE_CURRENT_SOURCE_DIR}/log2.txt)
+add_custom_command(
+    OUTPUT ${OUTPUT1}
+    COMMAND echo "This is a custom command that generates output files" > ${OUTPUT1}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating output files1"
+    VERBATIM
+)
+add_custom_command(
+    OUTPUT ${OUTPUT2}
+    COMMAND echo "This is a custom command that generates output files" > ${OUTPUT2}
+    BYPRODUCTS ${OUTPUT1}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating output files2"
+    VERBATIM
+)
+add_executable(hello main.cpp ${OUTPUT2})
+```
+
+我很快就发现了问题,${OUTPUT1}每次生成的内容都是一样的,所以依赖项不会更新,即使修改源码重新构建也只会执行配置后开始的第一次。
+注意Ninja是增量构建，如果文件没有变动反复生成同一目标实际是不会构建的只会报
+[build] ninja: no work to do.
+
+所以我寄希望与生成当前时间写入文件中(这样就不需要我每次都手动改动文件来观测了),我的期望是每次生成时写入新的当前时间到`${OUTPUT1}`,因为生成`${OUTPUT2}`依赖`${OUTPUT1}`,所以命令 Generating output files2 总会执行。
+我新增如下测试
+```c
+//新增和修改部分,其他地方和之前一致
+string(TIMESTAMP TIME_NOW "%m-%d-%H:%M:%S")
+message(STATUS "当前时间: ${TIME_NOW}")
+add_custom_command(
+    OUTPUT ${OUTPUT1}
+    COMMAND echo "This is time is${TIME_NOW}" > ${OUTPUT1}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating output files1"
+    VERBATIM
+)
+...
+```
+该测试也只是在第一次配置后执行，之后就不执行了。我一开始以为的原因是
+
 
 ### 生成器表达式
 用于在生成阶段而不是配置阶段生成数据,一般用来生成路径
