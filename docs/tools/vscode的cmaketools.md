@@ -1,3 +1,8 @@
+---
+title: vscode的cmaketools
+createTime: 2025/07/05 00:29:16
+permalink: /article/19lgyzty/
+---
 # cmaketools 插件的一些问题
 
 指定生成器

@@ -1,3 +1,8 @@
+---
+title: C#接口
+createTime: 2025/05/23 23:07:51
+permalink: /article/yemrteud/
+---
 
 
 ### 关于CLA via C# (第四版)一些待讨论的问题

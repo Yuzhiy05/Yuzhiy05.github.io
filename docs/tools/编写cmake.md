@@ -560,9 +560,92 @@ add_custom_command(
 )
 ...
 ```
-该测试也只是在第一次配置后执行，之后就不执行了。我一开始以为的原因是
+该测试也只是在第一次配置后执行，之后就不执行了。
+分析一下 目标hello依赖 `${OUTPUT2}`,`${OUTPUT2}`依赖`${OUTPUT1}`
+
+`${OUTPUT1}->${OUTPUT2}->hello` 很明显OUTPUT1是没有依赖的,所以生成后只要该文件不删除那么就不会执行,所以OUTPUT2也不会执行。
+随机我使用add_custom_target,以为目标默认都不是最新的所以每次都会执行构建行为
+
+```shell
+string(TIMESTAMP TIME_NOW "%m-%d-%H:%M:%S")
+set(OUTPUT1 ${CMAKE_CURRENT_SOURCE_DIR}/log.txt)
+set(OUTPUT2 ${CMAKE_CURRENT_SOURCE_DIR}/log2.txt)
+message(STATUS "当前时间: ${TIME_NOW}")
+add_custom_target(
+    alawys_run
+    COMMAND echo "This is time is${TIME_NOW}" > ${OUTPUT1}
+    BYPRODUCTS ${OUTPUT1}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating output files1"
+    VERBATIM
+)
+add_custom_command(
+    OUTPUT ${OUTPUT2}
+    COMMAND echo "This is a custom command that generates output files" > ${OUTPUT2}
+    DEPENDS ${OUTPUT1}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating output files2"
+    VERBATIM
+)
+
+add_executable(hello main.cpp)
+add_dependencies(hello alawys_run)
+```
+
+让hello依赖alawys_run ,`${OUTPUT2}` 再依赖alawys_run的生成文件`${OUTPUT1}`。按道理,这两个命令都会执行的，但实际是只执行一次就歇菜了。这是为什么呢？我搞了好久才明白
+```shell
+string(TIMESTAMP TIME_NOW "%m-%d-%H:%M:%S")
+```
+这里生成的时间戳是静态的,每次configure也就是 cmake --build ./build -G ninja -S.的时候就生成了,之后每次构建时间就是相同的，要想动态的只能使用脚本.
+我在Windows上构建,Powershell脚本很简单
+```shell
+#ps1
+$time = Get-Date -Format "MM-dd-HH:mm:ss"
+Add-Content -Path "log.txt" -Value $time
+#cmake 脚本
+string(TIMESTAMP now "%m-%d-%H:%M:%S")
+file(APPEND log2.txt "${now}\n")
+```
+调用脚本才能动态生成时间。
+```shell
+set(OUTPUT1 ${CMAKE_CURRENT_SOURCE_DIR}/script/log.txt)
+set(OUTPUT2 ${CMAKE_CURRENT_SOURCE_DIR}/script/log2.txt)
 
 
+
+# 强制每次都执行
+add_custom_target(
+    generate_time
+    COMMAND powershell -ExecutionPolicy Bypass -File ./cr_time.ps1
+    #DEPENDS ${OUTPUT1}
+    BYPRODUCTS ${OUTPUT1}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/script
+    COMMENT "generate_time-alawys"
+    VERBATIM
+)
+#上下两个脚本执行一个就行了
+add_custom_target(
+    generate_time2
+    DEPENDS ${OUTPUT2}
+    #DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/script/TEST.txt
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/script
+    COMMENT "generate_time2-alawys"
+    VERBATIM
+)
+add_custom_command(
+    OUTPUT ${OUTPUT2}
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/script/cr_time_c.cmake
+    DEPENDS ${OUTPUT1}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/script
+    COMMENT "Generating output files-DEPENDS"
+    VERBATIM
+)
+
+
+add_executable(hello main.cpp)
+#这里选择执行哪个就添加哪个做依赖
+add_dependencies(hello generate_time generate_time2)
+```
 ### 生成器表达式
 用于在生成阶段而不是配置阶段生成数据,一般用来生成路径
 

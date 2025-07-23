@@ -1,3 +1,8 @@
+---
+title: 安装c++常见库
+createTime: 2025/05/13 23:10:45
+permalink: /article/y019uwz3/
+---
 #安装c++ 常见库的的一些流程
 
 

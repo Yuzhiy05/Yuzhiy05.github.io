@@ -1,3 +1,8 @@
+---
+title: ts踩坑记录
+createTime: 2025/07/23 17:20:47
+permalink: /article/4vz3t8qm/
+---
 #TS入门踩坑记录
 
 使用了此文档入门

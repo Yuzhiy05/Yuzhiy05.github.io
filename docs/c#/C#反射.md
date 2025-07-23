@@ -1,3 +1,8 @@
+---
+title: C#反射
+createTime: 2025/07/05 00:29:16
+permalink: /article/g1ox23z8/
+---
 # 什么是反射
 反射允许在运行时未知的类型,获取有关加载的程序集及其中定义的类型的信息
 
@@ -481,7 +486,7 @@ MethodBase
 
 MethodInfo
 CreateDelgete 方法
-
+```c#
 //创建指定类型的委托类型的委托,Object 指定实例对象,用的时候需要转型
 CreateDelegate(Type delegateType)	
 CreateDelegate(Type, Object)	
@@ -489,7 +494,7 @@ CreateDelegate(Type, Object)
 //泛型方法,相当于原本填在形参中的类型填到泛型参数里了
 CreateDelegate<T>()	
 CreateDelegate<T>(Object)
-
+```
 用法
 ```c#
 public class test
