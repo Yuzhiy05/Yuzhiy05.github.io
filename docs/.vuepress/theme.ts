@@ -7,7 +7,7 @@ export default plumeTheme({
     shiki: {
       twoslash: true,
       lineNumbers: 10,
-      languages: ['cpp','powershell', 'csharp','json','cmake'],
+      languages: ['cpp','powershell', 'csharp','json','cmake','shell','typescript', 'javascript', 'python', 'html', 'css', 'markdown', 'vue'],
     },
     markdownEnhance: { demo: true },
     markdownPower: { caniuse: true, jsfiddle: true,
