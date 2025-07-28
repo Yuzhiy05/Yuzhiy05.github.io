@@ -11,8 +11,18 @@ permalink: /article/y019uwz3/
 2.点击booststrap.bat执行脚本，生成b2.exe
 3.执行命令行中执行
 ```powershell
+//这个在win下用vs工具链构建的vc140库不能给clang -target=x86_64-windows-msvc用
 b2 install --prefix=D:\workfile\lib\boost  --build-type=complete --with-regex address-model=64 link= static runtime-link=shared
+
+//这个能用 自己指定下系统根
+./b2 install --prefix=D:\workfile\lib\boost-clang4msabi --build-type=complete --with-regex -–with-system toolset=clang  address-model=64 cxxflags="--target=x86_64-windows-msvc -std=c++23 --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" linkflags="--target=x86_64-windows-msvc --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=lld" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
+
+//这两个用clang-cl生成的用不了
+./b2 install --prefix=D:\workfile\lib\boost-clang-cl --build-type=complete --with-regex -–with-system toolset=clang-win  address-model=64 cxxflags="--target=x86_64-windows-msvc /std"c++latest /Zc:__cplusplus" linkflags="--target=x86_64-windows-msvc -fuse-ld=lld" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
+
 ```
+因为cmake冲突我还手动把库里所有clang21 改为clangw21
+
 prefix:指定安装路径
 with:指定安装的库
 link:被编译库链接方式
@@ -29,7 +39,6 @@ runtime-link:被编译库与其他库的关系。
 A.Windows上lib前缀的为静态链接库,导入库和dll没有
 
 4.在cmake中使用find_packge引用
-
 
 
 ## abseil
