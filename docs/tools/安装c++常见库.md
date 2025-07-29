@@ -14,12 +14,22 @@ permalink: /article/y019uwz3/
 //这个在win下用vs工具链构建的vc140库不能给clang -target=x86_64-windows-msvc用
 b2 install --prefix=D:\workfile\lib\boost  --build-type=complete --with-regex address-model=64 link= static runtime-link=shared
 
-//这个能用 自己指定下系统根
-./b2 install --prefix=D:\workfile\lib\boost-clang4msabi --build-type=complete --with-regex -–with-system toolset=clang  address-model=64 cxxflags="--target=x86_64-windows-msvc -std=c++23 --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" linkflags="--target=x86_64-windows-msvc --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=lld" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
+//这个不能生成.lib导出库 被cmake IMPORTED_IMPLIB not set for imported target "Boost::regex" configuration"Debug". 拒绝
+
+./b2 install --prefix=D:\workfile\lib\boost1.87-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64 target-os=windows  cxxflags="--target=x86_64-windows-msvc -std=c++23 --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" linkflags="--sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=lld" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
+
+./b2 install --prefix=D:\workfile\lib\boost1.87-clang --build-type=complete --with-regex --with-system toolset=clang  address-model=64 cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags="--target=x86_64-windows-msvc --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=link" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
+
+//测试的参数
+define=BOOST_USE_WINDOWS_H  -D_DLL -lmsvcrt variant=release,debug 
+
+./b2 install --prefix=D:\workfile\lib\boost1.88-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64  cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags=" --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" link=shared runtime-link=shared
 
 //这两个用clang-cl生成的用不了
-./b2 install --prefix=D:\workfile\lib\boost-clang-cl --build-type=complete --with-regex -–with-system toolset=clang-win  address-model=64 cxxflags="--target=x86_64-windows-msvc /std"c++latest /Zc:__cplusplus" linkflags="--target=x86_64-windows-msvc -fuse-ld=lld" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
+./b2 install --prefix=D:\workfile\lib\boost-clang-win --build-type=complete --with-regex --with-system toolset=clang-win  address-model=64  cxxflags="--target=x86_64-windows-msvc /std:c++latest /Zc:__cplusplus" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
 
+// 这个能生成导入库 用的clang-windows-gnu 后面一点参数不能跟
+./b2 install --prefix=D:\workfile\lib\boost1.87-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64
 ```
 因为cmake冲突我还手动把库里所有clang21 改为clangw21
 
@@ -40,6 +50,10 @@ A.Windows上lib前缀的为静态链接库,导入库和dll没有
 
 4.在cmake中使用find_packge引用
 
+./b2 install --prefix=D:\workfile\lib\boost-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64  cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags="--target=x86_64-windows-msvc --sysroot=...\\windows-msvc-sysroot -fuse-ld=lld" link=shared runtime-link=shared
 
 ## abseil
 1.
+
+
+cmake 
