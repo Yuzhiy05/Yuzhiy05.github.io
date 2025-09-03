@@ -16,12 +16,12 @@ b2 install --prefix=D:\workfile\lib\boost  --build-type=complete --with-regex ad
 
 //这个不能生成.lib导出库 被cmake IMPORTED_IMPLIB not set for imported target "Boost::regex" configuration"Debug". 拒绝
 
-./b2 install --prefix=D:\workfile\lib\boost1.87-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64 target-os=windows  cxxflags="--target=x86_64-windows-msvc -std=c++23 --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" linkflags="--sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=lld" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
+./b2 install --prefix=D:\workfile\lib\boost1.88-clang-14 --build-type=complete toolset=clang address-model=64 link=shared runtime-link=shared --with-system --with-regex define=BOOST_USE_WINDOWS_H,BOOST_REGEX_STANDALONE,REGEX_FOUND,BOOST_REGEX_DYN_LINK  cxxflags="--target=x86_64-windows-msvc -std=c++14 --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" linkflags="--target=x86_64-windows-msvc --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=lld —D_DLL=1 -lmsvcrt" 
 
 ./b2 install --prefix=D:\workfile\lib\boost1.87-clang --build-type=complete --with-regex --with-system toolset=clang  address-model=64 cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags="--target=x86_64-windows-msvc --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=link" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
 
 //测试的参数
-define=BOOST_USE_WINDOWS_H  -D_DLL -lmsvcrt variant=release,debug 
+define=BOOST_USE_WINDOWS_H  -D_DLL -lmsvcrt variant=release,debug target-os=windows
 
 ./b2 install --prefix=D:\workfile\lib\boost1.88-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64  cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags=" --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" link=shared runtime-link=shared
 
@@ -49,8 +49,83 @@ runtime-link:被编译库与其他库的关系。
 A.Windows上lib前缀的为静态链接库,导入库和dll没有
 
 4.在cmake中使用find_packge引用
-
+```shell
 ./b2 install --prefix=D:\workfile\lib\boost-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64  cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags="--target=x86_64-windows-msvc --sysroot=...\\windows-msvc-sysroot -fuse-ld=lld" link=shared runtime-link=shared
+```
+1.单纯指定 cxxstd=14 等级低于17 不加define=BOOST_REGEX_DYN_LINK
+是没有.lib 导出库的
+2.指定cxxstd=14 添加define=BOOST_REGEX_DYN_LINK
+没有.lib 导出库
+3.2的基础上加 define=BOOST_REGEX_STANDALONE
+没有.lib导出库
+4.使用-std=c++03 define=BOOST_REGEX_DYN_LINK
+
+BOOST_REGEX_STANDALONE,BOOST_REGEX_DYN_LINK
+
+```shell
+PS D:..\lib> llvm-objdump -p boost_regex-clang21-mt-d-x64-1_88.dll
+
+...其他符号...
+Export Table:
+ DLL name: boost_regex-clang21-mt-d-x64-1_88.dll
+ Ordinal base: 1
+ Ordinal      RVA  Name
+       1   0x2140  _ZN5boost24scoped_static_mutex_lock4lockEv
+       2   0x2200  _ZN5boost24scoped_static_mutex_lock6unlockEv
+       3   0x20f0  _ZN5boost24scoped_static_mutex_lockC1ERNS_12static_mutexEb
+       4   0x20f0  _ZN5boost24scoped_static_mutex_lockC2ERNS_12static_mutexEb
+       5   0x21c0  _ZN5boost24scoped_static_mutex_lockD1Ev
+       6   0x21c0  _ZN5boost24scoped_static_mutex_lockD2Ev
+       7  0x6c2f8  _ZTVN5boost13re_detail_50023abstract_protected_callE
+       8   0x1470  regcompA
+       9   0x2240  regcompW
+      10   0x1800  regerrorA
+      11   0x25d0  regerrorW
+      12   0x1c30  regexecA
+      13   0x29c0  regexecW
+      14   0x17a0  regfreeA
+      15   0x2570  regfreeW
+
+# 使用dumpbin查看vc生成的dll
+PS D:..\boost\lib> dumpbin /EXPORTS  boost_regex-vc143-mt-gd-x64-1_87.dll
+Microsoft (R) COFF/PE Dumper Version 14.44.35207.1
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file boost_regex-vc143-mt-gd-x64-1_87.dll
+
+File Type: DLL
+
+  Section contains the following exports for boost_regex-vc143-mt-gd-x64-1_87.dll
+
+    00000000 characteristics
+    FFFFFFFF time date stamp
+        0.00 version
+           1 ordinal base
+           8 number of functions
+           8 number of names
+
+    ordinal hint RVA      name
+
+          1    0 00001000 regcompA = regcompA
+          2    1 00037F50 regcompW = regcompW
+          3    2 00001290 regerrorA = regerrorA
+          4    3 000381E0 regerrorW = regerrorW
+          5    4 000015F0 regexecA = regexecA
+          6    5 00038560 regexecW = regexecW
+          7    6 00001950 regfreeA = regfreeA
+          8    7 000388C0 regfreeW = regfreeW
+
+  Summary
+
+        2000 .data
+        A000 .pdata
+       1A000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       B8000 .text
+```
+
 
 ## abseil
 1.
