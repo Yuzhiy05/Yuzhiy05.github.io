@@ -230,7 +230,7 @@ public class MCustomFormatter : IFormatProvider, ICustomFormatter
                 suffix = "nb";
             else if (format == "Z")
                 suffix = "NB";
-            return $"arg{suffix}";
+            return $"{arg}{suffix}";
         }
         else
         {
@@ -255,6 +255,149 @@ public class MCustomFormatterTest
     }
 }
 
+
+常见错误写法
+
+MCustomFormatter customFormatter = new MCustomFormatter();
+Console.WriteLine("{0:x}", customFormatter);
+
+这种会输出类型名
+
+因为其中只会调用ToString函数 实现了IFormattable的可以调用对应实现的ToString
+
+只有主动调用Format函数才能使用对应格式化器去格式化类型
+
+
 ```
+`string.Format` 会调用  这个重载版本
+`string Format(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)` 其中再调用`string FormatHelper(IFormatProvider? provider, string format, ReadOnlySpan<object?> args)` 其中同样会构造ValueStringBuilder 其中调用 `void AppendFormatHelper(IFormatProvider? provider, string format, ReadOnlySpan<object?> args)` 把格式化器传进去再用对应格式化器格式化传入值
+
+CLR中 解析格式符的逻辑 我没看懂 但是作用是吧 `"this is{0:B2}"`  传入字符串中把{} 包裹的的:后面的格式符`B2`取出来 传给格式化器接口:ICustomFormatter的Format方法
+```c#
+ if (ch != '}')
+ {
+     // Continue consuming optional additional digits.
+     while (char.IsAsciiDigit(ch) && index < IndexLimit)
+     {
+         index = index * 10 + ch - '0';
+         ch = MoveNext(format, ref pos);
+     }
+
+     // Consume optional whitespace.
+     while (ch == ' ')
+     {
+         ch = MoveNext(format, ref pos);
+     }
+
+     // Parse the optional alignment, which is of the form:
+     //     comma
+     //     optional any number of spaces
+     //     optional -
+     //     at least one digit
+     //     optional any number of spaces
+     if (ch == ',')
+     {
+         // Consume optional whitespace.
+         do
+         {
+             ch = MoveNext(format, ref pos);
+         }
+         while (ch == ' ');
+
+         // Consume an optional minus sign indicating left alignment.
+         if (ch == '-')
+         {
+             leftJustify = true;
+             ch = MoveNext(format, ref pos);
+         }
+
+         // Parse alignment digits. The read character must be a digit.
+         width = ch - '0';
+         if ((uint)width >= 10u)
+         {
+             ThrowHelper.ThrowFormatInvalidString(pos, ExceptionResource.Format_ExpectedAsciiDigit);
+         }
+         ch = MoveNext(format, ref pos);
+         while (char.IsAsciiDigit(ch) && width < WidthLimit)
+         {
+             width = width * 10 + ch - '0';
+             ch = MoveNext(format, ref pos);
+         }
+
+         // Consume optional whitespace
+         while (ch == ' ')
+         {
+             ch = MoveNext(format, ref pos);
+         }
+     }
+
+     // The next character needs to either be a closing brace for the end of the hole,
+     // or a colon indicating the start of the format.
+     if (ch != '}')
+     {
+         if (ch != ':')
+         {
+             // Unexpected character
+             ThrowHelper.ThrowFormatInvalidString(pos, ExceptionResource.Format_UnclosedFormatItem);
+         }
+
+         // Search for the closing brace; everything in between is the format,
+         // but opening braces aren't allowed.
+         int startingPos = pos;
+         while (true)
+         {
+             ch = MoveNext(format, ref pos);
+
+             if (ch == '}')
+             {
+                 // Argument hole closed
+                 break;
+             }
+
+             if (ch == '{')
+             {
+                 // Braces inside the argument hole are not supported
+                 ThrowHelper.ThrowFormatInvalidString(pos, ExceptionResource.Format_UnclosedFormatItem);
+             }
+         }
+
+         startingPos++;
+         itemFormatSpan = format.AsSpan(startingPos, pos - startingPos);
+     }
+ }
+```
+
+tips c# 的标准格式说明符 和 自定义格式说明符 <https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-numeric-format-strings> 提示单个首字母的格式符不符合标准格式字符串就会抛异常:System.FormatException
+  Format specifier was invalid.
+
+```c#
+被视为标准格式字符串(单个字符加数值),无效抛异常
+int price = 169;
+Console.WriteLine("The cost is {0:A22222}.", price);
+中间空一个字符,有A+其他字符被视为自定义格式字符串,无法解析时原样输出
+Console.WriteLine("The cost is {0:A 22222}.", price);
+//输出 The cost is A 22222.
+非单个字符的格式串,被视为自定义格式字符串,无法解析时原样输出不抛异常
+Console.WriteLine("The cost is {0:AAAAAA}.", price);
+The cost is AAAAAAA.
+
+
+字符串内插调用一个这个函数
+public void AppendFormatted<T>(T value)
+{
+```
+
+tips 2 符合格式字符串中的每个格式化项都会调用一次 ICustomFormatter.Format的格式化方法 
+参考上面提供的msdn链接中的例子项 
+下面的语句调用三次ICustomFormatter.Format
+```c#
+Console.WriteLine(String.Format(new MyFormatter(),
+                                "{0} (binary: {0:B}) (hex: {0:H})", byteValue));
+```
+
+
+    
+  
+
 
 
