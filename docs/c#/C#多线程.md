@@ -9,6 +9,7 @@ c#中的任务取消是协作式的，什么是协作式的呢。就是说调用
 `CancellationToken` 类型的参数,外部通过`CancellationTokenSource` 类型的实例调用Cancel来请求取消,此时该实例内的Token会将属性`IsCancellationRequested` 设置为true。被调用函数内部使用此通知来自己决定是否取消,被调用函数的函数签名中完全可以不接受CancellationToken类型的参数，或者完全不理会取消请求。在需要取消的场合,通过判断IsCancellationRequested,调用`ct.ThrowIfCancellationRequested();`来抛出异常以此取消任务,当然调用方要try-catch处理异常
 
 这是一个示例
+这段代码犯了一个经典错误 参考这篇[文章](https://learn.microsoft.com/zh-cn/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming)
 ```c#
 public class MThread
 {
