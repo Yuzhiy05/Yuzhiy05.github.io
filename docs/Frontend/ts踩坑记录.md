@@ -91,3 +91,9 @@ node greeter.js
 使用node运行
 
 如果使用了TS语法,安装并使用ts-node 来运行
+
+tsc --init 生成tsconfig.json文件
+
+现在有更现代的tsx 去掉ts-node 直接编译运行ts程序。
+
+`npx tsc greeter.ts` 
