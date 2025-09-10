@@ -84,12 +84,32 @@ public class MThread
 }
 ```
 
-tips msdn的说明 上面下两个是同义
+tips msdn的说明 下面两个语句是同义 参考runtime里的[实现](https://github.com/dotnet/runtime/blob/b6127f9c7f6bab00186ec43d4a332053a1d02325/src/libraries/System.Private.CoreLib/src/System/Threading/CancellationToken.cs#L359)
 ```c#
-if (ct.IsCancellationRequested)
-{
-     ct.ThrowIfCancellationRequested();
-}
+ct.ThrowIfCancellationRequested();
+
 if (token.IsCancellationRequested)   
     throw new OperationCanceledException(token);
 ```
+
+
+### CancellationTokenSource和CancellationToken 一些成员函数的
+
+```c#
+Register(Action)	
+注册一个将在取消此 CancellationToken 时调用的委托。
+
+Register(Action, Boolean)	
+注册一个将在取消此 CancellationToken 时调用的委托。
+
+Register(Action<Object,CancellationToken>, Object)	
+注册取消此 CancellationToken 时将调用的委托。
+
+Register(Action<Object>, Object)	
+注册一个将在取消此 CancellationToken 时调用的委托。
+
+Register(Action<Object>, Object, Boolean)	
+注册一个将在取消此 CancellationToken 时调用的委托
+```
+Ai说CancellationToken 没有一个 <b style="color:red"> Register\<T\>(Action\<T\>, T) </b>这样重载的成员函数是因为泛型
+增加内存和jit编译，该函数主要给引用类型用的;装箱的性能损失可以接受;api灵活——在ui场景用(我意淫的);历史原因——CancellationToken 是在 .NET Framework 4.0 中引入的，当时泛型的使用还没有像现在这样普遍。为了保持向后兼容性，API 的设计可能更倾向于非泛型的实现。
