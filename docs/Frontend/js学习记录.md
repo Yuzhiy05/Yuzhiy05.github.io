@@ -1,3 +1,8 @@
+---
+title: js学习记录
+createTime: 2025/08/04 13:47:46
+permalink: /article/2pbod4sz/
+---
 
 
 # JS的常见坑

@@ -81,8 +81,8 @@ charEnumerator 使用了string做成员
 既然容器本身可以实现MoveNext Current 这些可枚举的操作为什么还需要IEnumerable可枚举器之类的接口呢?
 
 tips 
-`public interface IEnumerable<out T> : System.Collections.IEnumerable` 注意泛型 IEnumerable<T>的定义
-实现接口IEnumerable<T> 时同时还要实现一个非泛型版本,不过一般都是泛型版本实现调用非泛型版本
+`public interface IEnumerable<out T> : System.Collections.IEnumerable` 注意泛型 IEnumerable\<T\>的定义
+实现接口IEnumerable\<T\> 时同时还要实现一个非泛型版本,不过一般都是泛型版本实现调用非泛型版本
 
 ```c#
 // Returns an enumerator for this list with the given
@@ -367,7 +367,7 @@ CLR中 解析格式符的逻辑 我没看懂 但是作用是吧 `"this is{0:B2}"
  }
 ```
 
-tips c# 的标准格式说明符 和 自定义格式说明符 <https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-numeric-format-strings> 提示单个首字母的格式符不符合标准格式字符串就会抛异常:System.FormatException
+tips c# 的标准格式说明符 和 [自定义格式说明符](https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-numeric-format-strings)提示单个首字母的格式符不符合标准格式字符串就会抛异常:System.FormatException
   Format specifier was invalid.
 
 ```c#
