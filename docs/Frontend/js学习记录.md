@@ -28,6 +28,12 @@ console.log("0/infinity:" + (0 / Infinity));
 
 ```
 
+
+### null 和undefined
+js 沿用之前的语言习惯 其中的类型都是对象 所以null只是空对象并没有单独做出一个类型,同时null对象转换为数值是为0和c语言,java一样
+，undefined 表示此处无定义,转换成整数为Nan ；尽管在做 instanceof 进行比较时他们两仍相等,但却表达了不同的语义
+
+
 ### parseInt/parseFloat 函数
 
 将字符串转换为整数,参数不是字符串的先转换为字符串再转换为整数
@@ -61,6 +67,7 @@ JS使用Unicode字符集
 
 ### 对象
 键值对构成对象
+键值是字符串,使用数值型自动转换成字符串 ,所以写不写'foo':'hello'都不一样
 ```js
 var obj = {
   foo: 'Hello',
