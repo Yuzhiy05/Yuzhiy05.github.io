@@ -57,6 +57,65 @@ parseInt('.3') // NaN
 
 很傻逼[遇到了再看](https://wangdoc.com/javascript/types/number#parseint)
 
+### 强制类型转换 Nunmber String Boolean
+Js中对 运算符对操作数的类型与实际类型不一致时会发生转换 这种期望其实挺符合一般语境 比如减法就是期望两个数值相减
+
+Number
+对于字符串 Number转换比parseInt还严格只要字符串部分有一点不能转换成数值就会转换成Nan
+```js
+// 字符串：如果不可以被解析为数值，返回 NaN
+Number('324abc') // NaN
+```
+对于对象 除非是 `var x=[1]`; 这样Number(x) 返回1 其他都返回Nan
+这是因为对任何对象的转换成原始类型都先调用valueOf 方法如果返回的还是对象则toString 像[1,2,3]这样的数组转换成字符串
+'1,2,3' ,再对其进行Number函数这没法转换成数值所以是Nan,其他对象也是一样基本上没自定义valueOf的对象,valueOf的结果都是自己本身,都没法转成数值 ,当然自定义的valueOf和toString函数都返回对象,不符合js的*期望*时会直接报错 可见js对错误宽容多了
+
+String 
+对于原始类型 如期望一样转换成字面意义的字符串
+
+对于对象 则在调用valueOf与toString顺序进行调换了,先对对象进行toString操作,再valueOf。对于自定义的对象的valueOf与toString方法;js期望的是两次转换至少要转换到原始类型
+以便应用String转换成字符串,但是两次都返回对象这不符合js的*期望* js会报类型转换失败
+```
+var obj = {
+  valueOf: function () {
+    return {};
+  },
+  toString: function () {
+    return {};
+  }
+};
+
+String(obj)
+// TypeError: Cannot convert object to primitive value
+```
+
+boolean 
+该转换除了那些特殊意义的值其他都转换为true
+
+js 对不同语境时发现类型不匹配会自动隐式的转换类型
+
+1. 字符串和 数值相加时 js的期望的语义其实是字符串链接 所以
+```js
+1+'1' 
+// '11'
+'5' + {} 
+// "5[object Object]"
+'5' + [] 
+// "5"
+'5' + function (){} 
+// "5function (){}"
+```
+2. - 号对字符串来说就没字符串的语义了 所以
+```
+'2'-'1'
+//  变成数值 1
+
+'2'-1 
+// 字符串 减 数值 和字符串 加 数值不一样
+//1
+```
+除此之外* /都表达其数学上的语义只有+ 被借用了表达了字符串连接的语义
+
 ### 字符串
 tips  String.raw() = c# 里的@"x\rx\nx" 原样字符串
 JS使用Unicode字符集
@@ -222,7 +281,74 @@ tips js es5版本只有
 函数作用域   此作用域和其他语言
 es6的块级作用域后面介绍
 
+### 数组
+js对象本身就是一个key:value 键值对组合
+js的的数组就是一个特殊对象,他的所有键都是字符串 '0' '1' '2' '3'... 对,不是数字是字符串；因为js对象的键默认是字符串。
+所以数组里类型不一样都不是事
+```js
+[1,2,3,null,undefined,'1','2']
+```
 
+1.slice
+slice 的 切片函数 输入 数组的start 和end index索引能截取数组切片, 同时可以使用负索引
+```js
+var arr=[1,2,3,4,5];
+arr.slice(0,3) //1 2 3  左闭区间 右开区间
+arr.slice(3) //4 5  一直到末尾
+arr.slice(-2) //4 5 倒数第二位开始到末尾
+```
+
+2.sort 默认按字典序排序 卧槽里的太变态了！
+```js
+var arr4 = [111, 1011, 110];
+arr4.sort(); //  [ 1011, 110, 111 ]
+```
+自定义排序规则需要传函数 两个参数a,b,返回大于0 a 排b 前面 否则 b排a前面
+```js
+arr4.sort((a, b) => a - b);
+//[ 110, 111, 1011 ]
+```
+不同于其他语言的是 js更像c语言 其他语言的自定义排序函数都要求返回一个bool 表示a与b的序关系
+js与c直接的排序函数直接返回数值 而且这还是js推荐写法
+
+3.map 返回新数组的的映射函数 类似于forEach
+传入的函数有两个类型(原型) 
+3.1 纯成员 一个参数 
+3.2 当前成员 当前索引 源数组 三个参数
+```js
+var arr5 = arr4.map(a => a - 1);
+
+var arr6 = arr4.map((elem, index, arr) => {
+    return elem + index + arr.length;
+});
+``` 
+map本身还有一个接受 第二个参数的重载
+抄的示例
+```js
+var out = [];
+
+[1, 2, 3].forEach(function(elem) {
+  this.push(elem * elem);
+}, out);
+
+out // [1, 4, 9]
+```
+注意map 和forEach都会跳过空位 但不会跳过null 和undefined 
+
+
+tips2
+sort reverse  splice 会改变原数组
+其他一些常规操作都是生成新数组 且都会接受一个声明为 funcrtion(elem,index,arr) 的函数
+
+4.reduce reduceRight
+从左向右 应用函数 这个例子相当于相加 参数和之前的类似 同时reduce函数指定了初始值 10
+```js
+arr7.reduce((sum, curr, index, arr) => {
+    return sum + curr;
+},10)
+```
+
+还有一些其他原型函数 都按字面意思使用没啥坑
 ### 类型转换
 
 作为动态类型语言,转换在不同语境是相当随意的,当可以发生转换时就可以转
@@ -260,6 +386,55 @@ true
 NaN
 number
 ```
+
+
+### 包装对象
+加new 的Number Boolean String 构造函数调用
+类似于c# 装箱 原始类型转换成对象  让js在调属性的时候统一成一个模型 由`对象`来调
+
+包装对象的bool 和原始bool不一样 包装对象毕竟是对象 只有原始bool类型的false 才能在if 语境中表示false(是个对象在if语境都转换成true)
+```js
+if(new Boolean(false)){
+    console.log('true');
+}
+console.log(flasebool.valueOf());
+//输出
+true
+false
+```
+
+原始类型调用 一些属性的时候都是转换成包装对象再调用的
+数值类型记得加括号,不然会被当做小数点
+```js
+10.toString(2) //2进制
+
+```
+toFixed 保留几位小数的再转字符串 函数 他的舍入规则很蠢 有个对应只保留几位小数的函数 toPrecision 他的舍入也不准
+归根结底还是底部小数存储有关
+```js
+(10.055).toFixed(2) // 10.05
+(10.005).toFixed(2) // 10.01
+```
+
+fromCharCode 忽略大于0xFFFF 的多余部分 很坑不想写
+
+String 的原型方法
+substring/substr string既有类似数组的slice也有substring/substr 。有一些隐式行为
+1.自动调换参数  start 参数大于 end参数 会调换位置
+2.负数转0
+```js
+'JavaScript'.substring(10, 4) // "Script"
+// 等同于
+'JavaScript'.substring(4, 10) // "Script"
+
+'JavaScript'.substring(-3) // "JavaScript"
+'JavaScript'.substring(4, -3) // "Java"
+```
+
+split 也有些坑 一般遇不到
+
+### Date
+
 
 ### 运算符求值
 对于 *||* 和*&&* 运算符 与c语言不同的是,首个类型不为ture或false时返回第二个表达式的值,而不是逻辑运算的结果(bool)值,可能时因为js的值在if语境下可以隐式的转换成true或flase。以&& 为例子 多个&& 使用时 返回首个为false的表达式。这很好理解在c语言中,`a&&b`需要a与b均为真才为真,而a为真的情况下只需要关注b的表达式的值即可,所以js直接返回b了,因为js的动态类型不同语境可以相互转换,b若能转换为flase在if中就直接视为false了
@@ -381,3 +556,7 @@ x=(1+(2-3));
 ```
 当然这个例子举的不好,不管是不是右结合console.log出来的表达式的值一样
 
+### js 的错误处理
+
+这里没什么坑 还是继承(基类-js中没基类这种说法,但是又继承)错误Error 构造错误信息
+ throw try...catch...finally 这一套
