@@ -560,3 +560,37 @@ x=(1+(2-3));
 
 这里没什么坑 还是继承(基类-js中没基类这种说法,但是又继承)错误Error 构造错误信息
  throw try...catch...finally 这一套
+
+
+ ### 变量声明
+ let  会提升 初始化之前访问会报错
+ var  ES5 会变量提升 未初始化 定义为undefined  允许重复声明 作用域规则不清晰
+ const 不允许修改值 其他都和let一样
+
+ 示例
+ ```js
+ {
+    var func_area_obj_var = 10;
+}
+
+console.log(func_area_obj_var);
+
+{
+    let func_area_obj_let = 11;
+}
+
+console.log(func_area_obj_let);
+
+//输出
+10
+...\src\index.js:164
+console.log(func_area_obj_let);
+            ^
+
+ReferenceError: func_area_obj_let is not defined
+ ```
+
+ ### 统一的函数调用
+Function.prototype.call()   首个参数 this 表示应用的对象 后跟任意参数
+Function.prototype.apply()  首个参数 this 表示应用的对象 后跟参数数组
+Function.prototype.call.bind() 绑定this 不变

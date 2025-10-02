@@ -5,6 +5,10 @@ permalink: /article/64l51nbs/
 ---
 ### vue入门
 
+reactive 创建响应式对象
+
+ref 创建响应式 基础类型 
+
 
 
 
