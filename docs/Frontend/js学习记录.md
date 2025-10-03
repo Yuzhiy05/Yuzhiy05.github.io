@@ -592,5 +592,45 @@ ReferenceError: func_area_obj_let is not defined
 
  ### 统一的函数调用
 Function.prototype.call()   首个参数 this 表示应用的对象 后跟任意参数
+注意prototype (原型) 类似于其他语言的成员方法
+一般调用成员函数得先定义成员函数(js里起码es5里没成员函数这个叫法,不过在我看来就是一个东西)
+```js
+let obj={
+name:'114',
+func:function(){
+    console.log('call obj func');
+    console.log(this.name);
+}
+}
+obj.func();
+```
+你也可以不定义
+```js
+let obj2={
+    name:'114'
+}
+
+let func=function(name2){
+    console.log('call call func');
+    console.log(this.name+name2);
+}
+func.call(obj2,'514');
+```
+用函数调用语法传对象参数调用
+
+call在顶层使用不传参,默认使用的顶层对象;在浏览器里叫window;在node里叫啥不知道。调用的函数里没this就没事,有this没定义就undefined
+还有个用[调用原生方法](https://wangdoc.com/javascript/oop/this#functionprototypeapply)
+
+
 Function.prototype.apply()  首个参数 this 表示应用的对象 后跟参数数组
+和call 一样 只不过参数是以`[x1,x2,x3...]`这样的参数传的
+
+这样数组内容可以被解构成参数
+一个典型例子 找最大值 所有教程都有这个[例子](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/apply#%E5%B0%9D%E8%AF%95%E4%B8%80%E4%B8%8B)
+因为Math.max调用都是这么调的,只能找参数最大值
+`Math.max(2, -1, 5) // 5`
+apply这玩意现在可以把数组值结构成参数找到最大值,不过这个例子很有扭曲,标准库的Array为什么不提供相应函数呢？
+
+空元素变undefined,[例子](https://wangdoc.com/javascript/oop/this#functionprototypeapply:~:text=%EF%BC%882%EF%BC%89-,%E5%B0%86%E6%95%B0%E7%BB%84,-%E7%9A%84%E7%A9%BA%E5%85%83%E7%B4%A0)
+
 Function.prototype.call.bind() 绑定this 不变
