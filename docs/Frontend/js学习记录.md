@@ -590,8 +590,10 @@ console.log(func_area_obj_let);
 ReferenceError: func_area_obj_let is not defined
  ```
 
+ ### this
+
  ### 统一的函数调用
-Function.prototype.call()   首个参数 this 表示应用的对象 后跟任意参数
+1.Function.prototype.call()   首个参数 this 表示应用的对象 后跟任意参数
 注意prototype (原型) 类似于其他语言的成员方法
 一般调用成员函数得先定义成员函数(js里起码es5里没成员函数这个叫法,不过在我看来就是一个东西)
 ```js
@@ -622,7 +624,7 @@ call在顶层使用不传参,默认使用的顶层对象;在浏览器里叫windo
 还有个用[调用原生方法](https://wangdoc.com/javascript/oop/this#functionprototypeapply)
 
 
-Function.prototype.apply()  首个参数 this 表示应用的对象 后跟参数数组
+2.Function.prototype.apply()  首个参数 this 表示应用的对象 后跟参数数组
 和call 一样 只不过参数是以`[x1,x2,x3...]`这样的参数传的
 
 这样数组内容可以被解构成参数
@@ -633,4 +635,299 @@ apply这玩意现在可以把数组值结构成参数找到最大值,不过这�
 
 空元素变undefined,[例子](https://wangdoc.com/javascript/oop/this#functionprototypeapply:~:text=%EF%BC%882%EF%BC%89-,%E5%B0%86%E6%95%B0%E7%BB%84,-%E7%9A%84%E7%A9%BA%E5%85%83%E7%B4%A0)
 
-Function.prototype.call.bind() 绑定this 不变
+还有一个数组like 转数组
+slice 函数本来接受start 和end的index 返回切片后的数组 
+```js
+ let array_like = {
+        1: '1',
+        2: '5',
+        5: '6',
+        length: 3
+    }
+
+    let array_is = Array.prototype.slice.apply(array_like);
+    console.log(Array.isArray(array_like));
+    console.log(Array.isArray(array_is));
+    //输出
+    false
+    true
+```
+能这么搞本质事参数对象解包了
+上面apply能干的事ES6 剩余参数语法都能干 
+见[MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/apply#%E7%94%A8_apply_%E5%B0%86%E6%95%B0%E7%BB%84%E5%90%84%E9%A1%B9%E6%B7%BB%E5%8A%A0%E5%88%B0%E5%8F%A6%E4%B8%80%E4%B8%AA%E6%95%B0%E7%BB%84)
+
+3.Function.prototype.call.bind() 绑定this 不变
+
+call,和 apply 也能绑定对象 用一个函数存起来就是了
+```js
+ let for_bind = {
+        name: '114'
+    }
+
+    let apply_bind = function () {
+        console.log('apply_bind');
+        console.log(this === for_bind)
+    }
+    let binded = function () {
+        apply_bind.apply(for_bind);
+    }
+
+    binded();
+
+```
+这样apply_bind 用的this需要包裹成一个新函数存起来
+
+bind干的事就是简化这种写法,和其他语言bind差不多绑定一个对象为固定参数
+```js
+ let bind_func_obj = {
+        name: '114514',
+        func: function () {
+            console.log(this.name);
+        }
+    }
+    let binded_func = bind_func_obj.func;
+
+    binded_func();
+
+这个例子输出undefined
+因为调用时候不指定对象,this指向全局
+```
+这样手动绑定对象,也能绑其他对象
+```js
+ let other_obj = {
+        name: '514'
+    };
+    let binded_func2 = bind_func_obj.func.bind(bind_func_obj);
+    let binded_func3 = bind_func_obj.func.bind(other_obj);
+    binded_func2();
+    binded_func3();
+    //输出
+    114514
+    514
+```
+bind 主要就是解决 回调函数作为参数, 其内部this 乱指的问题,bind 完对象后再把返回的函数作为参数传递.
+
+还有个用法不算坑:和call一起用组成统一的函数调用语法
+让函数调用等价
+`f(obj,args...)== obj.f(args...)`
+
+### 严格模式
+
+js本来是脚本 现在变成大众化语言 需要搞一点约束 让一些傻逼写法报错 还要兼容以前老用法
+用一个严格模式区分开来
+
+ES6 新增块级作用域 以后都用let 声明遍历而不是var 
+
+
+### 异步 事件循坏 微任务 宏任务
+
+
+### DOM
+
+选择器参数 DOMString
+
+
+getElementsByClassName和querySelectorAll 区别
+
+动态和静态区别
+
+动态只读元素 可以通过具体DOM元素修改 但不能直接改
+
+### ES模块和CommonJS 模块
+报错
+[MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type is not specified and it doesn't parse as CommonJS. Reparsing as ES module because module syntax was detected.
+
+在ES模块里使用了__filename  __dirname这种全局变量
+代码
+```js
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const ENV_PATH = resolve(__dirname, '../.env.development');
+```
+
+# js的oop
+
+### 原型对象 原型链 继承
+
+ES6 用class 抽象出类的概念 来描述继承
+ES5这个继承看看得了
+
+三个东西
+
+函数: ES5的 任何函数都能当构造函数,构造函数就是普通函数 内部用this 表示生成对象的属性 加上new 关键字调用。
+```js
+let People = function (name = '114', end_name = '514', age = 24) {
+        this.name = name;
+        this.end_name = end_name;
+        this.age = age;
+        this.func = function () {
+            console.log(`${this.age} duse`)
+        }
+    };
+
+    let beast = new People();
+    beast.func();
+```
+ES5 的js没有类概念 但是有原型的概念,类似于基类
+这就是 `prototype`,别的语言用class定义类时,函数都是统一存储的也就是说,只有实例对象成员函数地址都一样
+```c#
+public class test{
+
+    public int age{get;set}=10;
+
+    public void ff()=>console.Writeline($"{age} desu");
+}
+
+
+var test1=new test();
+```
+c#定义的test类成员函数全局只有一份,js的成员就不一样了每个实例对象都有一份,你说这扯不扯。js的对象时动态的,可以在任意时刻添加删除
+成员.
+所以js把所有"类成员函数" 放在对象的原型对象里,所有从原型对象继承来的方法对所有被继承对象效果都一样。md这不就是虚函数?js非要搞这个原型。对其他语言来说class里的东西都是类型信息,存编译器里的,js直接就让我们操作类型信息,尽管他没类型这个概念.
+原型链就是,对象的原型对象也有自己的原型对象...一直链接到Object,构成一条原型链;Object的原型则是null。
+
+继承就是操作原型对象 主要就两玩意
+
+prototype 
+
+`xx.prototype=yy` 就是指定原型 但一般不这么写
+在原型中定义的属性,会被所有定义的类型继承
+```js
+上面People的例子
+People.prototype.color = 'white'; 
+```
+这样所有new出来的People 原型对象都有color属性了,如果赋值构造函数,构造函数也共享了
+
+
+constructor 
+还是拿People举例子,People 属性的原型的构造函数属性指向People这个函数。就相当于其他语言的类型信息对象,在js里直接暴露给你了
+```js
+People.prototype.constructor =People
+
+```
+
+有个坑注意 最好不要直接替换对象的原型对象
+```js
+  let People = function (name = '114', end_name = '514', age = 24) {
+        this.name = name;
+        this.end_name = end_name;
+        this.age = age;
+        this.func = function () {
+            console.log(`${this.age} duse`)
+        }
+    };
+
+    let beast = new People();
+    beast.func();
+
+    People.prototype.color = 'white';
+    console.info(beast.color);
+
+    console.log(People.prototype);
+
+    People.prototype = {
+        constructor: People,
+        name2: '1919',
+        fuc_super: function () {
+            console.log('调用原型对象')
+        }
+    };
+    console.log(People.prototype);
+    console.log(Object.getPrototypeOf(beast));
+    console.info(beast.color);
+
+    let new_obj = new People();
+    console.log(new_obj.color);
+    console.log(new_obj.name2);
+    //输出
+   white
+{ color: 'white' }
+{
+  constructor: [Function: People],
+  name2: '1919',
+  fuc_super: [Function: fuc_super]
+}
+{ color: 'white' }
+white
+undefined
+1919
+```
+
+在替换了People的原型对象后 已经创建对象的原型还是旧的原型对象,所以beast.color还能输出white。我一开始以为替换后所有以People的创建的对象的原型对象都替换了,所以一般都不直接替换原型对象.而是以`People.prototype.xxx`或
+
+Object.getPrototypeOf() 
+Object.setPrototypeOf()
+获取 / 设置某对象的原型
+
+Object.create() 从某个已存在对象创建对象 而不手动使用构造函数
+
+Object.prototype.isPrototypeOf() 判断对象是否是参数对象的原型 只要在原型链上的都是
+
+Object.prototype.__proto__ 这玩意指向对象的原型,以前浏览器用 现在js不仅是浏览器的脚本语言了 node之类的也用他们不一定实现这个玩意 ES6 已经淘汰了
+
+Object.getOwnPropertyNames() 类似于其他语言反射里的获取所有属性名(数组)
+
+Object.keys 获取像键值一样的可遍历的属性名 数组 (属性有属性描述对象可以改改属性是否可遍历)
+
+Object.prototype.hasOwnProperty() 判断是自有属性还是原型链上的属性
+
+for ...in 这种写法在js里是遍历属性的 遍历值得map或者forEach
+```js
+for ( var name in object ) {
+  if ( object.hasOwnProperty(name) ) {
+    /* loop code */
+  }
+}
+```
+拷贝对象 不用看
+
+
+### 继承构造函数
+ES6 有类之后写法更偏向有class的语言
+ES5 的继承写法了解一下即可
+
+不用new调用构造函数 非严格模式会什么都不干 对象都没创建
+
+ES5的继承分两步 子类调用父类函数,子类原型指向父类原型对象
+```js
+//第一步
+let Base=function(name){
+    this.name=name;
+}
+
+let Derived=function(name,age){
+    Base.call(this,name);
+    this.age=age;
+}
+ Derived.prototype = Object.create(Base.prototype);
+ Derived.prototype.constructor = Derived;
+
+    let new_obj = new Derived('114', '514');
+
+```
+ES6 有class就没这么多事了
+
+ES5 js不提供多重继承,有办法扭曲实现 没意思不用看
+
+### 模块
+ES6 才有模块
+ES5 用一些很扭曲的方法实现,了解就好
+模块就是复用别人的代码,导出模块中的对象能直接用。
+
+1. ES5 用对象做 模块内的任何东西都塞一个对象里,用什么直接调属性写法即可。
+这种干法,要把模块内所有东西都暴露出去。
+2. 用构造函数做,构造函数中定义变量的东西实例化后外部访问不到,只能内部定义闭包函数访问到
+3. 模块模式 经典[写法](https://wangdoc.com/javascript/oop/prototype#%E5%B0%81%E8%A3%85%E7%A7%81%E6%9C%89%E5%8F%98%E9%87%8F%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E7%9A%84%E5%86%99%E6%B3%95)看看得了
+本质就是变量放函数里,函数作用域外部访问不到,把需要外部暴露的模块return 出去。
+
+模块的放大模式在ES5里是个小坑,ES6不需要知道
+
+
+
+
+
+
