@@ -583,12 +583,79 @@ console.log(func_area_obj_let);
 
 //输出
 10
+
 ...\src\index.js:164
 console.log(func_area_obj_let);
             ^
 
 ReferenceError: func_area_obj_let is not defined
+
+
+
+有一点经常不被注意就是for循环
+使用var
+for(var i=0;i<5;i++){
+    console.log(i);
+}
+console.log("循环值为:"+i)
+//输出
+0
+1
+2
+3
+4
+循环值为:5
+
+使用let
+for (let i = 0; i < 5; i++) {
+    console.log(i);
+}
+console.log("循环值为:" + i)
+//输出
+0
+1
+2
+3
+4
+...\src\index.js:359
+console.log("循环值为:" + i)
+                      ^
+
+ReferenceError: i is not defined
  ```
+
+ 这里var 是声明在全局的,但是 let却和别的语言还是不一致 let 是声明在for的括号内的
+ let 和其他语言的auto let var比较接近，不允许重复声明之类的.现代编程范式都是先声明后使用,ES6推荐用这个
+
+这里var 没有块级变量的意义,只有函数级别变量(和全局)所以 if 块中定义会溢出到外部函数作用域(变量提升)把全局变量覆盖
+ ```js
+ var tmp = new Date();
+
+function f() {
+  console.log(tmp);
+  if (false) {
+    var tmp = 'hello world';
+  }
+}
+
+f(); // undefined
+ ```
+块作用域声明函数 一个坑不想细看
+
+ 同时和别的语言不一样的是
+ if 语境省略大括号在js会被视为没有块作用域
+
+
+ const 的语义只保证对象不可变,但对象指向的其他数据类型无法保证,要使得对象彻底不可变需要Object.freeze 冻结对象和其属性
+
+ 同时ES6的顶层对象属性 和全局变量不挂钩了
+ ES5 全局变量在浏览器中相当于 大的对象window 下面的属性;在ES6 这两解绑了 除了老的关键字var function 声明的变量和函数
+
+ 浏览器的顶层对象叫 window
+ node的顶层对象 是 global
+web worker  叫self
+ ES2020标准现在 有提案统一用 globalThis
+ 
 
  ### this
 
