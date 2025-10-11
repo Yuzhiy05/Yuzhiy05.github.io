@@ -4,7 +4,7 @@ createTime: 2024/12/26 22:32:41
 permalink: /article/bijxvme0/
 ---
 
-
+# 该文章使用的cmake版本为3.28 以上
 cmake 各变量名字
 
 PROJECT_SOURCE_DIR 表示当前项目的根目录也就是当前cmakelist文件所在路径。调用project(xxx)指定项目后的源代码目录
@@ -646,8 +646,90 @@ add_executable(hello main.cpp)
 #这里选择执行哪个就添加哪个做依赖
 add_dependencies(hello generate_time generate_time2)
 ```
+
+### add_custom_target
+首先声明一点 现代cmake构建是以target(目标)来构建代码的 ,创建目标避免声明式的全局依赖
+之前都是用类似`include_directories`，`link_directories` 这种命令这种命令是全局在子项目头文件和链接库也会包含进来
+为了更好更模块化的项目管理构建 使用面向目标的命令
+`add_custom_target` 正是有别于 `add_library`和`add_executable` 创建一个自定义目标
+这个目标不一定需要生成目标,通常执行一些外部脚本,例如编写c++程序需要一些前置文件,由python脚本或其他语言的现有程序生成,那么以此创建一个目标来执行命令更加符合现代cmake的用法
+首先熟悉一下该命令的参数
+```shell
+add_custom_target(Name [ALL] [command1 [args1...]]
+                  [COMMAND command2 [args2...] ...]
+                  [DEPENDS depend depend depend ...]
+                  [BYPRODUCTS [files...]]
+                  [WORKING_DIRECTORY dir]
+                  [COMMENT comment]
+                  [JOB_POOL job_pool]
+                  [JOB_SERVER_AWARE <bool>]
+                  [VERBATIM] [USES_TERMINAL]
+                  [COMMAND_EXPAND_LISTS]
+                  [SOURCES src1 [src2...]])
+```
+
+Name 不必多说 目标的名字
+
+ALL 用来指示是否作为默认构建的目标 当我们执行`cmake --build .` 而不在最后指定目标时 指示这个会在我们构建全部目标时把此目标加入构建
+后面的 可以跟命令 但这是隐式的行为 一般使用 COMMAND声明 后写命令
+
+COMMAND  传入的命令 多个命令按顺序执行 但不构成有状态的偏序 也就说 假如 命令1:创建文本1->命令2:读取文本1创建文本2->命令3:读取文本2创建文本3 这种有状态的脚本cmake command干不了;要执行完整的的脚本需使用`configure_file()`或`file(GENERATE)` 
+该命令同时可以把其他`add_executable` 创建的目标作为参数 也就说可以先生成其他可执行文件,再执行作为此次构建的依赖 (但要保证目标不是交叉编译的产物--废话！有例外但不用关注) COMMAND 的参数可以使用 生存器表达式
+
+TARGET_FILE
+
+TARGET_LINKER_FILE
+
+TARGET_SONAME_FILE
+
+TARGET_PDB_FILE
+
+使用这些作为生成器表达式时会生成依赖链,保证用到的时候生成
+
+BYPRODUCTS 命令执行的副产物  命令不一定每一次执行都生成一个一定的文件所以叫副产物,有时生成有时不生成.这玩意可以提供依赖无论是
+`add_custom_target` 还是 `add_custon_command add_dependencies` 用此声明的名字 都可以作为这些命令的DEPENDS 的依赖项
+cmake文档说明ninja 明确支持BYPRODUCTS 这个参数的 ninja编译器会在 副产物缺失时生成(存在的时根据命令是否更新) 以保证 构建依赖项存在依赖 可以使用一些生成表达式 一些其他说明无关紧要必要时参考cmake文本
+
+WORKING_DIRECTORY 命令执行时的路径 可以使用生成器表达式
+
+
+COMMENT 构建时echo 命令行的提示信息 可以使用生成器表达式
+
+DEPENDS 类似 add_custon_command页的介绍 也可以依赖 同一cmakelist 文件中 add_custom_command() 创建的OUTPUT的文件和依赖的文件项
+
+
+COMMAND_EXPAND_LISTS 让 COMMAND 中的参数列表会展开 假如你传的是${MY_ARGS} 这样一个变量 这个变量包含多个参数 会当整个字符串都当一个参数传进去 展开什么效果我也没试试 `⚠`
+
+​​SOURCES​ 指定该目标的源文件 这些文件不会参与编译不影响构建 这是给VSCODE CLINO 这些IDE的插件看到你定义了这个目标就会在图形化界面里添加到该目标下面方便你编辑和管理
+
+VERBATIM 转义的传入参数为了原样传入参数 也就说不用写 \a \" 这样的转义符cmake自动帮你转义
+
+JOB_POOLS  ninja这些多线程构建器会使用 和 USES_TERMINAL 不兼容 不深入构建不用过多关注 因为cmake需要兼容多个生成器所以有些参数不那么重要却要覆盖所有生成器
+
+注意- 这里渲染一下  该命令是在执行 `cmake --build .` 也就是调用内部生成器构建编译代码时执行的 ,add_custom_target 在语义上
+只有生成的副产品而没有生成文件,cmake文档明确说:就算生成和目标同名的文件都会当做过时的所以只要添加依赖,每次构建都会生成
+所以用来生产时构建时日志
+
+
+
+
+
 ### 生成器表达式
 用于在生成阶段而不是配置阶段生成数据,一般用来生成路径
+
+
+
+### find_package
+
+
+
+### install
+
+
+
+### CPack 生成安装包
+
+
 
 
 
