@@ -1,10 +1,12 @@
 
 
 打*号基本就没实际试试 有实例的基本上写过一遍 有的api就不写了用到自然会用
+以下表示成员的函数时正规写法 `xxx.prototype.prototype_name` 例如`String.prototype.at()` 都懒得写中间原型
+但是`String.at()` 表示静态 非实例函数。 所以表示成员函数或属性时连"类名"和原型都不写
 
 # ES6 的js
 
-### 变量解构
+###变量解构
 
 跟c++ 结构化绑定 和 c# 模式匹配里的 位置模式 很像
 
@@ -20,7 +22,7 @@ foo 为 undefined
 
 
 
-### 模板字符串
+## 模板字符串
 
 类似于 c# `@"xxx${index}"` 字符串
 使用反引号 ` `` `
@@ -125,7 +127,7 @@ console.log(Object.keys('123${aaa}456'));
 2.国际化每个国家数字不一样
 
 
-### 字符串新加了几个功能
+## 字符串新加了几个功能
 
 String.fromCodePoint() 识别大于0xFFFF 码点 根据Unicode码点创建字符串
 
@@ -185,24 +187,211 @@ normalize()  Unicode正规化
 toWellFormed()  处理代理字符串的
 
 
-### 正则表达式和ES6扩展*
+## 正则表达式和ES6扩展*
 暂时不看
 
+## 数值扩展
+
+1.新的二进制和八进制 写法
+
+只能用 0o 或0O表示8进制
+
+     0B或0b 表示二进制
+
+2.数值分隔符
+欧美人习惯每三个数值间加逗号或者下滑线_
+
+毕竟人家说 100 000  10万 叫 one  hundred thousand 一百个千
+所以js引入了数值下滑线 **100_000**  这玩意实际上就等于**100000** 只不过写起来好看
+作为参数传递 写入内存 输出都不影响就纯语法糖
+注意别写到那种一眼看上去不对的用法上就行
+比如
+```js
+
+0_b111111000
+0b_111111000
+
+3_.141
+3._141
+1_e12
+1e_12
+123__456
+_1464301
+1464301_
+```
+非要在进制表示后,小数点前后,科学计数法e前后,没意义的前后缀加下滑线你不报错谁报错呢? 不要当傻逼
+
+3.两个判断数值的静态函数 
+Number.isFinite() 是否有限
+
+Number.isNaN() 是否是NaN 有点绕 不是NaN就是数值 返回 false 
+注意ES5 里有这两函数的全局版本 全局版本调用前会先用Number构造函数转换到数值类型再判断
+
+4.全局版本数值解析
+Number.parseInt()
+Number.parseFloat()
+这两的全局版本现在为了模块化更清晰放Number对象里当静态函数了 行为不变
+
+### 精度相关
+5.Number.isInteger(number)
+判断是否整数
+有点搞笑这玩意 js存储整数也是ieee754小数存储的 超过精度的数值判断会失准 其次和其他Number函数性质一样
+非数值类型参数直接返回false
+
+6.Number.EPSILON 属性 一个常量
+js数值不是IEEE754 的小数吗 这里引入一个很小误差的误差值 (大于1的最小可表示小数1.000...1 (1位符号 8位指数 51位值)减去1算出来的误差) 也就是说算来算去数值比这个误差小那就没意义
+实际上不等的数值 相减小于这个最小误差 那么这两数在js里也相等 这玩意就类似于高数里那个极限趋近的 ε
+
+7.Number.isSafeInteger()
+ES6 表示数值的上下限
+Number.MAX_SAFE_INTEGER和Number.MIN_SAFE_INTEGER 也就是-2的53次方 和2的53次方
+这个函数就是判断这个数值在不在js的可表示范围内
+
+## MATH 扩展*
+
+Math.trunc() 截断小数部分 返回整数部分
+
+Math.sign() 返回符号 不是Number的会先转成Number
+
+Math.clz32() **count leading zero bits in 32-bit binary representation of a number**
+把数值转换成32位无符号数 算这里面有多少前导0
+Math.clz32(1) 就有31个
+
+Math.imul(a,b)  把两个数转成带符号整数然后相乘
+下面这个例子js原来功能算不了 存储不了溢出的数值 所以用这个算准确值
+```js
+(0x7fffffff * 0x7fffffff)|0 // 0
+
+Math.imul(0x7fffffff, 0x7fffffff) // 1
+```
+
+Math.fround()   返回一个数的32位单精度浮点数形式 精度缩窄会丢精度
+
+Math.f16round() 和上面差不多16位精度的浮点数
+
+Math.hypot(a,b,c) 平方和的平方根
+ $$\begin{array}{c} \sqrt{a^{2} +b^{2}+c^{2}} \end{array}$$
+Math.hypot(3, 4);        // 5
+
+### 对数
+Math.expm1(x) 以e为底的对数-1  
+ $$\begin{array}{c} \e^{x}-1 \end{array}$$
+
+Math.log1p(x) 
+  $$\begin{array}{c} \log_{}{(1+x)}  \end{array}$$
+
+Math.log10(x) 
+$$\begin{array}{c} \log_{10}{x}  \end{array}$$
+
+Math.log2()
+$$\begin{array}{c} \log_{2}{x}  \end{array}$$
+
+### 三角函数
+Math.sinh(x) 
+Math.cosh(x)
+Math.tanh(x) 
+Math.asinh(x) 
+Math.acosh(x) 
+Math.atanh(x)
+
+## BigInt*
+128的大整形 用的时候后面带n
+1n 相当于数值1 的大整形 其他很多操作和Number很像
+有些会不一致 我不想管细究没意思
 
 
+## 函数
 
+### 默认实参
+挺傻逼的 参数不给是undefined
+es6 前 默认实参得这么写
+```js
+function log(x, y) {
+  y = y || 'World';
+  console.log(x, y);
+}
+现在能直接
+function multiply(a, b = 1) {
+  return a * b;
+}
+```
+默认参数是表达式每次函数调用都会重新计算
+
+默认参数是非尾参数不会被忽略 显而易见的
+```js
+function f(x=1,y){
+  console.log(x,y);
+}
+
+f() // 1, undefined
+f(2) // 2, undefined
+f(, 1) // 报错
+f(undefined, 1) // 1, 1
+```
+你想忽略得显示传undefined 这就和不写参数的想法本末倒置了 注意null 和undefined语义不一样传null就是null不会触发默认参数因为你传了null
+
+有默认参数时 参数初始化有单独作用域 这就是个tips我不想细写
+看此[教程]<https://wangdoc.com/es6/function#%E4%BD%9C%E7%94%A8%E5%9F%9F>
+
+传对象可以用解包搞默认参数
+```js
+function ff({a=1,b=1}={})
+{
+  console.log(a,b);
+}
+
+function m2({x, y} = { x: 0, y: 0 }) {
+  return [x, y];
+}
+
+```
 
 
 # js的坑
-
+1.
 模板字符串做代码生成 实现简单的模板引擎
 用现有的就行不要学怎么写
 
+2.
 使用标签模板字符串
 模板字符串会转义 ,输入的是别的语言的字符串 转义规则不一样在js里转不了
 ES2018 放宽限制 对转不了的不报错转换成undefined
 
+3.
 只是有使用标签模板字符串
 ` tag`123` ` 这样调用的时候会放松限制
 
+4. *
+Number.isNaN() 
+Number.isFinite
+因为字符串 '15' 能 转换成数值15 所以全局函数版本先用Number转换数值对象,再isNaN() 返回false 他是一个数不是NaN
+对于Number.isFinite 你是字符串就直接判死刑了 返回false 只对数值对象判断
+直接用静态函数 你不是数值就直接返回true
+
+5.Number.isInteger(number) 超精度数值判断失准 25.0和25视为一个值
+```js
+function test_bool(...args) {
+    args.forEach((arg) => {
+        console.log(arg);
+    });
+}
+
+test_bool(
+    Number.isInteger(25), // true
+    Number.isInteger(25.0), // true
+    Number.isInteger(3.0000000000000002), // true
+    Number.isInteger(5E-324), // false
+    Number.isInteger(5E-325), // true
+)
+//输出true
+true
+true
+true
+true
+false
+true
+
+
+BigInt*  这个有些操作会和Number不一致
+我不想记具体的 有什么问题查MDN就好了
 
