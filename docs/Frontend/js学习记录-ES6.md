@@ -126,6 +126,7 @@ console.log(Object.keys('123${aaa}456'));
 
 2.国际化每个国家数字不一样
 
+正常使用console.log 还是将他放括号里的
 
 ## 字符串新加了几个功能
 
@@ -867,6 +868,17 @@ true
 
 8.箭头函数里的this*
 不指向箭头函数本身而是创建时的作用域对象 看这个[例子](https://wangdoc.com/es6/function#rest-%E5%8F%82%E6%95%B0:~:text=%E4%B8%80%E6%AC%A1%E9%83%BD%E6%B2%A1%E6%9B%B4%E6%96%B0%E3%80%82-,%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0,-%E5%AE%9E%E9%99%85%E4%B8%8A%E5%8F%AF%E4%BB%A5)
+
+对象定义中使用箭头函数
+```js
+const cat = {
+  lives: 9,
+  jumps: () => {         // ❗ 这是一个箭头函数
+    this.lives--;        // 这里的 this 不是 cat！
+  }
+}
+```
+同时通过箭头函数的没有属于自己的this 其中的this只会指向定义时外部this的特性;在事件回调中可以固定this值使其在调用时不会指向全局或者模块作用域
 
 此教程有很多例子我就不写了 反正关于this坑很多
 
