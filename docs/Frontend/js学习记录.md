@@ -816,6 +816,29 @@ const __dirname = dirname(__filename);
 const ENV_PATH = resolve(__dirname, '../.env.development');
 ```
 
+### 给导出对象起别名
+
+fs.promises.writeFile 这个函数名太长用起来麻烦导出时
+```js
+const fsp = require('fs').promises;
+await fsp.writeFile('hello.txt', 'Hello, 世界！');
+
+const { promises: fsPromises } = require('fs');
+const writeFile = fsPromises.writeFile;
+await writeFile('msg.txt', 'Hello!');
+
+const { writeFile } = require('fs').promises;
+```
+在ESmodule 里
+```ts
+import { promises as fsPromises } from 'fs';
+
+import fsPromises from 'fs/promises';
+
+//只引入一个对象
+import { writeFile } from 'fs/promises';
+```
+
 # js的oop
 
 ### 原型对象 原型链 继承
