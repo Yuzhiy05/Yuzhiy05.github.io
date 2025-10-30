@@ -811,6 +811,195 @@ AggregateError 封装了多个错误的对象
 
 Error对象现在有给case属性 提供一个报错原型不一定要字符串 具体看MDN
 
+## Symbol
+
+ES6 新增的原始类型
+用来标记唯一值,防止冲突的 ,一般用在对象属性名中
+这个类型类似于字符串,可以用字符串初始化他,在期望字符串的场合都会使用打印的字符串,用字符串初始化其实是给Symbol添加描述
+不然声明两个Symbol实际不一样,但人看不出却别
+任意两个Symbol类型都是不相等的,声明一堆Symbol类型的值尽管参数一样`===`判断都不指代同一对象
+
+实例属性
+description 就是描述Symbol字符串也就是构造时传入的字符串
+
+```js
+let syb1=Symbol('111');
+
+let syb2=Symbol('222');
+
+syb1.toString()
+syb2.toString()
+
+String(syb1)
+String(syb2)
+
+```
+一般放对象里当属性名,和一般属性名定义差不多但是注意使用和定义要套在`[]`里做表达式属性,不然属性名就成字符串了
+也能定义类似Enum的东西
+```js
+let syb1 = Symbol('111');
+    let syb2 = Symbol('222');
+    let syb3 = Symbol('333')
+
+    let obj = {
+        [syb1]: '111',
+    };
+    obj[syb2] = '222'
+
+    Object.defineProperty(obj, syb3, { value: '333' })
+
+    console.log(Object.getOwnPropertySymbols(obj))
+
+let Mode={
+        DEBUG:Symbol('denug'),
+        RELESER:Symbol('relseae'),
+        MIN:Symbol('MIN')
+    }
+    
+```
+因为能转为字符串,有些时候期望字符串的场合传Symbol,转换成字符串当唯一字符串使用
+
+tips:遍历Symbol声明的属性名得用专门的`Object.getOwnPropertySymbols()`
+其他的for...in getOwnPropertyNames 都找不到。还有个api能找到 Reflect.ownKeys()
+
+其他api都找不到 都遍历不到Syboml声明的属性
+
+2.静态属性
+Symbol.for(str)     查找是否已经用字符串str注册了Symbols,有就返回那个;没有就在全局注册一个并返回
+Symbol.keyFor(symbol)  查找全局有没有注册的Symbol,有就返回该Symbol的描述字符串
+
+3.几个内置Symbol
+参考[MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol/hasInstance)
+
+
+## 新的数据解构
+### Set
+类似于C++ 容器set
+按插入顺序(无序)键值唯一的容器
+
+如何创建?
+1.构造函数
+new Set()
+new Set(iterable) 传入数组之类的可迭代对象即可
+2.实例属性 add
+Set add(value)   注意add时不会隐式转换 且返回Set所以可以链式调用
+```js
+let set1=new Set()
+[1,3,4,5].forEach(x=>set1.add(x));
+
+let set2=new Set([1,3,4,5,6]);
+
+const set3 = new Set(document.querySelectorAll('div'));
+```
+其他小玩法
+1.数组元素去重
+2.去除字符串的空值部分
+```js
+[...new Set(array)]
+
+[...new Set('ababbc')].join('')
+```
+除了所有容器都有的
+constructor 的构造函数 还有以下常用api
+3.实例属性
+size 属性 返回Set 元素个数
+
+bool delete(value)  删除对应的值 返回是否删除成功
+
+bool has(value)   是否有该成员 
+
+void clear() 清除所有内容
+
+和array数组一样可以用以下实例方法/运算符遍历 
+keys()      键 遍历   Set没有键(或者说键就是值) 此函数效果和values()一样
+values()       值 遍历
+entries()      键值对遍历
+forEach()      回调遍历所有成员
+for...of
+... 展开运算符
+
+tips 使用Set可以为数组去重 同时可以实现 并集 交集  差集
+```js
+let set1
+```
+
+同时ESES2025 
+也提供了集合操作
+intersection(other)：交集
+union(other)：并集
+difference(other)：差集
+symmetricDifference(other)：对称差集 在difference的基础上去重了
+isSubsetOf(other)：判断是否为子集
+isSupersetOf(other)：判断是否为超集
+isDisjointFrom(other)：判断是否不相交
+
+other 为Set或类Set对象
+类Set 对象可以认为是实现了下面三个属性的对象
+
+size 返回元素数量
+has(value)  返回元素是否存在
+values()   返回容器中元素的迭代器对象
+
+
+### WeakSet
+类似Set 但成员只能是对象和Symbol值
+这是用来放临时对象,因为gc根据可达性分析,主要对象被引用就不会被gc清理
+用来放置:别处引用一旦访问不到该对象可立马被gc回收的对象的--期望容器内部对象与原对象有相同生存期;不占内存
+
+### Map
+js的对象本身就是键值对,但js对象的键是字符串
+使用时也会转换为字符串
+
+现在ES6 提供了一个键可以不是字符串的容器
+
+1.创建Map
+Map构造接受一个 键值对所组成的数组 或者可迭代对象
+```js
+  const map = new Map([
+        [1, '111'],
+        [2, '222']]
+    );
+    console.log(map.get(1));
+```
+tips 
+1.同名键(原始类型)值新值覆盖旧值
+
+2.==但不===的对象 也就是说内容相同但是不是同一对象(地址不同)的对象 作为Map的键 不被视为同一个键
+原始对象只要==也就是值相同就会被Map视为同一个键
+见下16 
+
+2.实例属性 Map.prototype.xxx
+size 成员数量
+
+Map set(key,values) 添加键值对 返回原Map对象
+
+values get(key)  获取对应键的值
+
+bool has(key) 是否有该键
+
+bool delete(key) 删除键值对 返回是否删除
+
+void clear()  清除成员
+
+3.遍历与数组 Set类似还是那几个函数
+注意Map遍历顺序是插入顺序
+
+Map没有filter 方法
+过滤得借助数组
+
+### Map Set 数组 类似物互转
+
+
+
+
+
+
+
+ 
+
+
+
+
 
 
 
@@ -880,6 +1069,15 @@ const cat = {
 ```
 同时通过箭头函数的没有属于自己的this 其中的this只会指向定义时外部this的特性;在事件回调中可以固定this值使其在调用时不会指向全局或者模块作用域
 
+8.1 js里的作用域就[三种](https://developer.mozilla.org/zh-CN/docs/Glossary/Scope)
+模块作用域
+
+全局作用域
+
+函数作用域
+
+也就是说声明对象时的的括号{}是不构成作用域的,这就是上面那个箭头函数的例子里为作为对象的属性包裹在对象声明的括号中{},this也指向外部的原因(作用域是全局,this指向声明时的作用域也就是全局)
+
 此教程有很多例子我就不写了 反正关于this坑很多
 
 9.Function.prototype.toString()
@@ -943,3 +1141,31 @@ myObject // Object {[object Object]: "valueB"}
 
 15. 成员函数的name 属性
 对 bind,Function 构造函数 和get set Symbol有特定行为
+
+
+16.Map的键值对
+set 同一个键的值最新的值会覆盖旧的值
+```js
+const map = new Map([
+        [1, '111'],
+        [2, '222'],
+        [1, '333']]
+    );
+    console.log(map.get(1));
+    //输出333
+```
+用对象做键需要引用
+```js
+const map2 = new Map(
+        [[{ p: '111' }, 111]]
+    );
+    let obj_key = {
+        p: '111'
+    };
+    map2.set(obj_key, 2);
+    console.log(map2.get({ p: '111' }))
+    console.log(map2.get(obj_key))
+    //输出
+    undefined
+    2
+```
