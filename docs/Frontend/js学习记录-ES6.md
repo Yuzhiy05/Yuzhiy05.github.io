@@ -872,7 +872,7 @@ Symbol.keyFor(symbol)  查找全局有没有注册的Symbol,有就返回该Symbo
 参考[MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol/hasInstance)
 
 
-## 新的数据解构
+## 新的数据结构
 ### Set
 类似于C++ 容器set
 按插入顺序(无序)键值唯一的容器
@@ -987,7 +987,215 @@ void clear()  清除成员
 Map没有filter 方法
 过滤得借助数组
 
-### Map Set 数组 类似物互转
+### WeakMap
+
+类似Map
+但只接受对象(非null)和Symbol值作为键key
+和WaeakSet类似 在其中的成员 键key。不干扰gc 即若引用,不增减引用计数
+而值仍在和一般对象一样
+
+没有下列实例方法和属性
+keys()、values()和entries() size
+
+只有get()、set()、has()、delete()
+
+一般引用DOM对象,DOM对象删除时,此处弱引用不会干扰gc释放DOM对象的内存
+
+### WeakRef
+是更进一步的创建弱引用
+也就是说WeaRef引用对象不会增加原对象的引用计数--不干扰gc
+
+deref()       解引用 原对象没被gc则返回原对象 否则返回undefined
+
+用处：作为缓存 缓存存在则取缓存,原对象失效则缓存失效
+
+## 迭代器Iterator
+
+遍历容器中的元素是很常见的操作,且对js的多数容器或对象例如:Array,Set,Map,DOM nodelist共有的操作;多数语言都为了将容器和遍历操作分离,来专门实现一个迭代器,而不是将迭代操作耦合到每个容器中。也就是说每个容器只需要实现了某些功能/协议(在别的语言中属于接口),都可以迭代。
+js的可迭代的概念[参考MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Iteration_protocols#%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%8D%8F%E8%AE%AE)
+
+这一切都是为了让容器都可以使用for...of遍历 一种统一的访问容器元素的机制
+
+注意 原先的for...in 会遍历到原型链的属性为了不破坏api 对数组对象还会遍历到非数字的属性 length
+
+迭代器类似c语言数组的指针
+
+如何实现可迭代?
+
+为对象添加 `[Symbol.iterator]()` 属性(或在原型链上添加该属性) 这样js每次对对象调用 for...of 时都会使用[Symbol.iterator]() 
+这个属性是个无参 返回一个迭代器的函数.
+
+如何实现迭代器?
+为自建迭代器
+1.实现next 方法
+IteratorResult  next(value[option])  参数是可选的
+返回值 符合IteratorResult接口要求
+差不多就下面这样一个对象
+
+{value:[value] ,done:true/false }   value为指向元素的值 done表示是否遍历完毕
+
+1.1 可选的实现
+return(value)  看MDN
+throw(exception)
+
+实现一个可迭代的例子,这里实现的可迭代对象利用了数组的已有迭代器;显然我们无法像c语言一样获得一个数组指针自己在内存上进行操作,从零实现迭代器。
+```js
+function iterable() {
+        this.length = 3;
+        this.first_name = '114';
+        this.mid_name = '514';
+        this.end_name = '1919'
+        this[Symbol.iterator] = function() {
+            let index = 0;
+            const values = [this.first_name, this.mid_name, this.end_name];
+            return {
+                next: () => {
+                    if (index < values.length) {
+                        return { value: values[index++], done: false };
+                    } else {
+                        return { value: undefined, done: true };
+                    }
+                }
+            }
+        }
+    }
+
+    const iter = new iterable();
+    for (let x of iter) {
+        console.log(x);
+    }
+    const iter = iter_obj[Symbol.iterator]();
+    console.log(`${iter.next().value}---`)
+    console.log(`${iter.next().value}---`)
+    console.log(`${iter.next().value}---`)
+```
+不过通常会把[Symbol.iterator] 写在数组原型对象上,让每一个用次原型做对象的都有该迭代方法，同时让数据和通用方法分离
+```js
+function Iterable() {
+  this.first_name = '114';
+  this.mid_name = '514';
+  this.end_name = '1919';
+}
+
+Iterable.prototype[Symbol.iterator] = function() {
+  const values = [this.first_name, this.mid_name, this.end_name];
+  let index = 0;
+  return {
+    next: () => {
+      if (index < values.length) {
+        return { value: values[index++], done: false };
+      } else {
+        return { value: undefined, done: true };
+      }
+    }
+  };
+}; 
+```
+再进一步把数据放进数组里
+```js
+function Iterable() {
+  this.data=['114','514','1919']
+}
+...
+```
+我们发现,自己实现一个可迭代对象不是从零开始造的(也没法造),而是尽可能复用内置对象和类型.
+
+有时对于相似对象
+我们可以复用已有的迭代器属性,例如
+```js
+let iterable = {
+  0: 'a',
+  1: 'b',
+  2: 'c',
+  length: 3,
+  [Symbol.iterator]: Array.prototype[Symbol.iterator]
+}
+```
+为自定义类数组对象添加可迭代属性;不用自己写迭代器方法了。当然可以替换某些可迭代对象的迭代方法实现使得返回完全不相关的对象
+
+
+一般以下情况会调用迭代器
+
+for...of
+
+对象解构赋值
+
+对象调用展开运算符
+
+Array.from(iterable)
+
+Map(), Set(), WeakMap(), WeakSet(iterable)
+
+Promise.all(iterable)
+
+Promise.race(iterable)
+
+tips 字符串也有迭代器接口 所以可以把字符串解包成单个字符
+```js
+let str = 'hello';
+let arr = [...str];
+console.log(arr);
+//
+[ 'h', 'e', 'l', 'l', 'o' ]
+```
+
+## class
+为了像其他语言使用oop一样,js引入class关键,让js声明对象可以和其他oop语言一样,其内部实现还是原型链那一套
+只不过语法不一样了
+
+原先js声明对象得声明一个普通函数,内部使用this关键字引用想要的属性(这样才算构造函数),同时还要调整原型链,并将这个声明上和普通函数无异只是内部特殊语法的构造函数的绑定到原型链的construct属性上;再使用new 关键字调用该构造函数才能生成对象
+不仅和一般语言不同且繁琐。
+
+现在引入了class可以这么写
+```js
+class myObj {
+    constructor(a, b) {
+      this.a = a - b;
+      this.b = a + b;
+    }
+    toString() {
+       return (this.a + this.b).toString();
+    }
+    ff(){
+      console.log('this is ff')
+    }
+  }
+```
+虽然语法不一样,实际还是原型链那一套
+可以看一下两个事实
+```js
+console.log(typeof myObj)
+console.log(myObj === myObj.prototype.constructor)
+//
+function
+true
+```
+同时在类中定义属性/函数 constructor,toString,ff实际都定义在原型链上
+```js
+console.log(Object.getOwnPropertyNames(x))
+console.log(Object.getOwnPropertyNames(myObj.prototype))
+//
+[ 'a', 'b' ]
+[ 'constructor', 'toString', 'ff' ]
+```
+同时和之前类似定义在constructor 中用this.property_name 引用的属性会作为对象自身的属性
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

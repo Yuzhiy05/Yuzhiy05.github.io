@@ -851,7 +851,7 @@ ES5这个继承看看得了
 函数: ES5的 任何函数都能当构造函数,构造函数就是普通函数 内部用this 表示生成对象的属性 加上new 关键字调用。
 ```js
 let People = function (name = '114', end_name = '514', age = 24) {
-        this.name = name;
+        this.name = name; //这里使用this.xxx的属性都会作为属性生成在对象钟
         this.end_name = end_name;
         this.age = age;
         this.func = function () {
