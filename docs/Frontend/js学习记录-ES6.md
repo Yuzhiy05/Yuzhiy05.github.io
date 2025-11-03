@@ -1143,6 +1143,7 @@ console.log(arr);
 为了像其他语言使用oop一样,js引入class关键,让js声明对象可以和其他oop语言一样,其内部实现还是原型链那一套
 只不过语法不一样了
 
+### 新语法
 原先js声明对象得声明一个普通函数,内部使用this关键字引用想要的属性(这样才算构造函数),同时还要调整原型链,并将这个声明上和普通函数无异只是内部特殊语法的构造函数的绑定到原型链的construct属性上;再使用new 关键字调用该构造函数才能生成对象
 不仅和一般语言不同且繁琐。
 
@@ -1179,6 +1180,166 @@ console.log(Object.getOwnPropertyNames(myObj.prototype))
 [ 'constructor', 'toString', 'ff' ]
 ```
 同时和之前类似定义在constructor 中用this.property_name 引用的属性会作为对象自身的属性
+和用assign与直接在原型上添加属性效果一样
+```js
+Object.assign(myObj.prototype, {
+        ff2() {
+            console.log('111');
+        },
+        age: 3
+    })
+    console.log(Object.getOwnPropertyNames(myObj.prototype))
+    myObj.prototype.ff3=function (){
+        console.log(4);
+    }
+    console.log(Object.getOwnPropertyNames(myObj.prototype))
+```
+同时class关键字还支持类表示的写法,使用类声明的名字时不加new还会报错(ES5比较宽容,为了防止忘记h写new 需要一些额外写法来防止,ES6使用语法糖直接解决了),每个类默认都需要有一个名为constructor的构造函数
+使用this声明属性后默认返回对象,这简直和ES5的构造函数语法一样就是为了在语法上更贴近java cpp c#等语言.
+```js
+let x=class X{
+  constructor(){
+    ...
+  }
+  ...
+}
+```
+新的语法里类自身属性(非原型链上的属性)也可以写在类定义顶部
+```js
+class X{
+  a=10;
+  str='111'
+  constructor(){
+    ...
+  }
+}
+```
+在顶部声明的属性就如同在constructor函数或原先ES5一样在构造函数里添加的属性一样是类实例的属性。
+
+同时为了更贴近java,c#.js的类声明中还可以使用get,set函数 和静态方法/属性 私有属性(访问控制)
+```js
+class XX{
+  a;
+  #name_1 = 'str'  //私有属性外部访问不到
+  static #name_2='name'
+  constructor(value){
+    this.a=value
+  }
+  get a(){
+    return this.a;
+  }
+  set a(value){
+    if (value > 0)
+      this.a = value + 1;
+    else
+    throw new Error("messaeg");
+  }
+  # ff(){
+    console.log('这是一个私有方法')
+  }
+  static set name2(value){
+    this.#name_2=value;
+  }
+   static ff() { console.log('this is static func') }
+}
+
+  let x = new XX(1);
+  XX.ff(); 
+  x.ff()     //报错x.ff 不是一个函数         
+  x.a = -1; // throw error
+  x.#name._1 //报错
+```
+get/set 用处与其他oop语言一样隔离任意数值操作,对存取行为进行验证。 搭配私有变量,防止意外的访问 
+
+使用`#`号开头在类首部 声明私有字段外部无法访问(动态检查),与其他语言的private关键字不同;#与之前_下滑线开头声明的内部函数一样(详细介绍参考下方)
+访问时也是带#号访问
+
+static 修饰函数/属性 调用时也与c# 一样使用类名访问,而不是类实例。 同时static也可以修饰私有属性 
+声明为static的属性和方法相当于声明在类的原型中
+
+
+
+tips 判断某个属性是否是私有属性 使用in 关键字
+
+### 静态变量的初始化
+
+静态变量存在依赖时,通常需要顺序初始化
+```js
+dosth(value)=>value+10;
+class X{
+  static x
+  static y
+  static z
+  constructor(value){
+    this.x=value;
+    this.y=dosth(this.x);
+    this.z=dosth(this.y)
+  }
+}
+```
+这样写,每次创建新的对象时都需要执行一遍。如果写在类外面,形式上数据与操作分离了不是一个好的实践。我们都希望关于类的事都放在类中
+
+现在可以直接写static 块,且这些静态的执行是按声明顺序同步执行的
+```js
+class X{
+  static x=10;
+  static y;
+  static z;
+  ff(){...}
+  static {
+    console.log('静态块1')
+    this.y=dosth(this.x)
+  }
+  ff2(){
+    ...
+  }
+  static {
+    console.log('静态块2')
+    this.z=dosthn(this.y)
+  }
+}
+```
+tips class中的this指向与其他oop语言无异都指向new 创建的类实例
+
+### 接口/抽象类 类似物
+
+new.target 关键字
+
+
+### 关于私有运算符的设计
+参考这篇[faq](https://github.com/tc39/proposal-class-fields/blob/main/PRIVATE_SYNTAX_FAQ.md)
+
+
+### 继承语法
+
+extends
+一个典型写法 继承某个类并调用其父类构造函数
+```js
+class A{
+  #aaa
+  constructor( a = 1) {
+    this.#aaa = a;
+  }
+}
+
+class B extends A{ 
+  #bbb
+  constructor( a = 1,b) {
+    super(a)
+    this.#bbb = b;
+  }
+}
+```
+这是个典型写法,注意在调用this.#bbb 需要先先调用super函数 因为子类的this 需要有父类构造函数初始化
+与一般oop的语言想象一致的是 class机制下 需要先构造父类,再构造子类
+
+正如oop理论 私有的属性和方法都不会继承 静态属性和方法则会被继承
+注意静态属性的继承是浅拷贝 对原始类型和对象有不一致
+
+
+tips 可以继承一些常见容器如Array 实现自己的容器类型
+
+
 
 
 
@@ -1377,3 +1538,7 @@ const map2 = new Map(
     undefined
     2
 ```
+
+17. super 作为函数 仅能在类中的 constructor 使用表示调用父类构造函数
+  作为对象可以在 类中任意函数使用 实例属性中指代 父类原型对象 静态属性中指向父类
+  同时super 作为对象有一些不一致性惨开mdn
