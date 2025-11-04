@@ -1333,6 +1333,15 @@ class B extends A{
 这是个典型写法,注意在调用this.#bbb 需要先先调用super函数 因为子类的this 需要有父类构造函数初始化
 与一般oop的语言想象一致的是 class机制下 需要先构造父类,再构造子类
 
+上述继承语法实际上构造了下面这样的原型链
+```js
+console.log(b.__proto__ === B.prototype)//true
+console.log(b.__proto__)// A{}
+console.log(B.__proto__ === A) // true
+console.log(B.prototype.__proto__ === A.prototype) // true
+```
+B其实是一个构造函数，他的原型指向构造函数A
+
 正如oop理论 私有的属性和方法都不会继承 静态属性和方法则会被继承
 注意静态属性的继承是浅拷贝 对原始类型和对象有不一致
 
@@ -1540,5 +1549,104 @@ const map2 = new Map(
 ```
 
 17. super 作为函数 仅能在类中的 constructor 使用表示调用父类构造函数
-  作为对象可以在 类中任意函数使用 实例属性中指代 父类原型对象 静态属性中指向父类
-  同时super 作为对象有一些不一致性惨开mdn
+  作为对象可以在 类中任意函数使用 实例属性中指代 父类原型对象(注意是这样的对象Base.prototype.x = 2) super.x可以取到而属于父类实例对象则取不到了
+  同时super 作为对象有一些不一致性参考mdn。
+super调用时使用this也存在一些不一致性 ,在此时super就是this 偷来两个例子 没跑过
+```js
+  class A {
+  constructor() {
+    this.x = 1;
+  }
+  print() {
+    console.log(this.x);
+  }
+ }
+class B extends A {
+  constructor() {
+    super();
+    this.x = 2;
+  }
+  m() {
+    super.print();
+  }
+}
+
+let b = new B();
+b.m() // 2
+
+class A {
+  constructor() {
+    this.x = 1;
+  }
+}
+
+class B extends A {
+  constructor() {
+    super();
+    this.x = 2;
+    super.x = 3;
+    console.log(super.x); // undefined
+    console.log(this.x); // 3
+  }
+}
+
+let b = new B();
+```
+
+静态属性中super指向父类对象实例
+
+18.简单说一下 prototype和__proto__和Object.getPrototypeOf(obj)
+
+prototype 是构造函数特有的属性class相当于构造函数的语法糖,使用class声明的也有这个属性* Function.prototype.prototype
+以下偷ai的例子
+```js
+function Person(name) {
+  this.name = name;
+}
+
+// 给 Person 的 prototype 添加方法
+Person.prototype.sayHello = function() {
+  console.log(`Hello, I'm ${this.name}`);
+};
+
+const person = new Person('Alice');
+person.sayHello(); // Hello, I'm Alice
+
+// Person 是一个函数，所以有 prototype 属性
+console.log(Person.prototype); // { sayHello: [Function], constructor: [Function: Person] }
+
+// 但 person 是个实例对象，没有 prototype 属性（普通对象默认没有 prototype 属性）
+console.log(person.prototype); // undefined
+```
+
+__proto__ 是每个对象都有的一个非标准化但是实现都有的属性
+指向每个对象的原型构造原型链的
+
+```js
+function Person() {}
+const p = new Person();
+
+// p.__proto__ 指向 Person.prototype
+console.log(p.__proto__ === Person.prototype); // true
+
+// Person.prototype 的 __proto__ 指向 Object.prototype
+console.log(Person.prototype.__proto__ === Object.prototype); // true
+
+// Object.prototype.__proto__ 是 null
+console.log(Object.prototype.__proto__); // null
+
+```
+
+Object.getPrototypeOf(obj) 是__proto__ 的替代 获取原型对象的标准方法
+```js
+function Person() {}
+const p = new Person();
+
+// 获取 p 的原型，等同于 p.__proto__
+console.log(Object.getPrototypeOf(p) === Person.prototype); // true
+
+// 获取 Person.prototype 的原型，就是 Object.prototype
+console.log(Object.getPrototypeOf(Person.prototype) === Object.prototype); // true
+```
+
+

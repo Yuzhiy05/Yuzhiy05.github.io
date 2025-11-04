@@ -996,7 +996,7 @@ let Derived=function(name,age){
  Derived.prototype = Object.create(Base.prototype);
  Derived.prototype.constructor = Derived;
 
-    let new_obj = new Derived('114', '514');
+let new_obj = new Derived('114', '514');
 
 ```
 ES6 有class就没这么多事了
