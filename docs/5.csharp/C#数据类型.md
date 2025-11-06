@@ -282,7 +282,7 @@ var group = table.AsEnumerable()
                });               
 ```
 
-# string 字符串类型
+## string 字符串类型
 
  C#的String被视为基元类型,直接使用字面值构造
  但是CLR via c#与微软的copilt ai都和编译器有一些出入
@@ -396,6 +396,123 @@ var sb=new StringBuilder("AAA");
  Console.WriteLine($"StringBuilder after clearing: {sb}");
  ```
 ::: 
+
+
+## 元组
+c# 因为设计缺陷
+存在两个元组
+值元组 System.valueTuple   其中成员的都是字段
+元组(引用类型) System.Tuple 其中成员的都是属性
+
+先介绍元组 System.Tuple 因为没有模板形参包
+所以有Tuple.Tuple\<T\> ,...Tuple\<T1,T2,T3,T4,T5,T6,T7,TRest\> 这么多类型
+
+使用
+```c#
+//静态方法可以进行泛型参数推导
+var tuple1=Tuple.Create(1,.2.1,"123",'c');
+//使用构造函数构造Tuple需要指明泛型参数
+var population = new Tuple<string, int, int, int, int, int, int>(
+                           "New York", 7891957, 7781984, 
+                           7894862, 7071639, 7322564, 8008278);
+```
+因为 不同泛型参数的Tuple(Tuple,Tuple\<T\>,...Tuple\<T1,T2...T7,TRest\>) 实际上是不同的九个类型,其构造函数不是泛型方法
+所以无法推导类型.一般使用静态方法Tuple.Create,可以进行泛型参数推导
+
+使用形如 item1,item2,item3...的属性名
+```c#
+tuple1.item1 ，tuple1.item2 ,tuple1.iteam3 
+```
+来访问tuple中的元素
+实现了两个显示接口方法
+以Tuple\<T1,T2,T3\> 为例
+```c#
+int IComparable.CompareTo(object obj);
+
+int IStructuralComparable.CompareTo(object other, System.Collections.IComparer comparer);
+
+bool IStructuralEquatable.Equals(object other, System.Collections.IEqualityComparer comparer);
+```
+IComparable.CompareTo 默认相等性比较 比较方法是按 Tuple元素Item1,Item2...一个个比较 用于数组排序 Array.Sort()默认调用
+
+IStructuralComparable.CompareTo 可以自定义比较器 比如我只比较两个Tuple 的第二个值的大小来代表两个Tuple的大小 
+
+IStructuralEquatable.Equals 相对性比较
+
+例子 
+```C#
+public class CustomComparer<T1, T2, T3> : IComparer
+{
+    public int Compare(Object x, Object y)
+    {
+        var t = x as Tuple<T1, T2, T3>;
+        if (t == null)
+            return 0;
+        else
+        {
+            var t2 = y as Tuple<T1, T2, T3>;
+            return Comparer<T3>.Default.Compare(t.Item3, t2.Item3);
+        }
+    }
+}
+Random random = new Random();
+
+// 创建一个数组，用于存放 10 个 Tuple<int, char, double>
+var tuple_arr = new Tuple<int, char, double>[10];
+
+// 循环生成 10 个随机 Tuple
+for (int i = 0; i < 10; i++)
+{
+    int item1 = random.Next(1, 100); // 随机整数，比如 1~99
+    char item2 = (char)random.Next(65, 91); // 随机大写字母 A(65) ~ Z(90)
+    double item3 = Math.Round(random.NextDouble() * 100, 2); // 随机浮点数 0.00 ~ 99.99
+
+    // 创建 Tuple 并放入数组
+    tuple_arr[i] = Tuple.Create(item1, item2, item3);
+}
+
+//默认调用IComparable.CompareTo
+Array.Sort(tuple_arr);
+
+foreach (var tuple in tuple_arr)
+    Console.WriteLine($"[{tuple.Item1}|{tuple.Item2}|{tuple.Item3}]");
+
+//使用IStructuralComparable.CompareTo
+Array.Sort(tuple_arr, new CustomComparer<T1, T2, T3>());
+foreach (var tuple in tuple_arr)
+    Console.WriteLine($"[{tuple.Item1}|{tuple.Item2}|{tuple.Item3}]")
+```
+这个例子在.net9 上基本上是最新的运行时实际上都没有调用 IStructuralComparable接口而是直接使用默认比较器和IComparable.CompareTo去调用Compare()来进行比较
+但是AI和MSDN都介绍说Array.Sort(Array, IComparer) 会调用IStructuralComparable接口CompareTo找Compare方法实际上Debug一下就知道
+传入比较器为空,会使用默认比较器。
+```c#
+public void Sort(Span<T> keys, IComparer<T> comparer)
+{
+	try
+	{
+		if (comparer == null)
+		{
+			comparer = Comparer<T>.Default;
+		}
+		IntrospectiveSort(keys, comparer.Compare);
+	}
+    ...//其他代码省略
+}
+```
+>尽管可以直接调用此方法，但它最常由包含 IComparer 参数的集合排序方法调用，这些方法用于对集合的成员进行排序。 例如，它由 Array.Sort(Array, IComparer) 方法以及Add使用 SortedList.SortedList(IComparer) 构造函数实例化的 对象的 方法SortedList调用。
+<https://learn.microsoft.com/zh-cn/dotnet/api/system.tuple-6.system-collections-istructuralcomparable-compareto?view=net-9.0#-->
+吐槽一下msdn的段落链接也炸了。
+
+元组在ai都被吐槽为落后,让我使用c#7/.net core2 开始的值元组
+
+2.System.valueTuple
+
+
+
+
+
+### 解构赋值
+
 
 
 
