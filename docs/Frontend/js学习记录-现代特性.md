@@ -1,3 +1,8 @@
+---
+title: js学习记录-现代特性
+createTime: 2025/10/23 22:22:55
+permalink: /article/phjyyo80/
+---
 
 
 # js 的现代特性
@@ -61,7 +66,7 @@ js依此来维护一个任务队列,也就是函数中的同步代码,只有同�
 还有两个 分别是 浏览器空闲时执行的回调 和 手动构造`任务`的方法
 
 ## Promise
-类似于 c# 的 async await 其返回值Task<result> 和c++ 的多线程工具 future/promise(可惜没做成语言特性) c++20的co_awiwt更像，不过js是单线程的异步操作不一定需要使用线程来实现
+类似于 c# 的 async await 其返回值Task\<result\> 和c++ 的多线程工具 future/promise(可惜没做成语言特性) c++20的co_awiwt更像，不过js是单线程的异步操作不一定需要使用线程来实现
 
 异步函数不直接返回所需对象,而是返回一个`承诺` 对象
 这个承诺对象自然而然的分三种情况

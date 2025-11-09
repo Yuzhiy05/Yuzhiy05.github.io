@@ -1,3 +1,8 @@
+---
+title: xmake使用记录
+createTime: 2025/10/12 23:21:12
+permalink: /article/l1y1lkci/
+---
 
 
 

@@ -1,3 +1,8 @@
+---
+title: js学习记录-ES6
+createTime: 2025/10/31 00:08:11
+permalink: /article/xwbbpjtm/
+---
 
 
 打*号基本就没实际试试 有实例的基本上写过一遍 有的api就不写了用到自然会用
