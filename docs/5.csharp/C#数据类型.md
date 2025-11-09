@@ -401,9 +401,10 @@ var sb=new StringBuilder("AAA");
 ## 元组
 c# 因为设计缺陷
 存在两个元组
-值元组 System.valueTuple   其中成员的都是字段
-元组(引用类型) System.Tuple 其中成员的都是属性
+值元组(值类型) System.valueTuple   其中成员的都是字段  元素可变
+元组(引用类型) System.Tuple 其中成员的都是属性  元素内容不可变
 
+### Tuple
 先介绍元组 System.Tuple 因为没有模板形参包
 所以有Tuple.Tuple\<T\> ,...Tuple\<T1,T2,T3,T4,T5,T6,T7,TRest\> 这么多类型
 
@@ -424,6 +425,12 @@ var population = new Tuple<string, int, int, int, int, int, int>(
 tuple1.item1 ，tuple1.item2 ,tuple1.iteam3 
 ```
 来访问tuple中的元素
+
+tips 观察所有Item(index)...属性的声明
+```c#
+public T1 Item1 { get; }
+```
+只有get,没有set Tuple的所有元素都是只读的
 实现了两个显示接口方法
 以Tuple\<T1,T2,T3\> 为例
 ```c#
@@ -505,13 +512,148 @@ public void Sort(Span<T> keys, IComparer<T> comparer)
 
 元组在ai都被吐槽为落后,让我使用c#7/.net core2 开始的值元组
 
-2.System.valueTuple
+### System.valueTuple
+c# 为值元组设计了新语法,只需要用括号包裹就可以定义一个匿名元组
+```c#
+(int,string)t=("loka", 18);
+var t=("loka", 18);
+```
+其中t的类型就是 `(int,string)` 这个表达式
+
+1.元组元素的映射,元组元素可以用如下方式指定名字,如果没有指定名字,但其中的值是引用了别的变量,那么可以推导出该变量初始化的名字当元组名。
+```C#
+var t = (Sum: 4.5, Count: 3);
+Console.WriteLine($"Sum of {t.Count} elements is {t.Sum}.");
+
+(double Sum, int Count) d = (4.5, 3);
+Console.WriteLine($"Sum of {d.Count} elements is {d.Sum}.");
+
+//用初始化的变量名推导元组元素的名字
+var sum = 4.5;
+var count = 3;
+var t = (sum, count);
+Console.WriteLine($"Sum of {t.count} elements is {t.sum}.");
+```
+同样可以用默认名Item1,Item2...
+
+2.使用using 定义元组别名
+c#12可以说使用,注意使用位置
+1.想在单个文件可见
+```c#
+using System;
+using System.Collections.Generic;
+using person=(int,string)
+```
+2.想要在全局可见需要写在所有using之前,并且使用global修饰
+```c#
+global using person=(int,string)
+using System;
+using System.Collections.Generic;
+```
+
+3.和Tuple有类似的api
+其中 元素都是字段
+```c#
+public T1 Item1;
+```
+
+tips ValueTuple是所有值类型的隐式基类,但不能创建直接从 ValueType 继承的类。 相反，单个编译器提供语言关键字:struct关键字
+[参考](https://learn.microsoft.com/zh-cn/dotnet/api/system.valuetype?view=net-9.0#remarks)
+另一个用处是在方法中声明ValueTuple参数,使得参数传递值而不是引用
+
+### 元组的赋值与相等性比较
+1.元组赋值按类型和元素数量匹配
+不看字段名,只要按顺序对应位置的类型相同(或可隐式转换)且元素数量相同。
+```c#
+ var t = ("1", 12);
+ var t2 = ("2", 12);
+ var t3 = ("111", 12, 1);
+ var t4 = ( 12, "111");
+ t = t2;  //可以
+ t = t3;  //无法将类型“(string, int, int)”隐式转换为“(string, int)”
+ t = t4;  //无法将类型“(int, string)”隐式转换为“(string, int)”
+```
 
 
+2.与赋值一样不考虑元组名字
+考虑
+1.两元组元素数量相等
+2.元组按顺序的两个元素可比较
+以下相等比较的表达式 1,3,4报错 元素数量不一致,无法比较的类型连编译都不通过
+```c#
+public struct Customclass { }
+
+var t1 = (1, 2);
+var t2 = (1, '1');
+var t3 = (1, 2, 3);
+var t4 = (1, new Customclass());
+ Console.WriteLine(t1 != t3);//元素数量不对
+ Console.WriteLine(t1 != t2);
+ Console.WriteLine(t1 == t3);//元素数量不对
+ Console.WriteLine(t1 == t2);
+ Console.WriteLine(t1 != t4);//无法应用相等比较运算符
+```
+
+tips 元组类型可以是表达式,所以在相等比较时会先求值表达式
+MSDN偷的例子
+```c#
+Console.WriteLine((Display(1), Display(2)) == (Display(3), Display(4)));
+
+int Display(int s)
+{
+    Console.WriteLine(s);
+    return s;
+}
+// Output:
+// 1
+// 2
+// 3
+// 4
+// False
+```
 
 
 
 ### 解构赋值
+四种语法
+1.为每个变量单独使用var 
+2.不使用var 指明类型 可隐式转换
+3.为单独某个元素声明var 另编译器推导其类型
+4.在括号外为所有变量声明var 
+```c#
+ (var name, var age) = ("loka", 18);
+ (string name1, int age2) = ("loka", 18);
+ (var name2, int age2) = ("loka", 18);
+ var(name3, age3) = ("loka", 18); 
+```
+
+和模式匹配结合的例子，从MSDN上偷来的
+循环访问多个整数，并输出可被 3 整除的整数
+```c#
+for (int i = 4; i < 20;  i++)
+{
+    if (Math.DivRem(i, 3) is ( Quotient: var q, Remainder: 0 ))
+    {
+        Console.WriteLine($"{i} is divisible by 3, with quotient {q}");
+    }
+}
+```
+
+使用`_` 下滑线来忽略元组的某些元素,这被称为弃元
+```c#
+ var (_, _, _, pop1, _, pop2) = ("New York City", 1960, 2010，1.1，2.1,3);
+ Console.WriteLine($"{pop2 - pop1:N0}");
+```
+### 让用户自定义类型也支持解构
+需要为类型声明 如下方法
+可以重载多个该方法
+```c#
+public void Deconstruct(out [类型]参数名1, out [类型] 参数名2, out [类型]参数名3)
+```
+
+## Record 记录类型
+拥有值语义的引用类型
+
 
 
 
