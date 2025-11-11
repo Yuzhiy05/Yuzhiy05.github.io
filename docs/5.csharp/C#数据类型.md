@@ -654,6 +654,198 @@ public void Deconstruct(out [类型]参数名1, out [类型] 参数名2, out [�
 ## Record 记录类型
 拥有值语义的引用类型
 
+使用主构造函数语法来声明Record类型
+主构造函数语法(C# 12)即声明类型时后跟类似于函数的参数和括号,编译器会生成签名为此的构造函数
+Preson的声明使用record修饰并且使用主构造函数后会生成类似Preson2的解构(两者完全不等价只是解糖后的行为相似)
+```c#
+public record Preson(int Id, string Name);
+
+public struct Preson2(int Id, string Name)
+{
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+
+    public override string ToString()
+    {
+        return $"Preson2:{Id={Id}, Name={Name}}";
+    }
+}
+```
+相似在哪?
+1.主构造函数声明的参数表示这个参数都需要初始化时不能不提供-对应required
+2.使用主构造函数后这些参数都需要对象值设定语法来指示而不是写在调用函数的参数中
+3.初始化完成后,属性是只读的无法再次赋值,只能在类对象初始化时赋值
+4.打印对象时会打印对应属性而不是调用Object.ToString()打印其类型
+5.相等性比较类似于struct:是比较值是否相同而不是比较引用/地址(是否为同一对象)
+
+```c#
+ var tt = new Preson();//报错 未提供与“Preson.Preson(int, string)”的所需参数“Id”对应的参数
+ var tt2 = new Preson2(1, "loka");//报错 必须在对象初始值设定项或属性构造函数中设置所需的成员'Preson2.Id'。必须在对象初始值设定项或属性构造函数中设置所需的成员'Preson2.Name'。
+
+var tt=new Preson(1,"loka");//可行
+
+var tt2=new Preson2 { Name="loka",Id=1 };//可行
+```
+
+
+
+
+## 对象初始值设定语法
+可以对象初始化时手动指定属性的值
+```c#
+public class outClass
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    public override string ToString()=> $"outClass: Id={Id}, Name={Name}";
+
+}
+
+public class test_type1
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    public string[] C = new string[2];
+    
+    //注意这里的注释
+    public outClass out_class_ { get; set; }//=new outClass();
+
+    public test_type1()
+    {
+        Id = 0;
+        Name = "default";
+    }
+
+    public test_type1(int id)
+    {
+        Id = id;
+    }
+}
+
+public static void test()
+{
+    var t1 = new test_type1 { Id = 10, Name = "Alice" };
+    var t2 = new test_type1(20) { Name = "Bob" };
+
+    // 方法 A：使用嵌套的索引初始化（默认构造已为 C 分配了数组）
+    var t3 = new test_type1()
+    {
+        Id = 10,
+        Name = "Alice",
+        C = { [0] = "1", [1] = "2" },
+        out_class_ = { Id = 11, Name = "111" },
+    };
+
+    // 方法 B：直接赋一个新的数组（更明确，也可改变长度）
+    var t4 = new test_type1
+    {
+        Id = 11,
+        Name = "Carol",
+        C = new string[] { "a", "b" },
+    };
+
+   
+    Console.WriteLine($"{t3.Id} {t3.Name} C[0]={t3.C[0]} C[1]={t3.C[1]},out_class_={t3.out_class_}");
+    Console.WriteLine($"{t4.Id} {t4.Name} C[0]={t4.C[0]} C[1]={t4.C[1]},out_class_={t3.out_class_}");
+}
+```
+这段代码在t3初始化时会抛异常:System.NullReferenceException:“Object reference not set to an instance of an object.”
+暂时不管,先介绍这个语法:对象初始化的时候可以使用大括号的语法对每个声明为public的属性或字段赋值。如t1和t2
+
+对于t3和t4的示例,演示了嵌套类型"初始化"的语法
+对于嵌套对象 可以使用不带new的 `Property = { ... }`语法初始化嵌套对象，如例子t3,t4所示
+
+**该语法本质是先创建对象再赋值**,所以这里t3初始化抛异常的原型是因为先初始化时构造函数什么都没干;out_class_==null.
+要想修复这个问题可以在属性声明时初始化 ` public outClass out_class_ { get; set; }=new outClass();`
+或在无参构造函数中初始化该属性;或在{}初始化时使用`new(){...}` 语法"初始化"(赋值)
+```c#
+public test_type1()
+{
+    Id = 0;
+    Name = "default";
+    <span style="
+    color: #22863a;
+    background-color: #f0fff4;
+    padding: 0 4px;
+    border-radius: 3px;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 14px;
+    display: inline-block;
+    margin: 0;">
+    +out_class_ = new outClass(); </span>
+    
+    //测试一下博客的markdown解析器支不支持这个语法
+    ```diff
+    + out_class_ = new outClass();
+    ```
+}
+```
+
+针对t1,t2的初始化语句 使用ILDsm查看后(.net9环境)
+```IL
+  IL_0001:  newobj     instance void csharp4IL.Test_object_initializers/test_type1::.ctor()
+  IL_0006:  dup
+  IL_0007:  ldc.i4.s   10
+  IL_0009:  callvirt   instance void csharp4IL.Test_object_initializers/test_type1::set_Id(int32)
+  IL_000e:  nop
+  IL_000f:  dup
+  IL_0010:  ldstr      "Alice"
+  IL_0015:  callvirt   instance void csharp4IL.Test_object_initializers/test_type1::set_Name(string)
+  IL_001a:  nop
+  IL_001b:  stloc.0
+  IL_001c:  ldc.i4.s   20
+  IL_001e:  newobj     instance void csharp4IL.Test_object_initializers/test_type1::.ctor(int32)
+  IL_0023:  dup
+  IL_0024:  ldstr      "Bob"
+  IL_0029:  callvirt   instance void csharp4IL.Test_object_initializers/test_type1::set_Name(string)
+```
+
+可以明显看到先newobj,调用构造函数生成对象后再调用set函数赋值属性
+
+显而易见的是
+1.`out_class_ = { Id = 11, Name = "111" }` 也就是`Property = { ... }`此语法复用对象的实例
+2.`out_class_ = new() { Id = 11, Name = "111" } Property = new() { ... }` 创建新的对象实例并替换原有对象
+
+
+同时对于没有设置set的只读属性(类对象) 语法1`Property = { ... }`也可以相应初始化该属性
+从MSDN偷来的例子
+```c#
+public class Settings
+    {
+        public string Theme { get; set; } = "Light";
+        public int FontSize { get; set; } = 12;
+    }
+
+    public class Application
+    {
+        public string Name { get; set; } = "";
+        // This property is read-only - it can only be set during construction
+        public Settings AppSettings { get; } = new();
+    }
+
+    public static void Example()
+    {
+        // You can still initialize the nested object's properties
+        // even though AppSettings property has no setter
+        var app = new Application
+        {
+            Name = "MyApp",
+            AppSettings = { Theme = "Dark", FontSize = 14 }
+        };
+
+        // This would cause a compile error because AppSettings has no setter:
+        // app.AppSettings = new Settings { Theme = "Dark", FontSize = 14 };
+
+        Console.WriteLine($"App: {app.Name}, Theme: {app.AppSettings.Theme}, Font Size: {app.AppSettings.FontSize}");
+    }
+```
+
+### init访问器/required修饰符
+
+
+
 
 
 
