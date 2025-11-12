@@ -647,44 +647,217 @@ for (int i = 4; i < 20;  i++)
 ### 让用户自定义类型也支持解构
 需要为类型声明 如下方法
 可以重载多个该方法
+参考下面例子
 ```c#
-public void Deconstruct(out [类型]参数名1, out [类型] 参数名2, out [类型]参数名3)
+//声明 如下方法
+public void Deconstruct(out [类型]参数名1, out [类型] 参数名2, out [类型]参数名3...){}
+
+//使用
+ public class TypeCustomDeconstruct
+ {
+     private int id;
+     private string name;
+
+     public TypeCustomDeconstruct(int id, string name)
+     {
+         this.id = id;
+         this.name = name;
+     }
+
+     public void Deconstruct(out int id, out string name)
+    {
+        id = this.id;
+        name = this.name;
+    }
+    
+    //相同参数
+    public void Deconstruct(out string type, out string name)
+    {
+       type = this.type;
+       name = this.name;
+    }
+    
+    //相同参数
+    public void Deconstruct(out string name, out int id, out string type)
+    {
+        id = this.id;
+        name = this.name;
+        type = this.type;
+    }
+ }
+
+var obj = new TypeCustomDeconstruct(1, "Alice", "male");
+var (id, name, sex) = obj;//可行匹配到了
+var (name2, id2) = obj; //二义性 无法推导类型无法匹配
+var (type, name3) = obj;//二义性 无法推导类型无法匹配
+(string id3, string name4) = obj;//二义性 无法匹配尽管指明类型
 ```
+MSDN的说明注意一下
+>具有相同数量参数的多个 Deconstruct 方法是不明确的。 在定义 Deconstruct 方法时，必须小心使用不同数量的参数或“arity”。 在重载解析过程中，不能区分具有相同数量参数的 Deconstruct 方法。
+
+~~虽然没有明说为什么不行~~ 不过这表示 **第四个解构赋值** 尽管指明类型但是参数元数的重载有两个也是不能重载解析的
+(有大佬说明:语义上是要求要能先返回一个tuple,再拆tuple到两个变量)
+
+同时也可以设置扩展方法的Deconstruct 函数来设定解构行为
+```c#
+public static void Deconstruct(this [Type] p,out...)
+```
+
 
 ## Record 记录类型
 拥有值语义的引用类型
 
 使用主构造函数语法来声明Record类型
 主构造函数语法(C# 12)即声明类型时后跟类似于函数的参数和括号,编译器会生成签名为此的构造函数
-Preson的声明使用record修饰并且使用主构造函数后会生成类似Preson2的解构(两者完全不等价只是解糖后的行为相似)
+Person的声明使用record修饰并且使用主构造函数后会生成类似Person2的结构(两者完全不等价只是解糖后的行为相似)
 ```c#
-public record Preson(int Id, string Name);
+public record Person(int Id, string Name);
 
-public struct Preson2(int Id, string Name)
+public struct Person2(int Id, string Name)
 {
     public required int Id { get; init; }
     public required string Name { get; init; }
 
     public override string ToString()
     {
-        return $"Preson2:{Id={Id}, Name={Name}}";
+        return $"Person2:{Id={Id}, Name={Name}}";
     }
 }
 ```
 相似在哪?
-1.主构造函数声明的参数表示这个参数都需要初始化时不能不提供-对应required
+1.主构造函数声明的参数表示这个参数都需要;初始化时不能不提供-对应required
 2.使用主构造函数后这些参数都需要对象值设定语法来指示而不是写在调用函数的参数中
 3.初始化完成后,属性是只读的无法再次赋值,只能在类对象初始化时赋值
 4.打印对象时会打印对应属性而不是调用Object.ToString()打印其类型
 5.相等性比较类似于struct:是比较值是否相同而不是比较引用/地址(是否为同一对象)
 
 ```c#
- var tt = new Preson();//报错 未提供与“Preson.Preson(int, string)”的所需参数“Id”对应的参数
- var tt2 = new Preson2(1, "loka");//报错 必须在对象初始值设定项或属性构造函数中设置所需的成员'Preson2.Id'。必须在对象初始值设定项或属性构造函数中设置所需的成员'Preson2.Name'。
+ var tt = new Person();//报错 未提供与“Person.Person(int, string)”的所需参数“Id”对应的参数
+ var tt2 = new Person2(1, "loka");//报错 必须在对象初始值设定项或属性构造函数中设置所需的成员'Person2.Id'。必须在对象初始值设定项或属性构造函数中设置所需的成员'Person2.Name'。
 
-var tt=new Preson(1,"loka");//可行
+var tt=new Person(1,"loka");//可行
 
-var tt2=new Preson2 { Name="loka",Id=1 };//可行
+var tt2=new Person2 { Name="loka",Id=1 };//可行
+```
+### 区分Record/Record class/Record struct
+
+1.record ==record class 本身是引用类型 但是具有值语义
+2.record struct 是值类型 同样的具有值语义
+
+编译器会自动生成一下内容
+1.使用record声明类型;并使用主构造函数语法时,其中参数的位置叫"位置参数",声明的类型叫"位置记录"
+对于record class 编译器会创建对应参数类型的属性
+
+对于record struct 编译器会创建对应参数类型的读写属性
+
+2.创建的构造函数参数声明顺序与位置参数一致
+
+3.record struct生成的字段会初始化为默认值
+
+4.编译器创建一个包含所有"位置参数"的Deconstruct方法
+
+5.值相等的 Object.Equals(Object)  Object.GetHashCode()   == 和 !=
+
+上面那个例子可以扩写一下
+```c#
+``diff
+public record struct Person(int Id, string Name);
+``
+
+public struct Person2
+{
+    public required int Id { get; set; } = default(int);
+    public required string? Name { get; set; } = default(string);
+
+    public Person2(int Id_, string Name_)
+    {
+        Id = Id_;
+        Name = Name_;
+    }
+
+    public void Deconstruct(out int id, out string name)
+    {
+        id = Id;
+        name = Name;
+    }
+
+    public override string ToString() => $"Preson2: Id={Id}, Name={Name}";
+}
+
+```
+Person这个位置记录 创建的类型解糖后差不多为Person2;因为创建的属性是个读写属性
+同时
+>从 C# 11 开始，如果你没有初始化结构中的所有字段，编译器会将代码添加到将这些字段初始化为默认值的构造函数中。 分配给其 default 值的结构将初始化为 0 位模式。 使用 new 初始化的结构体初始化为 0 位模式，然后执行所有字段初始值设定项和构造函数。**每个 struct 都具有一个 public 无参数构造函数。**
+所以可以使用初始值设定语法,参考下方初始值设定语法
+```c#
+var tt2=new Person2 { Name="loka",Id=1 };
+```
+再看record/record class的例子
+```c#
+public record class Person3(string FirstName, string LastName);
+
+public class Person4
+{
+    public required string FirstName { get; init; }
+    public required string LastName { get; init; }
+
+    public Person4(string FirstName_, string LastName_)
+    {
+        FirstName = FirstName_;
+        LastName = LastName_;
+    }
+
+    public void Deconstruct(out string FirstName_, out string LastName_)
+    {
+        FirstName_ = FirstName;
+        LastName_ = LastName;
+    }
+
+    public override string ToString() => $"Preson2: Id={FirstName}, Name={LastName}";
+}
+```
+此处Person3的位置记录声明了类似Person4 的类型
+但是这里使用如下初始化语法
+```c#
+ var pre2= new Person3("1", "loka");//可以
+ var pre3= new Person3 { FirstName = "2", LastName = "jeff" };//报错:未提供与“Person3.Person3(string, string)”的所需参数“FirstName”对应的参数
+ pre2.FirstName="emi";//报错:只能在对象初始值设定项中或在实例构造函数或 "init" 访问器中的 "this" 或 "base" 上分配 init-only 属性或索引器 "Person3.FirstName"。
+```
+属性赋值语句的报错侧面证实了位置record声明的效果:声明了仅初始化(构造函数中/或对象初始值设定语法中)中(init-only)可以赋值的属性
+
+`var pre3= new Person3 { FirstName = "2", LastName = "jeff" }` 该表达式报错参考下方说明:此语法糖实际上是先调用无参的构造函数,再利用属性的set函数赋值,编译器通过语法检查防止你在初始化外赋值。
+因为结构struct会默认生成一个public的无参构造函数,而class不会这么做。所以record class/record 与record struct在初始化语法上存在一些差异
+
+如果你对编译器默认生成的属性不满意,
+可以主动声明一个同名属性把编译器生成属性覆盖掉
+可以自定义属性访问器
+可添加字段 但必须用位置参数初始化字段
+
+参考下面例子
+```c#
+public record Person5(string FirstName, string LastName,int age)
+{
+    //在记录中定义字段 因为析构函数的需要所以 需要初始化该字段 不一定非要位置字段
+    public string FirstName_ = FirstName;
+   
+   //对默认生成的属性不满意 自定义同名属性和访问器覆盖默认实现
+    private int age
+    {
+        get { return age + 1; }
+        set { if (value> 0) age = value; }
+    }
+    
+    //对默认生成的属性不满意单纯的指向修改访问控制符
+    // (不自定义访问器)实际仍是自动的属性则必须要初始化这个属性
+    private string LastName
+    {
+        get;
+        init;
+    } = LastName;//=""
+
+    //和声明类成员一样声明属性 不一定需要位置属性(在主构造函数声明)
+    public string FullName => $"{FirstName} {LastName}";
+}
 ```
 
 
