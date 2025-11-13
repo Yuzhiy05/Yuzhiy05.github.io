@@ -557,9 +557,6 @@ using System.Collections.Generic;
 public T1 Item1;
 ```
 
-tips ValueTuple是所有值类型的隐式基类,但不能创建直接从 ValueType 继承的类。 相反，单个编译器提供语言关键字:struct关键字
-[参考](https://learn.microsoft.com/zh-cn/dotnet/api/system.valuetype?view=net-9.0#remarks)
-另一个用处是在方法中声明ValueTuple参数,使得参数传递值而不是引用
 
 ### 元组的赋值与相等性比较
 1.元组赋值按类型和元素数量匹配
@@ -860,8 +857,293 @@ public record Person5(string FirstName, string LastName,int age)
 }
 ```
 
+### 关于相等性比较
+record修饰的class或struct都是基于属性值的相等性比较
+见下例
+```c#
+public record class Person3(string FirstName, string LastName, string[] phnumber);
+
+ var per3=new Person3("Alice","Smith",["1234"]);
+ var per3_2 = new Person3("Alice", "Smith", ["1234"]);
+
+ Console.WriteLine(per3==per3_2);//false
+
+ var phonenumber=new string[2] { "5678", "91011" };
+ var per3_3=per3 with { phnumber= phonenumber};
+ var per3_4 = per3 with { phnumber = phonenumber };
+ Console.WriteLine(per3_3==per3_4);//true
+```
+可见即使record 声称 相等性比较是值语义的 但是面对引用类型时仍然 会使得这种值语义失败
+这是因为 
+1.record 通过编译器生成 Object.Equals(Object)的替代函数 仅仅通过重写该方法  用户不能重写
+
+2. 合成 virtual/sealed, Equals(R? other) R为记录类型 该函数实现 IEquatable\<T\>。 用户可以重写(不如说用户向实现)
+   
+3. 合成Object.GetHashCode()  用户可以覆盖
+   
+4. `==,!=` 运算符 不能重写
+5. 派生/继承类型的重写参考[MSDN](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#value-equality)
+
+对string[2] 这样的引用类型应用Equals方法时 仍然进行的是引用比较,即数组是否指向同一地址
+
+注意因为c# 重写了string类型的Object.Equals(Object) 方法所以即使是引用类型相等性比较时仍然是值比较
+
+为了定制更加值语义比较的需求 我们需要这样重写方法
+```c#
+public record class Person3(string FirstName, string LastName, string[] phnumber)
+    : IEquatable<Person3>
+{
+    //public override bool Equals(object? obj)  该方法无法声明 因为默认生成的方法不是virtual 修饰
+    //public  bool Equals(Person3? obj)  //如果记录不是密封的(sealed修饰) 该方法必须要声明virtual
+    bool IEquatable<Person3>.Equals(Person3? obj)
+    {
+        return obj is Person3 other
+            && FirstName == other.FirstName
+            && LastName == other.LastName
+            && phnumber.SequenceEqual(other.phnumber); // 比较数组内容
+    }
+
+    public virtual bool Equals(Person3? obj)
+    {
+        return (this as IEquatable<Person3>).Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(FirstName, LastName, phnumber.Length); // 简化处理
+    }
+}
+
+var per3=new Person3("Alice","Smith",["1234"]);
+var per3_2 = new Person3("Alice", "Smith", ["1234"]);
+
+//这样进行相等性比较
+ Console.WriteLine(per3==per3_2);//true
+```
+
+### 使用with 表达式创建新记录
+对于record class来说位置参数生成的属性都是init-only的(仅在初始化阶段可赋值的)
+这个时候为了简化从一个已存在记录的实例创建只有某些属性不一致的对象时 with表达式初始化很有用
+参考MSDN的例子
+```c#
+public record Person(string FirstName, string LastName)
+{
+    public string[] PhoneNumbers { get; init; }
+}
+
+public static void Main()
+{
+    Person person1 = new("Nancy", "Davolio") { PhoneNumbers = new string[1] };
+    Console.WriteLine(person1);
+    // output: Person { FirstName = Nancy, LastName = Davolio, PhoneNumbers = System.String[] }
+
+    Person person2 = person1 with { FirstName = "John" };
+    Console.WriteLine(person2);
+    // output: Person { FirstName = John, LastName = Davolio, PhoneNumbers = System.String[] }
+    Console.WriteLine(person1 == person2); // output: False
+
+    person2 = person1 with { PhoneNumbers = new string[1] };
+    Console.WriteLine(person2);
+    // output: Person { FirstName = Nancy, LastName = Davolio, PhoneNumbers = System.String[] }
+    Console.WriteLine(person1 == person2); // output: False
+
+    person2 = person1 with { };
+    Console.WriteLine(person1 == person2); // output: True
+}
+```
+注意使用with 表达式 需要属性不管是否是位置参数生成的属性 都需要init/set访问器
+注意` person2 = person1 with { };`的例子with指向的复制都是浅拷贝 也就是说对于引用类型,复制后的引用的仍是都是同一对象(只复制指针)
+所以输出true
+
+编译器为了实现该功能
+
+对于record class
+1.合成了一个Clone函数  用户无法重写覆盖 with表达式调用Clone函数 通过Clone函数调用复制构造函数
+2.一个复制构造函数      可以重写
+
+对于record struct
+1.不生成复制构造函数 在值分配时复制
+
+在Person3中添加复制构造,使用with表达式时就会被调用
+```c#
+public record class Person3(string FirstName, string LastName, string[] phnumber): IEquatable<Person3>
+{
+  ....
+  public Person3(Person3? obj)
+  {
+    Console.WriteLine("Person3 copy constructor called");
+    FirstName = obj?.FirstName ?? "";
+    LastName = obj?.LastName ?? "";
+    phnumber = obj?.phnumber ?? Array.Empty<string>();
+  }
+  ...
+}
+
+var per3 = new Person3("Alice", "Smith", ["1234"]);
+var phonenumber = new string[2] { "5678", "91011" };
+var per3_3 = per3 with { phnumber = phonenumber };
+```
+
+### 初始化存在依赖的属性 使用with的注意事项
+参考MSDN的[例子](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#nondestructive-mutation:~:text=%E9%80%9A%E8%BF%87%E8%AE%A1%E7%AE%97%E8%AE%BF%E9%97%AE%E4%B8%8A%E7%9A%84%E5%80%BC%E6%9D%A5%E7%A1%AE%E4%BF%9D%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7%E7%9A%84%E6%AD%A3%E7%A1%AE%E6%80%A7%EF%BC%8C%E5%A6%82%E4%BB%A5%E4%B8%8B%E5%A3%B0%E6%98%8E%E6%89%80%E7%A4%BA%EF%BC%9A)
+大致是说 with表达式也依赖初始值设定语法-先构造函数初始值再调用属性赋值.因此如果给属性添加初始化器会导致with表达式赋值的属性依赖
+其他有初始值的属性时可能会使用被克隆对象的初值而不是使用with表达式新赋的值
+
+### 编译器自动生成的ToString
+对于记录我们更加注重是数据
+所以编译器生成的ToString函数会将属性和值打印出来而不是字段
+格式为`<record type name> { <property name> = <value>, <property name> = <value>, ...}`
+
+编译器会实现
+对于record class
+1.virtual PrintMembers 方法      用户可重写覆盖
+2.ToString 函数              用户可重写覆盖
+
+对于record struct
+同样生成上述方法但是是private的
+
+这个实现其实有问题
+```c#
+protected virtual bool PrintMembers(StringBuilder sb)
+{
+    Console.WriteLine("Custom PrintMembers called");
+    sb.AppendLine($"FirstName:{{{FirstName}, LastName: {LastName}, Age: {age}}}");
+    return true;
+}
+
+ public override string ToString() => PrintMembers();
+```
+注意对编译器自动生成的PrintMembers 对于一些没重写ToString方法的引用类型仍是打印值
+
+只要定义了符合条件的PrintMembers 编译器合成的ToString函数就能调用到
+编译器合成的ToString大概长这样
+```c#
+public override string ToString()
+{
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.Append("Person5"); // type name
+    stringBuilder.Append(" { ");
+    if (PrintMembers(stringBuilder))
+    {
+        stringBuilder.Append(" ");
+    }
+    stringBuilder.Append("}");
+    return stringBuilder.ToString();
+}
+```
+对于PrintMembers应该如何声明参考[MSDN]
+(https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#printmembers-formatting-in-derived-records)
+
+最后总结一下 record实际是 一些特殊要求的class类型因为实际确实有这些类型的需求所以c#添加了record这个语法糖来简化一种特定类型的声明
+声明compA 编译器实际上生成类似compB的结构
+```c#
+//一个record class
+ public record compA(int Id, string Name);
+
+ //
+ public class compB
+ {
+     public required int Id { get; init; }
+     public required string Name { get; init; }
+
+     public compB(int Id_, string Name_) 
+     {
+         Id =Id_;
+         Name = Name_;
+     }
+      public compB(compB other)
+     {
+        if (other == null)
+         throw new ArgumentNullException(nameof(other));
+
+         Id = other.Id;
+         Name = other.Name;
+     }
+    
+    // 模拟 record class 的行为：编译器对 record class 生成的 with 表达式会调用一个
+    // 受保护的虚拟 Clone 方法
+    //然而这个实现有问题手动模拟不了
+     protected virtual compB Clone([with表达式的参数]...args)
+     {
+       return new compB(this){ [whit指定的属性]=args[1]};
+     }
+
+     public override bool Equals(object? obj)
+     {
+         if (obj is not compB other)
+             return false;
+         return Id == other.Id && Name == other.Name;
+     }
+     public override int GetHashCode() => HashCode.Combine(Id, Name);
+
+     public void Deconstruct(out int id, out string name)
+     {
+         id = Id;
+         name = Name;
+     }
+     protected virtual bool PrintMembers(StringBuilder sb)
+     {
+         sb.AppendLine($"Id:{Id} Name:{Name}");
+         return true;
+     }
+     public override string ToString()
+     {
+         StringBuilder stringBuilder = new StringBuilder();
+         stringBuilder.Append("compB"); // type name
+         stringBuilder.Append(" { ");
+         if (PrintMembers(stringBuilder))
+         {
+             stringBuilder.Append(" ");
+         }
+         stringBuilder.Append("}");
+         return stringBuilder.ToString();
+     }
+ }
+```
+其中Clone方法完全模拟不了(可能是我不会写),因为init要求必须由对象初始值指定语法指定属性的初始值
+虽然该语法是先构造对象,再调用属性赋值的语法糖 但在语义上属性赋值的部分仍然属于初始化的语义
+以下例子是一些语法的解糖状态 后面用ILspy看一下
+```c#
+//例子1
+var t=new <RcordType>(someargues){Property=xxx};
+
+var t=new <RcordType>(someargues);
+t.Property=xxx;
+
+//例子2
+var t3=with t2{Property2=yyy};
+
+var t3=t2.Clone();
+t3.Property2=yyy;
+
+//例子3
+var t4=new compA(1,"111");
+var t5=t with { Name="222"};
+```
+例子3生成的IL
+```IL
+.locals init (class csharp4IL.compA V_0,
+           class csharp4IL.compA V_1)
+  IL_0000:  nop
+  IL_0001:  ldc.i4.1
+  IL_0002:  ldstr      "111"
+  IL_0007:  newobj     instance void csharp4IL.compA::.ctor(int32,
+                                                            string)
+  IL_000c:  stloc.0
+  IL_000d:  ldloc.0
+  IL_000e:  callvirt   instance class csharp4IL.compA csharp4IL.compA::'<Clone>$'()
+  IL_0013:  dup
+  IL_0014:  ldstr      "222"
+  IL_0019:  callvirt   instance void modreq([System.Runtime]System.Runtime.CompilerServices.IsExternalInit) csharp4IL.compA::set_Name(string)
+  IL_001e:  nop
+  IL_001f:  stloc.1
+```
+基本上可以验证例子2
 
 
+
+### 关于继承和派生的内容
+参考[MSND](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#inheritance)
 
 ## 对象初始值设定语法
 可以对象初始化时手动指定属性的值
@@ -949,12 +1231,25 @@ public test_type1()
     margin: 0;">
     +out_class_ = new outClass(); </span>
     
-    //测试一下博客的markdown解析器支不支持这个语法
+   
+}
+```
+
+ <span style="
+    color: #22863a;
+    background-color: #f0fff4;
+    padding: 0 4px;
+    border-radius: 3px;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 14px;
+    display: inline-block;
+    margin: 0;">
+    +out_class_ = new outClass(); </span>
+
+ //测试一下博客的markdown解析器支不支持这个语法
     ```diff
     + out_class_ = new outClass();
     ```
-}
-```
 
 针对t1,t2的初始化语句 使用ILDsm查看后(.net9环境)
 ```IL
