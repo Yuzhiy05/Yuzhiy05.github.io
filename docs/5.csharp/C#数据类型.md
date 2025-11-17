@@ -1313,6 +1313,20 @@ public class Settings
 ### init访问器/required修饰符
 
 
+## StringBuilder
+没什么好说的 c#的string类型是固定大小不能扩容
+StringBuilder就是频繁读写,和处理用户输入等没有预期大小字符内容的
+
+注意两点
+1.c#字符串使用utf-16 c#的char就是utf-16 有时候需要转换
+2.StringBuilder 因为可以扩容,但扩容后不是每次都是连续的,多次扩容的话内存分布类似*队列*。
+MSDN的StringBuilder相关介绍页,在解决Char[]访问器性能下降问题的方法就是说的[这个](https://learn.microsoft.com/zh-cn/dotnet/fundamentals/runtime-libraries/system-text-stringbuilder#iterate-stringbuilder-characters)
+1.ToString()
+2.复制进新StringBuilder
+3.扩展最大容量
+都是让内存连续
+
+
 
 
 
