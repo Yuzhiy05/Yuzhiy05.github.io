@@ -32,6 +32,7 @@ cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="D:\\workfile\\compiler\\clang\\llvm\\bi
 cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="D:\\workfile\\compiler\\clang\\llvm\\bin\\clang++.exe" -DCMAKE_SYSROOT="D:\\workfile\\compiler\\clang\\x86_64-windows-gnu" 
 
 
-cmake .. -G"Ninja" -DCMAKE_TOOLCHAIN_FILE="D:/workfile/compiler/toolchaincmake/clang-toolchain.cmake"
+
+cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="D:\\workfile\\compiler\\clang\\llvm\\bin\\clang++.exe" -DCMAKE_SYSROOT="D:\\workfile\\compiler\\windows-msvc-sysroot"  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -DCMAKE_CXX_FLAGS="--target=x86_64-windows-msvc --sysroot=D:/workfile/compiler/windows-msvc-sysroot -fuse-ld=lld"
 
 ```

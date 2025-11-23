@@ -438,7 +438,7 @@ add_custom_command(
 构建后复制、签名、打包
 
 用的少的参数
-APPEND  在COMMAND后添加命令 注意COMMAND 可以加很多行 没用过
+APPEND  在COMMAND后添加命令 注意COMMAND 可以加很多行  对同一文件多次处理 时使用多个add_custom_command 时存在一个命令链 没用过
 
 USES_TERMINAL 指定使用的终端 和APPEND 不能一起使用。对于Ninja生成器这会把命令放在console pool中(因为ninja可以并发构建)
 
@@ -482,7 +482,7 @@ add_library(VisualT_library SHARED "${private_headers}" "${public_headers}" "${s
 他告诉我三种情况
 1.OUTPUT 生成的文件不存在时
 2.DEPENDS 中依赖的文件比OUTPUT文件更新时
-3.
+3.其他命令或目标依赖此OUTPUT时
 
 例一
 一开始我写一个规则
@@ -718,14 +718,235 @@ JOB_POOLS  ninja这些多线程构建器会使用 和 USES_TERMINAL 不兼容 �
 用于在生成阶段而不是配置阶段生成数据,一般用来生成路径
 
 
+## 为项目添加依赖
 
 ### find_package
+该指令有两种模式查找包
+module 模式
+该模式cmake通过搜索文件名格式为:Find<PackageName>.cmake的脚本文件,由该脚本来找包
+在cmake安装路径
+`\<cmake_path\>/share/cmake\<version\>/` 可以看到一些该格式的脚本 这些都是cmake维护一份查找常用软件包的脚本 当然这些脚本通常不是库提供者维护的可能会有些过时
+同时也可以自主维护一个Find\<PackageName\>.cmake脚本
+
+通常在调用find_package 的module模式之前 
+设置 CMAKE_MODULE_PATH 变量 为 Find\<PackageName\>.cmake的查找路径让cmake找到需要的脚本
+其次会去cmake维护的路径搜索
+
+config模式
+这个推荐且比较常使用;除非特殊指定一般module模式查找失败是会使用该模式
+通常在github下载包后,使用cmake构建完成.项目的\<packagename\>/lib/cmake/ 路径会存在
+形如
+\<PackageName\>Config.cmake或\<LowercasePackageName\>-config.cmake <lowercasePackageName>-config-version.cmake  <PackageName>ConfigVersion.cmake的文件前两个比较常见,这些是由软件/包开发者同步维护的
+cmake的config模式正是通过搜索该文件来查找引入软件包
+
+同文件夹下可能还存在 \<PackageName\>ConfigVersion.cmake或\<LowercasePackageName\>-config-version.cmake 脚本用来指示包的版本并验证包版本是否满足查找要求
+只要\<PackageName\>Config.cmake 被找到且版本满足要求那么包就被视为被找到 
+一个常用变量<PackageName>_FOUND被设置为true
+
+tips  一个\<PackageName\>Config.cmake 可能包含多个导出的目标,这些目标可能是经过子模块构建的,然后通过cmake命令include() 包含该.cmake的脚本文件来引入目标 
+
+使用find_package  模式之前一般会设置 `CMAKE_PREFIX_PATH` 变量来引入包路径
+
+假设存在一个包路径为./libs/A_package/lib/cmake/A_compent/A_packageConfig.cmake 那么就要把`CMAKE_PREFIX_PATH`设置为 ././libs/A_packag
+同时也可以设置一个同名环境变量`CMAKE_PREFIX_PATH` 来指示包搜索路径
+
+<PackageName>_DIR 也可以指示搜索路径不过这个路径要指示到./lib/cmakeA_compent/
+
+find_package 的函数签名
+
+```c++
+//典型用法
+find_package(<PackageName> [<version>] [REQUIRED] [COMPONENTS <components>...])
+//该签名只有PackageName是必要的
 
 
+//常见写法
+find_package(Catch2)
+find_package(GTest REQUIRED)
+find_package(Boost 1.79 COMPONENTS date_time)
+
+//基本签名 Basic Signature
+find_package(<PackageName> [version] [EXACT] [QUIET] [MODULE]
+             [REQUIRED|OPTIONAL] [[COMPONENTS] [components...]]
+             [OPTIONAL_COMPONENTS components...]
+             [REGISTRY_VIEW  (64|32|64_32|32_64|HOST|TARGET|BOTH)]
+             [GLOBAL]
+             [NO_POLICY_SCOPE]
+             [BYPASS_PROVIDER]
+             [UNWIND_INCLUDE])
+```
+介绍一下Basic Signature 
+被module和config模式同时支持
+这两种模式找到包都会设置 一个 \<PackageName\>_FOUND 变量指示是否找到包
+
+一些参数的用处
+[QUIET] 禁用信息提示,REQUIRED的包找不到不会报错
+
+[OPTIONAL] 指示的包是可选的找不到不报错
+
+[REQUIRED] 指示的包是必要的 找不到包cmake会报错并停止配置
+
+[[COMPONENTS] [components...]] COMPONENTS关键字后跟该包需要引入的组件名 例如Boost库下的regex asio等组件 任意一个组件找不到则整个包被视为找不到
+tips REQUIRED/OPTIONAL后可以直接跟组件名而不用写COMPONENTS关键字
+例如
+```c++
+find_package(absl REQUIRED strings flat_hash_map Time)
+```
+[version] 指示所查询的包版本 两种参数形式
+1.major[.minor[.patch[.tweak]]] 
+2.versionMin...[<]versionMax  verMIn...verMax范围形式的两端都包含在内 用了`<`符号排除端点
+
+[EXACT] 该参数指示搜索包的版本和version完全相同 (和version的范围参数版本不兼容)
+
+tips 注意[version] [EXACT]参数和[COMPONENTS]如果不设置会被外部调用的同参数继承 也就是说find_package指定了[version] [EXACT],[COMPONENTS]参数,所查找到.cmake脚本中再次调用find_package且没指定这三个参数,那么这个子调用也会应用这三个参数
+
+tips 对于常见调用`find_package(Catch2)`不声明组件的调用 具体行为是找到所有组件,不找任何组件或任意个组件由config.cmake脚本来决定cmake不对这种用法做规定
+*无关紧要的参数说明*
+[OPTIONAL_COMPONENTS components...] 由该参数指示的组件找不到无所谓,只要required的组件找到就表示该包被找到
+
+[REGISTRY_VIEW] windows上有用 通过注册表查询
+
+[GLOBAL] 将引入的组件提升到全局 CMAKE_FIND_PACKAGE_TARGETS_GLOBAL变量也能做这件事
+
+[BYPASS_PROVIDER] 我也没弄懂干嘛的
+[UNWIND_INCLUDE] 应用在find_package中调用find_package的情况;找不到包就相当于编程语言抛异常栈回溯一层层返回了,不让他继续find_package和include了 参考[install(EXPORT_PACKAGE_DEPENDENCIES)](https://cmake.org/cmake/help/latest/command/install.html#command:install)
+
+除了基本签名还有一个完整签名的find_package
+我省略了部分参数保留部分对我来说有用的解释一下
+```c++
+find_package(<PackageName> [version] [EXACT] [QUIET]
+             [REQUIRED|OPTIONAL] [[COMPONENTS] [components...]]
+             [CONFIG|NO_MODULE]
+             ...
+             [NAMES name1 [name2 ...]]
+             [CONFIGS config1 [config2 ...]]
+             [HINTS path1 [path2 ...]]
+             [PATHS path1 [path2 ...]]
+             ...
+             [PATH_SUFFIXES suffix1 [suffix2 ...]]
+             ...)
+```
+[CONFIG|NO_MODULE] 这两是同义词 设置了这个就表示使用config模式 会跳过module模式的搜索过程
+
+[NAMES] 包名的可选项 设置了此项 就不会查找\<PackageName\> 而是把names1...当包名查找
+
+[CONFIGS] 该命令默认会找格式为\<PackageName\>Config.cmake 的脚本但是有时脚本名字不叫这一类 该参数允许你指定一类名字
+
+搜索中所有被考虑的版本的脚本文件的路径放在 `<PackageName>_CONSIDERED_CONFIGS`变量里 对应的版本文件路径存在`<PackageName>_CONSIDERED_VERSIONS`
+
+[PATH_SUFFIXES] 配合cmake的搜索条目表 
+
+
+config 模式查找顺序
+首先不管什么模式都先在  CMAKE_FIND_PACKAGE_REDIRECTS_DIR 指示路径下查找
+根据前缀路径和特定格式的路径查找
+可能的前缀,查找顺序为:
+1.找根路径
+cmake 变量\<Pacakage_name\>_root  Pacakge_name大小写都可
+
+环境变量  \<Pacakage_name\>_root 
+
+tips 根路径会传递(按cmake文档所说包的根变量被被维护成一个栈)也就是说find_package查找的.cmake脚本中又调用了find_package那么这个子调用的查找路径会包含上一层父调用的。在调用find_package时手动传  NO_PACKAGE_ROOT_PATH 参数 或设置变量CMAKE_FIND_USE_PACKAGE_ROOT_PATH 为 FALSE来避免
+
+2.将如下三个缓存变量做搜索前缀 在命令行中由 `-DVAR=VALUE`指定
+CMAKE_PREFIX_PATH
+
+CMAKE_FRAMEWORK_PATH
+
+CMAKE_APPBUNDLE_PATH
+
+调用时传参 NO_CMAKE_PATH或 设置CMAKE_FIND_USE_CMAKE_PATH 为FALSE 避免
+
+3.以下特定环境变量 一般由shell指定的
+<PackageName>_DIR
+
+CMAKE_PREFIX_PATH
+
+CMAKE_FRAMEWORK_PATH
+
+CMAKE_APPBUNDLE_PATH
+
+调用时传参 NO_CMAKE_ENVIRONMENT_PATH 或设置 CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH 为 FALSE
+
+4.HINTS 
+
+调用时传递参数 
+HINTS 一般由其他已存在的路径组合
+
+
+5.操作系统的环境变量
+
+传参 NO_SYSTEM_ENVIRONMENT_PATH 或
+设置 CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH  FALSE 跳过该步骤
+
+6.用户注册表
+windows系统用具体参考[文档](https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html#user-package-registry)
+
+7.平台指定的cmake变量
+cmake在不同平台会设置下面不同变量前缀
+CMAKE_INSTALL_PREFIX / CMAKE_STAGING_PREFIX 通过调用时传递NO_CMAKE_INSTALL_PREFIX 或CMAKE_FIND_USE_INSTALL_PREFIX 设置为 FALSE 跳过这两个路径查询
+
+CMAKE_SYSTEM_PREFIX_PATH
+
+CMAKE_SYSTEM_FRAMEWORK_PATH
+
+CMAKE_SYSTEM_APPBUNDLE_PATH
+
+通过调用时传递 NO_CMAKE_SYSTEM_PATH 或设置 CMAKE_FIND_USE_CMAKE_SYSTEM_PATH 为 FALSE跳过上面这些路径的查询
+
+tips linux软件可能安装在 /usr/local cmake就根据平台习惯把指定这些路径为此类变量
+
+8.系统注册表
+同样参考文档
+
+9.调用时传递 PATHS  硬编码路径
+
+tips 设置  CMAKE_IGNORE_PATH, CMAKE_IGNORE_PREFIX_PATH, CMAKE_SYSTEM_IGNORE_PATH 和CMAKE_SYSTEM_IGNORE_PREFIX_PATH 同样会导致上述路径被忽略
+
+根据以上路径前缀+特定格式 组合成搜索路径 按顺序找到第一个可用的包就不会再找了
+见[文档表](https://cmake.org/cmake/help/latest/command/find_package.html#id21)
+
+例如
+./libs/absl/cmake/
+./libs/absl/lib/cmake/
+
+对于存在多个版本包的配置文件搜索的规则的细致说明参考[文档](https://cmake.org/cmake/help/latest/command/find_package.html#command:find_package:~:text=For%20search%20paths%20which%20contain%20glob%20expressions)
+
+以下变量也会影响到搜索的路径
+CMAKE_FIND_ROOT_PATH  默认为空 会重定向find_package的搜索路径
+CMAKE_SYSROOT      除了影响find_package的搜索结果还会影响别的一般不用
+
+tips 搜索成功后会缓存变量;要清除构建文件 修改路径才能影响
+
+以下三个变量会改变find_package包是否必要的行为
+在find_package之前设置
+
+CMAKE_DISABLE_FIND_PACKAGE_\<PackageName\>  不让该包被查找 1.模拟包找不到情况 2.该包内容包含在项目里
+
+CMAKE_REQUIRE_FIND_PACKAGE_<PackageName>  让包称为必须的 该设置优先级高于find_package传参 OPTIONAL
+
+常见写法
+```c++
+    set(LIB_PATH "D:/workfile/lib")
+    set(CMAKE_PREFIX_PATH "${LIB_PATH}/abseil")
+    find_package(absl REQUIRED strings flat_hash_map)
+    if(absl_FOUND)
+        get_target_property(tmp absl::strings INTERFACE_INCLUDE_DIRECTORIES)
+        message(STATUS "absl::strings includes: ${tmp}")
+        //一般不用写
+        #target_include_directories(hello PRIVATE ${LIB_PATH}/abseil/include/absl)
+        target_link_libraries(hello PRIVATE absl::strings) 
+    else()
+        message(FATAL_ERROR "Could not find absl")
+    endif()
+```
+
+### FetchContent
 
 ### install
 
-
+### CPS
+Common Package Specification 通用包描述文件 以后再看我现在还没用到
 
 ### CPack 生成安装包
 
