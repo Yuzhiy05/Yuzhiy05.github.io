@@ -5,6 +5,8 @@ permalink: /article/y019uwz3/
 ---
 #安装c++ 常见库的的一些流程
 
+我的工具链比较特殊
+使用clang 和 微软的STL标准库 系统跟手动指定链接器使用lld 构建系统用ninja
 
 ## boost
 1.在boost页面下载源码,解压
@@ -16,14 +18,14 @@ b2 install --prefix=D:\workfile\lib\boost  --build-type=complete --with-regex ad
 
 //这个不能生成.lib导出库 被cmake IMPORTED_IMPLIB not set for imported target "Boost::regex" configuration"Debug". 拒绝
 
-./b2 install --prefix=D:\workfile\lib\boost1.88-clang-14 --build-type=complete toolset=clang address-model=64 link=shared runtime-link=shared --with-system --with-regex define=BOOST_USE_WINDOWS_H,BOOST_REGEX_STANDALONE,REGEX_FOUND,BOOST_REGEX_DYN_LINK  cxxflags="--target=x86_64-windows-msvc -std=c++14 --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" linkflags="--target=x86_64-windows-msvc --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=lld —D_DLL=1 -lmsvcrt" 
+./b2 install --prefix=D:\workfile\lib\boost1.88-clang-14 --build-type=complete toolset=clang address-model=64 link=shared runtime-link=shared --with-system --with-regex define=BOOST_USE_WINDOWS_H,BOOST_REGEX_STANDALONE,REGEX_FOUND,BOOST_REGEX_DYN_LINK  cxxflags="--target=x86_64-windows-msvc -std=c++14 --sysroot=..\\windows-msvc-sysroot" linkflags="--target=x86_64-windows-msvc --sysroot=..\\windows-msvc-sysroot -fuse-ld=lld —D_DLL=1 -lmsvcrt" 
 
-./b2 install --prefix=D:\workfile\lib\boost1.87-clang --build-type=complete --with-regex --with-system toolset=clang  address-model=64 cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags="--target=x86_64-windows-msvc --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot -fuse-ld=link" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
+./b2 install --prefix=D:\workfile\lib\boost1.89-clang --build-type=complete --with-regex --with-system toolset=clang  address-model=64 cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags="--target=x86_64-windows-msvc --sysroot=..\\windows-msvc-sysroot -fuse-ld=lld —D_DLL=1 -lmsvcrt" define=BOOST_USE_WINDOWS_H -DBOOST_REGEX_STANDALONE=on link=shared runtime-link=shared
 
 //测试的参数
 define=BOOST_USE_WINDOWS_H  -D_DLL -lmsvcrt variant=release,debug target-os=windows
 
-./b2 install --prefix=D:\workfile\lib\boost1.88-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64  cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags=" --sysroot=D:\\workfile\\compiler\\windows-msvc-sysroot" link=shared runtime-link=shared
+./b2 install --prefix=D:\workfile\lib\boost1.88-clang --build-type=complete --with-system --with-regex toolset=clang  address-model=64  cxxflags="--target=x86_64-windows-msvc -std=c++23" linkflags=" --sysroot=..\\windows-msvc-sysroot" link=shared runtime-link=shared
 
 //这两个用clang-cl生成的用不了
 ./b2 install --prefix=D:\workfile\lib\boost-clang-win --build-type=complete --with-regex --with-system toolset=clang-win  address-model=64  cxxflags="--target=x86_64-windows-msvc /std:c++latest /Zc:__cplusplus" define=BOOST_USE_WINDOWS_H link=shared runtime-link=shared
@@ -126,9 +128,21 @@ File Type: DLL
        B8000 .text
 ```
 
+✅这个试了可以 把 系统根之类的写cxxflag里
+```powershell
+./b2 install --prefix=D:\workfile\lib\boost1.89-clang --build-type=complete --with-regex toolset=clang  address-model=64 cxxflags="--target=x86_64-windows-msvc -std=c++20 -fuse-ld=lld --sysroot=..\\windows-msvc-sysroot" linkflags="--target=x86_64-windows-msvc --sysroot=..\\windows-msvc-sysroot -fuse-ld=lld -lmsvcrt -D_DLL=1" -DBOOST_REGEX_STANDALONE=on link=shared runtime-link=shared
+```
+
+regex这个库比较特殊 因为用到了system中表示boost::err_code 所以需要编译成动态库 但是可以通过 -DBOOST_REGEX_STANDALONE=on
+使用独立模式减掉这个依赖 从而当头文件库使用。
+
+所以头文件库的话cmake里需要 `target_include_directories(boost_test PUBLIC ${Boost_INCLUDE_DIRS})` 而不是
+`target_link_libraries(boost_test PRIVATE Boost::regex)` 
+
+独立模式下Regex使用b2编译完只有dll没有lib 所以 用target_link_libraries报错configcmake根本没生成导入库
 
 ## abseil
-1.
-
-
-cmake 
+1.✅ 在官网基础上 本来想用toolchain.cmake脚本设置这些参数发现不行总是失败
+```powershell
+cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="D:\\workfile\\compiler\\clang\\llvm\\bin\\clang++.exe" -DCMAKE_SYSROOT="D:\\workfile\\compiler\\windows-msvc-sysroot"  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -DCMAKE_CXX_FLAGS="--target=x86_64-windows-msvc --sysroot=D:/workfile/compiler/windows-msvc-sysroot -fuse-ld=lld"
+``` 
