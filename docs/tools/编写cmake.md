@@ -834,7 +834,7 @@ find_package(<PackageName> [version] [EXACT] [QUIET]
 
 搜索中所有被考虑的版本的脚本文件的路径放在 `<PackageName>_CONSIDERED_CONFIGS`变量里 对应的版本文件路径存在`<PackageName>_CONSIDERED_VERSIONS`
 
-[PATH_SUFFIXES] 配合cmake的搜索条目表 
+[PATH_SUFFIXES] 为搜索路径指定后缀 指定后缀  
 
 
 config 模式查找顺序

@@ -27,12 +27,9 @@ cmake --build build --config Release
 cmake --install build --config Release --prefix /path/to/install
 
 //其他细化命令
-cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="D:\\workfile\\compiler\\clang\\llvm\\bin\\clang++.exe" -DCMAKE_SYSROOT="D:\\workfile\\compiler\\windows-msvc-sysroot" 
+cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="...\\clang\\llvm\\bin\\clang++.exe" -DCMAKE_SYSROOT="...\\windows-msvc-sysroot" 
 
-cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="D:\\workfile\\compiler\\clang\\llvm\\bin\\clang++.exe" -DCMAKE_SYSROOT="D:\\workfile\\compiler\\clang\\x86_64-windows-gnu" 
+cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="D:\\workfile\\compiler\\clang\\llvm\\bin\\clang++.exe" -DCMAKE_SYSROOT="...\\clang\\x86_64-windows-gnu" 
 
-
-
-cmake .. -G"Ninja" -DCMAKE_CXX_COMPILER="D:\\workfile\\compiler\\clang\\llvm\\bin\\clang++.exe" -DCMAKE_SYSROOT="D:\\workfile\\compiler\\windows-msvc-sysroot"  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -DCMAKE_CXX_FLAGS="--target=x86_64-windows-msvc --sysroot=D:/workfile/compiler/windows-msvc-sysroot -fuse-ld=lld"
 
 ```
