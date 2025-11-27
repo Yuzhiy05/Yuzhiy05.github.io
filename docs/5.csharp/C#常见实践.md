@@ -1,3 +1,8 @@
+---
+title: C#常见实践
+createTime: 2025/11/12 23:30:40
+permalink: /article/j80chme0/
+---
 
 
 

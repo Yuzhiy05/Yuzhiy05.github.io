@@ -723,7 +723,7 @@ JOB_POOLS  ninja这些多线程构建器会使用 和 USES_TERMINAL 不兼容 �
 ### find_package
 该指令有两种模式查找包
 module 模式
-该模式cmake通过搜索文件名格式为:Find<PackageName>.cmake的脚本文件,由该脚本来找包
+该模式cmake通过搜索文件名格式为:Find\<PackageName\>.cmake的脚本文件,由该脚本来找包
 在cmake安装路径
 `\<cmake_path\>/share/cmake\<version\>/` 可以看到一些该格式的脚本 这些都是cmake维护一份查找常用软件包的脚本 当然这些脚本通常不是库提供者维护的可能会有些过时
 同时也可以自主维护一个Find\<PackageName\>.cmake脚本
@@ -736,12 +736,12 @@ config模式
 这个推荐且比较常使用;除非特殊指定一般module模式查找失败是会使用该模式
 通常在github下载包后,使用cmake构建完成.项目的\<packagename\>/lib/cmake/ 路径会存在
 形如
-\<PackageName\>Config.cmake或\<LowercasePackageName\>-config.cmake <lowercasePackageName>-config-version.cmake  <PackageName>ConfigVersion.cmake的文件前两个比较常见,这些是由软件/包开发者同步维护的
+\<PackageName\>Config.cmake或\<LowercasePackageName\>-config.cmake \<lowercasePackageName\>-config-version.cmake  \<PackageName\>ConfigVersion.cmake的文件前两个比较常见,这些是由软件/包开发者同步维护的
 cmake的config模式正是通过搜索该文件来查找引入软件包
 
 同文件夹下可能还存在 \<PackageName\>ConfigVersion.cmake或\<LowercasePackageName\>-config-version.cmake 脚本用来指示包的版本并验证包版本是否满足查找要求
 只要\<PackageName\>Config.cmake 被找到且版本满足要求那么包就被视为被找到 
-一个常用变量<PackageName>_FOUND被设置为true
+一个常用变量\<PackageName\>_FOUND被设置为true
 
 tips  一个\<PackageName\>Config.cmake 可能包含多个导出的目标,这些目标可能是经过子模块构建的,然后通过cmake命令include() 包含该.cmake的脚本文件来引入目标 
 
@@ -750,13 +750,13 @@ tips  一个\<PackageName\>Config.cmake 可能包含多个导出的目标,这些
 假设存在一个包路径为./libs/A_package/lib/cmake/A_compent/A_packageConfig.cmake 那么就要把`CMAKE_PREFIX_PATH`设置为 ././libs/A_packag
 同时也可以设置一个同名环境变量`CMAKE_PREFIX_PATH` 来指示包搜索路径
 
-<PackageName>_DIR 也可以指示搜索路径不过这个路径要指示到./lib/cmakeA_compent/
+\<PackageName\>_DIR 也可以指示搜索路径不过这个路径要指示到./lib/cmakeA_compent/
 
 find_package 的函数签名
 
 ```c++
 //典型用法
-find_package(<PackageName> [<version>] [REQUIRED] [COMPONENTS <components>...])
+find_package(\<PackageName\> [<version>] [REQUIRED] [COMPONENTS <components>...])
 //该签名只有PackageName是必要的
 
 
@@ -766,7 +766,7 @@ find_package(GTest REQUIRED)
 find_package(Boost 1.79 COMPONENTS date_time)
 
 //基本签名 Basic Signature
-find_package(<PackageName> [version] [EXACT] [QUIET] [MODULE]
+find_package(\<PackageName\> [version] [EXACT] [QUIET] [MODULE]
              [REQUIRED|OPTIONAL] [[COMPONENTS] [components...]]
              [OPTIONAL_COMPONENTS components...]
              [REGISTRY_VIEW  (64|32|64_32|32_64|HOST|TARGET|BOTH)]
@@ -814,7 +814,7 @@ tips 对于常见调用`find_package(Catch2)`不声明组件的调用 具体行�
 除了基本签名还有一个完整签名的find_package
 我省略了部分参数保留部分对我来说有用的解释一下
 ```c++
-find_package(<PackageName> [version] [EXACT] [QUIET]
+find_package(\<PackageName\> [version] [EXACT] [QUIET]
              [REQUIRED|OPTIONAL] [[COMPONENTS] [components...]]
              [CONFIG|NO_MODULE]
              ...
@@ -832,7 +832,7 @@ find_package(<PackageName> [version] [EXACT] [QUIET]
 
 [CONFIGS] 该命令默认会找格式为\<PackageName\>Config.cmake 的脚本但是有时脚本名字不叫这一类 该参数允许你指定一类名字
 
-搜索中所有被考虑的版本的脚本文件的路径放在 `<PackageName>_CONSIDERED_CONFIGS`变量里 对应的版本文件路径存在`<PackageName>_CONSIDERED_VERSIONS`
+搜索中所有被考虑的版本的脚本文件的路径放在 `\<PackageName\>_CONSIDERED_CONFIGS`变量里 对应的版本文件路径存在`\<PackageName\>_CONSIDERED_VERSIONS`
 
 [PATH_SUFFIXES] 为搜索路径指定后缀 指定后缀  
 
@@ -858,7 +858,7 @@ CMAKE_APPBUNDLE_PATH
 调用时传参 NO_CMAKE_PATH或 设置CMAKE_FIND_USE_CMAKE_PATH 为FALSE 避免
 
 3.以下特定环境变量 一般由shell指定的
-<PackageName>_DIR
+\<PackageName\>_DIR
 
 CMAKE_PREFIX_PATH
 
@@ -923,7 +923,7 @@ tips 搜索成功后会缓存变量;要清除构建文件 修改路径才能影�
 
 CMAKE_DISABLE_FIND_PACKAGE_\<PackageName\>  不让该包被查找 1.模拟包找不到情况 2.该包内容包含在项目里
 
-CMAKE_REQUIRE_FIND_PACKAGE_<PackageName>  让包称为必须的 该设置优先级高于find_package传参 OPTIONAL
+CMAKE_REQUIRE_FIND_PACKAGE_\<PackageName\>  让包称为必须的 该设置优先级高于find_package传参 OPTIONAL
 
 常见写法
 ```c++
