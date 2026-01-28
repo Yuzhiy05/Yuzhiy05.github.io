@@ -256,9 +256,24 @@ target_link_libraries(main ${TESTFUNC_LIB})
 
 PRIVATE 关键字表明 fmt 仅在生成 HelloWorld 时需要，不应传播到其他依赖项目
 ###  cmake 命令速览
+cmake -S <dir> 指定项目跟目录  根CMakeLists.txt要包含其中 
+cmake -B <dir>  指定构建目录   cmake的输出 cmake调用生成器的输出都在这里
+cmake  --build <dir> 在指定的构建目录中运行构建系统
+
+cmake cmake --build <dir> --config <cfg> 构建时选择配置
+
 cmake -Bbuild -GNinja -S.  以ninja生成 以 当前目录为源码 构建目录为build(如果没有就新建)
 
 cmake -Bbuild -GNinja -S.. 在build文件夹下执行
 
 ninja 在build文件夹下执行
 
+使用不同构建器需要切换构建目录
+>Note We can't reuse the build directory with different generators. It is necessary to delete the build directory between CMake runs if you want to switch to a different generator using the same build directory.
+
+### cmaketools插件
+
+配置一些环境
+LLVM_ROOT
+BOOST_ROOT
+WIN_SYSROOT 
