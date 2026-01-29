@@ -121,6 +121,96 @@ file() 命令则可以用来获取文件列表
 file(GLOB_RECURSE SOURCES src/*.cpp include/*.h)
 递归地查找 src 和 include 目录下所有以 .cpp 或 .h 结尾的文件，并将它们存储在 SOURCES 变量中。然后，add_executable 命令使用 SOURCES 变量中的文件来生成可执行文件
 
+### 构建目标
+add_executable(target_name files...)
+add_add_executable和add_library 能直接参数后跟文件列表表示该目标依赖文件(编译的文件)
+项目变大了文件散布在子文件夹写一堆文件
+早期解决办法
+1.include命令直接包含子文件夹的CMAKElist.txt
+在子文件夹中使用list命令将文件路径打包成变量
+2.file(GLOB_RECURSE src ...) 列举文件
+3.set(FILEPATH ...) 手写文件
+4.aux_source_directory(.cpp)
+```cmake
+root cmakelists.txt
+
+include(A/cmakelists.txt)
+incldue(B/cmakelists.txt)
+
+add_executable(target_name ${filepath})
+
+子目录A cmakelist.txt
+
+list(APPEND filepath
+${CMAKE_CURRENT_SOURCE_DIR}/a.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/b.cpp
+)
+```
+现在有更现代的方法
+
+target_sources 添加源码
+其中参数路径可以使用生成器表达式
+```cmake
+签名
+target_sources(
+<target>
+  [<INTERFACE|PUBLIC|PRIVATE>
+   [FILE_SET <set> [TYPE <type>] [BASE_DIRS <dirs>...] [FILES <files>...]]...
+  ]...
+)
+
+target_sources(taget_name
+[PRIVATE|PUBLIC|INTERFACE]
+<impl_file>  myfunc.cpp  #实现文件 默认在CMAKE_CURRENT_SOURCE_DIR下
+FILE_SET <file_set_name> # 文件集名称 你叫TYPE类型里的名称就可以省略TYPE
+TYPE  [HEADERS|CXX_MODULES]
+BASE_DIR <dir>     #要包含文件跟目录 一般是include 不写就相当于当前源码路径
+FILES  <filepath> #要包含的具体文件
+
+... //能写好几个
+
+)
+```
+tips
+参考[文档](https://cmake.org/cmake/help/latest/command/target_sources.html#file-sets)
+>Files in a PRIVATE or PUBLIC file set are marked as source files for the purposes of IDE integration
+
+被标记为源的.h文件可以被IDE找到防止IDE爆红找不到头文件
+
+PRIVATE    告诉目标编译源文件 也就是编译时带上这些文件      HEADER_SETS
+INTERFACE      给head_only库用 -> 把文件集合(引用的文件) 放  INTERFACE_HEADER_SETS变量里
+PUBLIC     target_sources里用的少 表示PRIVATE加INTERFACE
+
+引入target是为了跟踪
+The artifact kind (executable, library, header collection, etc)
+
+Source files
+
+Include directories
+
+Output name of an executable or library
+
+Dependencies
+
+Compiler and linker flags
+
+例子
+```cmake
+target_link_libraries(Tutorial
+  PRIVATE
+    MathFunctions
+)
+```
+note:
+>The order here is only loosely relevant. That we call target_link_libraries() prior to defining MathFunctions with add_library() doesn't matter to CMake. We are recording that Tutorial has a dependency on something named MathFunctions, but what MathFunctions means isn't resolved at this stage.
+>The only target which needs to be defined when calling a CMake command like target_sources() or target_link_libraries() is the target being modified.
+调用target_link_libraries前只需要Tutorial的定义即可MathFunctions定义无所谓 add_library(MathFunctions)在前在后无关紧要
+
+
+### add_subdirectory
+集成子项目的cmakelists
+note: cmake处理子项目的子项目的cmakelists时 相对路径都是基于子项目的而不是包含他的上一级cmakelist
+
 ### 引入第三方静态库
 以spdlog为例子
 此类库基本为头文件库体积不打使用子模块构建

@@ -266,6 +266,8 @@ cmake -Bbuild -GNinja -S.  以ninja生成 以 当前目录为源码 构建目录
 
 cmake -Bbuild -GNinja -S.. 在build文件夹下执行
 
+cmake --build build --clean-first 先清理再构建
+
 ninja 在build文件夹下执行
 
 使用不同构建器需要切换构建目录
