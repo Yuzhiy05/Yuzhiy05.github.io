@@ -256,6 +256,7 @@ target_link_libraries(main ${TESTFUNC_LIB})
 
 PRIVATE 关键字表明 fmt 仅在生成 HelloWorld 时需要，不应传播到其他依赖项目
 ###  cmake 命令速览
+```cmake
 cmake -S <dir> 指定项目跟目录  根CMakeLists.txt要包含其中 
 cmake -B <dir>  指定构建目录   cmake的输出 cmake调用生成器的输出都在这里
 cmake  --build <dir> 在指定的构建目录中运行构建系统
@@ -267,13 +268,65 @@ cmake -Bbuild -GNinja -S.  以ninja生成 以 当前目录为源码 构建目录
 cmake -Bbuild -GNinja -S.. 在build文件夹下执行
 
 cmake --build build --clean-first 先清理再构建
-
+```
 ninja 在build文件夹下执行
+
+Visual Studio 17 2022
+-G "Visual Studio 18 2026"
 
 使用不同构建器需要切换构建目录
 >Note We can't reuse the build directory with different generators. It is necessary to delete the build directory between CMake runs if you want to switch to a different generator using the same build directory.
 
-### cmaketools插件
+Vs/vscode可以在launch.vs.json和tasks.vs.json 里使用cmakepreset的key变量
+```json
+{
+  "name": "windows-base",
+  "hidden": true,
+  "generator": "Ninja",
+  "binaryDir": "${sourceDir}/out/build/${presetName}",
+  "installDir": "${sourceDir}/out/install/${presetName}",
+  "cacheVariables": {
+    "CMAKE_C_COMPILER": "cl.exe",
+    "CMAKE_CXX_COMPILER": "cl.exe"
+  }
+   "environment": {
+        "MY_ENVIRONMENT_VARIABLE": "Test",
+        "PATH": "$env{HOME}/ninja/bin:$penv{PATH}"
+  }
+  ...
+}
+```
+${cmake.<KEY-NAME>}
+${cmake.binaryDir}
+
+也能使用环境变量
+${env.<VARIABLE-NAME>}
+${env.MY_ENVIRONMENT_VARIABLE}
+## cmaketools插件
+
+
+### 开ASAN 地址检查器
+
+在主要是在编译器和链接器选项前加参数 
+gcc/clang -fsanitize=address
+msvc    /fsanitize=address
+放cmake里
+```cmake
+if(MSVC)
+    target_compile_options(<target_name> PUBLIC /fsanitize=address)
+  else()
+    target_compile_options(<target_name> PUBLIC -fsanitize=address)
+    target_link_options(<target_name> PUBLIC -fsanitize=address)
+ endif()
+```
+注意在vs里使用cmake+msvc时 cmakelist默认模板为了生成调试文件启动热重载会加/ZI参数 把下面这行注释掉就好
+```cmake
+# 如果支持，请为 MSVC 编译器启用热重载。
+if (POLICY CMP0141)
+  cmake_policy(SET CMP0141 NEW)
+  #set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+endif()
+```
 
 配置一些环境
 LLVM_ROOT
