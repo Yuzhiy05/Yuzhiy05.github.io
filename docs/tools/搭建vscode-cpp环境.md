@@ -302,6 +302,18 @@ ${cmake.binaryDir}
 也能使用环境变量
 ${env.<VARIABLE-NAME>}
 ${env.MY_ENVIRONMENT_VARIABLE}
+
+### cmake基本概念
+cmake 一切都是字符串
+string是普通字符串 
+list是带分号的字符串 
+
+
+cmake宏和函数区别在于作用域 类似于c++宏 执行宏的副作用会被上下文看到，函数单独创建作用域想返回得set变量set(<var> <value> PARENT_SCOPE) 3.25后 return(PROPAGATE)
+
+cmake变量本身就是字符串,这导致宏和函数传参数名时实绩上只传了变量名字符串而没有传递该变量指向的的实绩内容取值时得用
+${${ListVar}} 而不是{${ListVar}}
+
 ## cmaketools插件
 
 
