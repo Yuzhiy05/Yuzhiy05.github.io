@@ -261,7 +261,7 @@ cmake -S <dir> 指定项目跟目录  根CMakeLists.txt要包含其中
 cmake -B <dir>  指定构建目录   cmake的输出 cmake调用生成器的输出都在这里
 cmake  --build <dir> 在指定的构建目录中运行构建系统
 
-cmake cmake --build <dir> --config <cfg> 构建时选择配置
+cmake --build <dir> --config <cfg> 构建时选择配置
 
 cmake -Bbuild -GNinja -S.  以ninja生成 以 当前目录为源码 构建目录为build(如果没有就新建)
 
@@ -309,10 +309,21 @@ string是普通字符串
 list是带分号的字符串 
 
 
-cmake宏和函数区别在于作用域 类似于c++宏 执行宏的副作用会被上下文看到，函数单独创建作用域想返回得set变量set(<var> <value> PARENT_SCOPE) 3.25后 return(PROPAGATE)
+cmake宏和函数区别在于作用域 类似于c++宏 执行宏的副作用会被上下文看到，函数单独创建作用域想返回得set变量set(\<var\> \<value\> PARENT_SCOPE) 
 
 cmake变量本身就是字符串,这导致宏和函数传参数名时实绩上只传了变量名字符串而没有传递该变量指向的的实绩内容取值时得用
 ${${ListVar}} 而不是{${ListVar}}
+
+### 添加asan检测
+就是在编译器添加编译选项 链接特定asan库
+```cmake
+if(msvc)
+target_compile_options(<target> PUBLIC /fsanitize=address)
+else(gcc)
+target_compile_options(<target> PUBLIC -fsanitize=address)
+target_link_options(<target> PUBLIC -fsanitize=address)
+endif()
+```
 
 ## cmaketools插件
 
@@ -340,7 +351,25 @@ if (POLICY CMP0141)
 endif()
 ```
 
+
+### 一些其他工具
+CLang-tidy
+
+Include what you use
+
+Clang-format
+
+```
+git ls-files -- '*.cpp' '*.h' | xargs clang-format -i -style=file
+ git diff --exit-code --color
+```
+
 配置一些环境
 LLVM_ROOT
 BOOST_ROOT
 WIN_SYSROOT 
+
+
+other 
+有一个问题没解决
+vs里使用cmake构建c++项目 下拉菜单显示的可执行文件名能否去掉后缀 generate_sql.exe (app\\generate_sql.exe)只显示generate_sql 因为者是个根cmakelist包含add_subdirectory(app)生成的项目
