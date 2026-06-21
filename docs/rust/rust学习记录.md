@@ -323,6 +323,7 @@ cargo doc --open
 cargo文档功能能自动生成html
 
 ## Rust语法
+rust的引用就是指针
 ### 函数调用中的解引用强制转换
 
 函数调用类型和传入类型实现了如下trait时调用解引用强制转换
@@ -564,4 +565,215 @@ function printCoordinates({x, y}) {
 printCoordinates({x: 10, y: 20});
 
 ```
+
+### rust的类型介绍
+切片类型和DST 动态大小类型
+&str &[T]
+
+元组结构体
+结构体内部字段都是无名的
+示例
+```rust
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+fn main() {
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+}
+
+```
+
+无字段的unit类型
+`struct A;`==()
+
+never type ! 不返回任何类型
+
+### 枚举enum
+
+```Rust
+enum Status {
+    Value(u32),
+    Stop,
+}
+
+let list_of_statuses: Vec<Status> =
+    (0u32..20)
+    .map(Status::Value)
+    .collect();
+```
+
+
+
+## 实现一些常见trait 
+
+### 关联类型
+
+## 运算符重载
+
+## 自定义迭代器
+
+## 孤儿原则:为外部类型实现外部trait
+
+为类型实现trait需要类型或trait其一定义在当前crate内,想要为外部类型实现外部trait怎么办呢?
+例如我需要扩展Vec的功能 为其实现Display
+这就需要`Wrapper`包装类型,你不需要为Vec实现fmt::Dispaly而是为`strcut VecWrapper(Vec<String>)`实现该trait
+
+此时包装类型如果希望拥有内部被代理类型的全部功能需要通过实现 `Deref` trait,在调用时返回内部类型
+
+### 其他trait
+Sized trait
+?Sized trait 
+
+Fn trait 闭包类型
+
+tips
+fn 函数指针 这是一个类型不是一个trait,这个类型本身实现了Fn、FnMut 和 FnOnce三个trait
+
+一个特殊例子
+```Rust
+enum Status {
+    Value(u32),
+    Stop,
+}
+
+let list_of_statuses: Vec<Status> =
+    (0u32..20)
+    .map(Status::Value)
+    .collect();
+```
+
+## 调用同名方法
+
+
+## 其他特性
+
+### 类型别名
+类似于c++的typedef 和using 别名
+```Rust
+type Kilometers = i32;
+
+let x: i32 = 5;
+let y: Kilometers = 5;
+println!("x + y = {}", x + y);
+
+```
+
+## 宏
+### 声明宏
+其匹配类似于正则表达式匹配
+典型例子vec!
+```Rust
+#![allow(unused)]
+
+#[macro_export]
+macro_rules! vec {
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            temp_vec
+        }
+    };
+}
+
+```
+` ( $( $x:expr ),* )` 一整个这个玩意相当于模式匹配中的模式
+从外向内看
+`(...)`最外部的大括号可以换成任意的方括号`[]`,花括号`{}` 都无所谓主要是包裹内部的模式
+`$(...)` 相当于正则表达式中的非捕获分组
+tips
+`$( ... )*`重复捕获
+`$( ... )+`一次或多次
+`$( ... )?`零次或一次
+
+`,` 表示 `$( $x:expr )`这个模式匹配上后可以出现逗号
+`*` 这个是跟前面`$()`一起的只不过,中间可以插逗号
+
+`$x:expr` 表示任何rust类型表达式
+合起来的意思就是这个模式可以匹配多个带逗号的rust表达式
+```Rust
+let v=vec![1,3,4];
+```
+这里
+Rust不在乎括号使用方括号只是更像创建集合
+其次
+1,3,4 和`$( $x:expr ),*` 匹配上了
+其中
+`1,3,4` 分别和`$(temp_vec.push($x);)*`匹配了3次展开生成了三次temp_vec.push调用
+最后宏展开结果如下
+```Rust
+let mut temp_vec = Vec::new();
+temp_vec.push(1);
+temp_vec.push(2);
+temp_vec.push(3);
+temp_vec
+```
+### 过程宏
+是接收一个或TokenStream 返回一个TokenStream的过程
+一般有几个用途
+1. drive宏-只能用于结构体和枚举,例如:`#[derive(Debug, Clone, Serialize)]` 为类型实现特定trait;因为这些trait对大多数类型写法都差不多
+```Rust
+// 没有derive宏，你需要手写：
+struct Pancakes;
+impl HelloMacro for Pancakes {
+    fn hello_macro() {
+        println!("Hello, Macro! My name is Pancakes!");
+    }
+}
+
+// 有了derive宏，只需：
+#[derive(HelloMacro)]
+struct Pancakes;
+// 编译器自动生成上面的impl代码
+```
+2.类属性宏
+同样是接受任意token流,返回token流
+可作用于结构体,枚举和函数
+典型例子就是日志
+ai给了个例子
+你写如下代码
+```Rust
+#[log_call]
+fn process_data(data: Vec<u8>) -> Result<(), Error> {
+    println!("处理数据...");
+    Ok(())
+}
+```
+宏展开成如下代码
+```rust
+宏展开后的代码（编译器实际看到的）：
+fn process_data(data: Vec<u8>) -> Result<(), Error> {
+    // 宏自动添加的：记录开始
+    println!("[LOG] 调用 process_data, 参数长度: {}", data.len());
+    let start = std::time::Instant::now();
+    
+    // 你的原始代码
+    let result = (|| {
+        println!("处理数据...");
+        Ok(())
+    })();
+    
+    // 宏自动添加的：记录结束
+    let duration = start.elapsed();
+    println!("[LOG] process_data 执行耗时: {:?}", duration);
+    
+    result
+}
+```
+这些重复代码都由宏自动生成
+
+3.类函数宏
+接受任意token;类似函数调用
+例子
+```Rust
+let sql = sql!(SELECT * FROM posts WHERE id=1);
+```
+像这样的sql语句(DSL)需要解析特定领域语言的用这个宏
+知道一下有这个东西就好大部分情况都不需要你写,起码我没到这个程度
+
+
+
 
