@@ -866,7 +866,7 @@ tips同步上下文不是含有某些变量的对象,一开始我总是将他和
 通常其他方法创建的task都需要绑定一个委托(构造或者其他函数中显示传递一个委托/函数)
 此方法不需要预先设置一个委托/函数
 
-生成TaskCompletionSource\<T\>其中包含一个Task<T>属性
+生成TaskCompletionSource\<T\>其中包含一个Task\<T\>属性
 SetResult
 
 SetException

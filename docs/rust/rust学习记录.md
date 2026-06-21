@@ -1,3 +1,8 @@
+---
+title: rust学习记录
+createTime: 2026/06/21 23:31:33
+permalink: /article/hgmwfx9h/
+---
 
 
 
@@ -115,7 +120,7 @@ fn hello(name: &str) {
     println!("Hello, {}!", name);
 }
 ```
-这里调用hello的过程 经历的是 &MyBox<String> 被解引用强制转换加上了*变成 *(&MyBox<String>) 调用了deref 再被转换为&String
+这里调用hello的过程 经历的是 &MyBox\<String\> 被解引用强制转换加上了*变成 *(&MyBox\<String\>) 调用了deref 再被转换为&String
 再被加上* ;*(&String) 调用deref 变成&str 符合函数调用参数?
 
 A:
@@ -450,7 +455,7 @@ auto c=A{};
 
 
 ### 同质容器
-使用 Box<dyn Draw>实现鸭子类型
+使用 Box\<dyn Draw\>实现鸭子类型
 
 符合对象安全要求的trait才能作为 trait对象
 1.返回值类型不为 Self        

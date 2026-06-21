@@ -1,3 +1,8 @@
+---
+title: C#初始化语法
+createTime: 2026/06/21 23:31:33
+permalink: /article/rx2k3xa4/
+---
 
 
 

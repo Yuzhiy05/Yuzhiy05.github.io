@@ -1,3 +1,8 @@
+---
+title: 使用cmake测试
+createTime: 2026/06/21 23:31:33
+permalink: /article/3p0nmnyp/
+---
 
 
 # c++测试
@@ -106,7 +111,7 @@ ctest --test-dir build -R add
 其他[参数](https://cmake.org/cmake/help/latest/manual/ctest.1.html#run-tests)指定
 翻译一些
 
->If using a multi-config generator, eg Visual Studio, it will be necessary to specify a configuration with ctest -C <config> <remaining flags>, where <config> is a value like Debug or Release. This is true whenever using a multi-config generator, and won't be called out specifically in future commands.
+>If using a multi-config generator, eg Visual Studio, it will be necessary to specify a configuration with ctest -C \<config\> \<remaining flags\>, where \<config\> is a value like Debug or Release. This is true whenever using a multi-config generator, and won't be called out specifically in future commands.
 
 多配置生成器需要用
 -C \<cfg\>, --build-config \<cfg\> 参数指定使用哪个配置

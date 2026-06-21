@@ -1,3 +1,8 @@
+---
+title: slint设计学习
+createTime: 2026/06/21 23:31:33
+permalink: /article/ap9f850g/
+---
 #  slint
 slint 语法和qml很像用 标识符加大括号{} 表示ui控件
 不想html要开始结束标签

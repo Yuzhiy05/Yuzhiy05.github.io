@@ -1,3 +1,8 @@
+---
+title: 使用cmake进行安装
+createTime: 2026/06/21 23:31:33
+permalink: /article/rxrz0z56/
+---
 
 
 
@@ -14,7 +19,7 @@ RUNTIME
 OBJECT
 对象库.
 
-FILE_SET <set-name>
+FILE_SET \<set-name\>
 头文件库
 
 以下都是Macos系统用的不用管

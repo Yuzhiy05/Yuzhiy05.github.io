@@ -1,3 +1,8 @@
+---
+title: invoke
+createTime: 2026/06/21 23:31:33
+permalink: /article/87gt4ybw/
+---
 
 
 tips 以下代码都是我在windows11 .net10 vs2026(roslyn)下跑过的

@@ -1,3 +1,8 @@
+---
+title: rust多线程
+createTime: 2026/06/21 23:31:33
+permalink: /article/0m5cmlod/
+---
 
 
 # 多线程相关api

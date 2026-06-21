@@ -1,3 +1,8 @@
+---
+title: 配置cmake
+createTime: 2026/06/21 23:31:33
+permalink: /article/89jcugmg/
+---
 
 
 

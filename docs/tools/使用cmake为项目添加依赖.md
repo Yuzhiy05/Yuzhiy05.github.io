@@ -1,3 +1,8 @@
+---
+title: 使用cmake为项目添加依赖
+createTime: 2026/06/21 23:31:33
+permalink: /article/1dngp6mo/
+---
 
 
 

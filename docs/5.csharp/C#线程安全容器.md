@@ -1,3 +1,8 @@
+---
+title: C#线程安全容器
+createTime: 2026/06/21 23:31:33
+permalink: /article/dow05eez/
+---
 
 # 线程安全容器
 ## BlockingCollection 阻塞集合

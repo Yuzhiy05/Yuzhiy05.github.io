@@ -1,3 +1,8 @@
+---
+title: qml学习
+createTime: 2026/06/21 23:31:33
+permalink: /article/77e2utuz/
+---
 
 
 ### qml组件
