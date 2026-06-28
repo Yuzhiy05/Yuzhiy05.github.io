@@ -3,12 +3,12 @@ title: Boost库使用-regex
 createTime: 2025/05/14 22:41:42
 permalink: /article/94jsixre/
 ---
-#Boost库使用 Regex用法
 
+# Boost库使用 Regex用法
 
 1.正则表达式的模式怎么写
 
-```r
+```regex
 字符
 .        // 任意字符（除换行外）
 \d       // 数字 [0-9]
@@ -67,11 +67,13 @@ $        // 字符串结束（或行结束，多行模式下）
 \X             // Unicode 组合字符序列
 ```
 
-
 三个功能函数
+```cpp
 boost::regex_match()    // 完全匹配
 boost::regex_search()   // 搜索匹配
 boost::regex_replace()  // 替换匹配
+```
 
-
+:::tip
 regex_search 函数搜索到首个匹配项就结束
+:::

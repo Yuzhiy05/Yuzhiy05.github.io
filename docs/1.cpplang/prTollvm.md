@@ -3,13 +3,15 @@ title: prTollvm
 createTime: 2025/03/27 22:19:44
 permalink: /article/hz1oz1zb/
 ---
+
 # 给llvm提交pr
 
-
 ### clone llvm 项目
-```git
-1.git clone --depth=1 --filter=blob:none --branch main git@github.com:Yuzhiy05/llvm-project.git
+```bash
+git clone --depth=1 --filter=blob:none --branch main git@github.com:Yuzhiy05/llvm-project.git
+```
 
+:::info
 在Git中，blob是指文件的内容。当你在Git仓库中对文件进行更改时，Git会创建一个新的blob对象来表示文件的新内容。
 --filter=blob：none，“blob”指的是仓库中大于特定大小阈值的二进制对象。默认情况下，Git将任何大于100 KB的对象视为blob。
 当你在克隆仓库时使用--filter=blob：none时，Git会从克隆中排除这些大型二进制对象（blob）。这可以显著减少克隆仓库的大小，并使下载速度更快
@@ -17,18 +19,25 @@ permalink: /article/hz1oz1zb/
 --filter=blob:limit=<size> 过滤掉大小为size的 文件内容(blob)
 
 --depth=1 只clone 最新提交
+:::
 
-2. git sparse-checkout set libcxx libcxxabi libunwind runtimes cmake libc llvm 
-3. git sparse-checkout add third-party  
+```bash
+git sparse-checkout set libcxx libcxxabi libunwind runtimes cmake libc llvm 
+git sparse-checkout add third-party  
+```
+
+:::tip
 添加更多模块
+ai给的答案里 git sparse-checkout init --cone 这条不需要了查文档这个要废弃了 直接set 路径 不需要/libcxx
+:::
 
- tips: ai给的答案里 git sparse-checkout init --cone 这条不需要了查文档这个要废弃了 直接set 路径 不需要/libcxx
-4.git pull --depth=1 --update-shallow  # 保持浅层历史
-
+```bash
+git pull --depth=1 --update-shallow  # 保持浅层历史
 ```
 
 ### 构建libcxx
-```c++
+
+```cpp
 cmake -G Ninja -S llvm-project/runtimes -B build  \
 -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind \
 -DCMAKE_SYSROOT="D:\workfile\compiler\clang\x86_64-windows-gnu" \
@@ -83,10 +92,6 @@ cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_PROJECTS="libcxx"
 // D:/workfile/github/llvm-libcxx/llvm-project/libcxx/src/support/runtime/stdexcept_default.ipp:13:12: fatal error: 'cxxabi.h' file not found
 //    13 | #  include <cxxabi.h>
 //       |            ^~~~~~~~~~
-
-
-
-
 ```
 
 构建toolchain
@@ -142,32 +147,42 @@ find_program(LLD_PATH lld HINTS "${LLVM_DIR}/bin")
 if(NOT CLANG_PATH OR NOT LLD_PATH)
     message(FATAL_ERROR "Toolchain components not found in ${LLVM_DIR}/bin")
 endif()
+```
 
+```bash
 cmake -G Ninja \
   -S llvm-project/runtimes \
   -B build \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_TOOLCHAIN_FILE=/toolchaincmake/x86_64-windows-gnu/runtimes.cmake
 
-  cmake -G Ninja -S llvm-project/runtimes -B build -DCMAKE_CROSSCOMPILING=ON -DCMAKE_TOOLCHAIN_FILE=D:/workfile/compiler/toolchaincmake/x86_64-windows-gnu/runtimes.cmake -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm"
+cmake -G Ninja -S llvm-project/runtimes -B build -DCMAKE_CROSSCOMPILING=ON -DCMAKE_TOOLCHAIN_FILE=D:/workfile/compiler/toolchaincmake/x86_64-windows-gnu/runtimes.cmake -DCMAKE_INSTALL_PREFIX="D:/workfile/lib/llvm"
 
-   cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=D:/workfile/compiler/toolchaincmake/buildlibcxx.cmake -S llvm-project/runtimes -B build
+cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=D:/workfile/compiler/toolchaincmake/buildlibcxx.cmake -S llvm-project/runtimes -B build
 
+clang++ -o main.exe main.cpp --target=x86_64-windows-gmu --sysroot=D:\workfile\compiler\clang\libcxx -fuse-ld=lld -flto=thin  -rtlib=compiler-rt -stdlib=libc++ -std=c++20 -lc++  -unwindlib=libunwind  -lc++abi -lunwind -lntdll 
+```
 
-
-   clang++ -o main.exe main.cpp --target=x86_64-windows-gmu --sysroot=D:\workfile\compiler\clang\libcxx -fuse-ld=lld -flto=thin  -rtlib=compiler-rt -stdlib=libc++ -std=c++20 -lc++  -unwindlib=libunwind  -lc++abi -lunwind -lntdll 
-
-
+:::warning
 build llvm时可能报错
->>The imported target “clangBasic"references the file “/usr/lib/llvm-10/lib/libclangBasic.a"
->>
+:::
+
+```bash
+# 报错信息
+The imported target “clangBasic"references the file “/usr/lib/llvm-10/lib/libclangBasic.a"
+
+# 解决方案
 sudo apt install libclang-20-dev
+```
 
-
+```bash
 cmake -G Ninja -S llvm-project/runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20
+```
 
+:::info
+编译完成后使用修改后的库 linux下
+:::
 
-
-//编译完成后使用修改后的库 linux下
+```bash
 clang++-20  libcxx/llvm-project/libcxx/test/libcxx/ranges/range.utility/range.utility.conv/to.verify.cpp -o test -std=c++23 -stdlib=libc++ -I ~/libcxx/build/include/c++/v1
 ```

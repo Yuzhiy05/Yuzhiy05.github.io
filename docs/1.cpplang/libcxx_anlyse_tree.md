@@ -3,15 +3,17 @@ title: libcxx_anlyse_tree
 createTime: 2025/02/27 08:55:42
 permalink: /article/68nz5xdu/
 ---
+
 # libc++ 中的tree 分析
 
-```c++
+```cpp
 template <class _From, class _To>
 using __rebind_pointer_t = typename pointer_traits<_From>::template rebind<_To>::other;
 ```
+
 node 类型
 
-```c++
+```cpp
 template <class _VoidPtr>
 struct __tree_node_base_types {
   typedef _VoidPtr __void_pointer;
@@ -59,5 +61,3 @@ public:
   __tree_node_base& operator=(__tree_node_base const&) = delete;
 };
 ```
-
-

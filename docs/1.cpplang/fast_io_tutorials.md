@@ -4,10 +4,11 @@ createTime: 2024/12/02 23:04:13
 permalink: /article/xst10xfz/
 ---
 
+# fast_io 教程
 
 打印自定义类型需要特化print_define
 
-```c++
+```cpp
 #include <fast_io.h>
 struct point
 {
@@ -29,26 +30,26 @@ int main(){
      ::fast_io::println(point{2, 5});
 }
 ```
+
 ::: card title="结果" icon="twemoji:astonished-face"
 (2,5)
 \-----------------
 :::
- 
-
 
 打印容器
 
-```c++
+```cpp
  std::vector vec{1,2,3,4,5};
  fast_io::println(::fast_io::mnp::rgvw(str, ","));
 ```
+
 ::: card title="结果" icon="twemoji:astonished-face"
 1|2|3|4|5
 :::
 
 打印带自定义类的容器
 
-```c++
+```cpp
 #include <fast_io.h>
 struct test_t
 {
@@ -92,7 +93,6 @@ int main(){
 	print(fast_io::mnp::rgvw(v3), " \n"
 	"-----");
 }
-
 ```
 
 ::: card title="结果" icon="twemoji:astonished-face"  
