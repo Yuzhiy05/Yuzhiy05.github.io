@@ -4,382 +4,342 @@ createTime: 2025/01/04 21:54:15
 permalink: /article/tlw73yi4/
 ---
 
+## DataTable
 
+简单介绍常见的 C# 应用到的数据类型。
 
-1.简单介绍常见的C#应用到的数据类型
+**命名空间**：`System.Data`
 
-Datatable
+DataTable 是个抽象上的二维表。
 
-命名空间:
-System.Data
+### 构造函数
 
-Datatable是个抽象上的二维表
+| 构造函数 | 说明 |
+|----------|------|
+| `DataTable()` | 在不使用参数的情况下初始化 DataTable 类的新实例 |
+| `DataTable(String)` | 使用指定的表名初始化 DataTable 类的新实例 |
+| `DataTable(String, String)` | 使用指定的表名和命名空间初始化 DataTable 类的新实例 |
 
-构造函数
-DataTable()	
-在不使用参数的情况下初始化 DataTable 类的新实例。
+存在一个过时的构造函数不予展示。
 
-DataTable(String)	
-使用指定的表名初始化 DataTable 类的新实例。
+### 常用属性
 
-DataTable(String, String)	
-使用指定的表名和命名空间初始化 DataTable 类的新实例。
+| 属性 | 说明 |
+|------|------|
+| `CaseSensitive` | 指示表中的字符串比较是否区分大小写 |
+| `ChildRelations` | 获取此 DataTable 的子关系的集合 |
+| `Columns` | 获取属于该表的列的集合 |
+| `Constraints` | 获取由该表维护的约束的集合 |
+| `Container` | 获取组件的容器（继承自 MarshalByValueComponent） |
+| `DataSet` | 获取此表所属的 DataSet |
+| `DefaultView` | 获取可能包含筛选视图或游标位置的表的自定义视图 |
+| `HasErrors` | 获取一个值，该值指示该表所属的 DataSet 的任何表的任何行中是否有错误 |
+| `MinimumCapacity` | 获取或设置该表最初的起始大小 |
+| `Rows` | 获取属于该表的行的集合 |
+| `Site` | 获取或设置 ISite 的 DataTable |
+| `TableName` | 获取或设置 DataTable 的名称 |
 
-存在一个过时的构造函数不予展示
+### 不常用的属性
 
+| 属性 | 说明 |
+|------|------|
+| `DesignMode` | 获取指示组件当前是否处于设计模式的值（继承自 MarshalByValueComponent） |
+| `DisplayExpression` | 获取或设置一个表达式，该表达式返回的值用于在用户界面中表示此表 |
+| `Events` | 获取附加到该组件的事件处理程序的列表（继承自 MarshalByValueComponent） |
+| `ExtendedProperties` | 获取自定义用户信息的集合 |
+| `IsInitialized` | 获取一个值，该值指示是否已初始化 DataTable |
+| `Locale` | 获取或设置用于比较表中字符串的区域设置信息 |
+| `Namespace` | 获取或设置 DataTable 中所存储数据的 XML 表示形式的命名空间 |
+| `ParentRelations` | 获取该 DataTable 的父关系的集合 |
+| `Prefix` | 获取或设置 DataTable 中所存储数据的 XML 表示形式的命名空间 |
+| `PrimaryKey` | 获取或设置用作数据表主键的列数组 |
+| `RemotingFormat` | 获取或设置序列化格式 |
 
-常用属性
+### 常见方法
 
-CaseSensitive	
-指示表中的字符串比较是否区分大小写。
+| 方法 | 说明 |
+|------|------|
+| `BeginInit()` | 开始初始化在窗体上使用或由另一个组件使用的 DataTable。初始化发生在运行时 |
+| `Clear()` | 清除所有数据的 DataTable |
+| `Clone()` | 克隆 DataTable 的结构，包括所有 DataTable 架构和约束 |
+| `EndInit()` | 结束在窗体上使用或由另一个组件使用的 DataTable 的初始化。初始化发生在运行时 |
+| `ImportRow(DataRow)` | 将 DataRow 复制到 DataTable 中，保留任何属性设置以及初始值和当前值 |
+| `Merge(DataTable)` | 将指定的 DataTable 与当前 DataTable 合并 |
+| `Merge(DataTable, Boolean)` | 将指定的 DataTable 与当前 DataTable 合并，指示是否保留当前 DataTable 中的更改 |
+| `Merge(DataTable, Boolean, MissingSchemaAction)` | 将指定的 DataTable 与当前 DataTable 合并，指示是否保留更改以及如何处理当前 DataTable 中缺失的架构 |
+| `NewRow()` | 创建与该表具有相同架构的新 DataRow |
+| `Select()` | 获取由所有 DataRow 对象组成的数组 |
+| `Select(String)` | 获取由与筛选条件匹配的所有 DataRow 对象组成的数组 |
+| `Select(String, String)` | 以指定排序顺序，获取由与筛选条件匹配的所有 DataRow 对象组成的数组 |
+| `Select(String, String, DataViewRowState)` | 以与指定状态匹配的排序顺序，获取由与筛选条件匹配的所有 DataRow 对象组成的数组 |
 
-ChildRelations	
-获取此 DataTable 的子关系的集合。
+### 示例
 
-Columns	
-获取属于该表的列的集合。
+```csharp
+var dt = new DataTable("table1");
+var dt2 = new DataTable();
 
-Constraints	
-获取由该表维护的约束的集合。
-
-Container	
-获取组件的容器。
-(继承自 MarshalByValueComponent)
-
-
-DataSet	
-获取此表所属的 DataSet。
-
-DefaultView	
-获取可能包含筛选视图或游标位置的表的自定义视图。
-
-
-HasErrors	
-获取一个值，该值指示该表所属的 DataSet 的任何表的任何行中是否有错误。
-
-
-
-MinimumCapacity	
-获取或设置该表最初的起始大小。
-
-
-Rows	
-获取属于该表的行的集合。
-
-Site	
-获取或设置 ISite 的 DataTable。
-
-TableName	
-获取或设置 DataTable 的名称。
-
-不常用的属性:（折叠）
-DesignMode	
-获取指示组件当前是否处于设计模式的值。
-(继承自 MarshalByValueComponent)
-
-DisplayExpression	
-获取或设置一个表达式，该表达式返回的值用于在用户界面中表示此表。 DisplayExpression 属性用于在用户界面中显示此表名。
-
-Events	
-获取附加到该组件的事件处理程序的列表。(继承自 MarshalByValueComponent)
-
-ExtendedProperties	
-获取自定义用户信息的集合。
-
-IsInitialized	
-获取一个值，该值指示是否已初始化 DataTable。
-
-Locale	
-获取或设置用于比较表中字符串的区域设置信息。
-
-Namespace	
-获取或设置 DataTable 中所存储数据的 XML 表示形式的命名空间。
-
-ParentRelations	
-获取该 DataTable 的父关系的集合。
-
-Prefix	
-获取或设置 DataTable 中所存储数据的 XML 表示形式的命名空间。
-
-PrimaryKey	
-获取或设置用作数据表主键的列数组。
-
-RemotingFormat	
-获取或设置序列化格式。
-
-常见方法
-
-BeginInit()	
-开始初始化在窗体上使用或由另一个组件使用的 DataTable。 初始化发生在运行时。
-
-Clear()	
-清除所有数据的 DataTable。
-
-Clone()	
-克隆 DataTable 的结构，包括所有 DataTable 架构和约束。
-
-EndInit()	
-结束在窗体上使用或由另一个组件使用的 DataTable 的初始化。 初始化发生在运行时。
-
-ImportRow(DataRow)	
-将 DataRow 复制到 DataTable 中，保留任何属性设置以及初始值和当前值。
-
-Merge(DataTable)	
-将指定的 DataTable 与当前 DataTable 合并。
-
-Merge(DataTable, Boolean)	
-将指定的 DataTable 与当前 DataTable 合并，指示是否保留当前 DataTable 中的更改。
-
-Merge(DataTable, Boolean, MissingSchemaAction)	
-将指定的 DataTable 与当前 DataTable 合并，指示是否保留更改以及如何处理当前 DataTable 中缺失的架构
-
-NewRow()	
-创建与该表具有相同架构的新 DataRow。
-
-Select()	
-获取由所有 DataRow 对象组成的数组。
-
-Select(String)	
-获取由与筛选条件匹配的所有 DataRow 对象组成的数组。
-
-Select(String, String)	
-以指定排序顺序，获取由与筛选条件匹配的所有 DataRow 对象组成的数组。
-
-Select(String, String, DataViewRowState)	
-以与指定状态匹配的排序顺序，获取由与筛选条件匹配的所有 DataRow 对象组成的数组。
-
-示例
-
-```c#
-var dt=new DataTable("table1");
-var dt2=new DataTable();
-
-var dc =new DataColum();
+var dc = new DataColumn();
 dt.Columns.Add(dc);
 //
-dt.Columns.Add("column1",System.Type.GetType("System.string"));
-dt.Columns.Add("column2",typeof(String))
+dt.Columns.Add("column1", System.Type.GetType("System.string"));
+dt.Columns.Add("column2", typeof(String));
 
-var dc2=new DataColumn("column2",typeof(String));
-dt.Colums.Add(dc2);
+var dc2 = new DataColumn("column2", typeof(String));
+dt.Columns.Add(dc2);
 
-//添加行
-//与创建列不同的是，必须使用NewRow创建新建行
-var dr=dt.NewRow()
-dr["columns1"]="1";
-dr[0]="2";
+// 添加行
+// 与创建列不同的是，必须使用 NewRow 创建新建行
+var dr = dt.NewRow();
+dr["columns1"] = "1";
+dr[0] = "2";
 dt.Rows.Add(dr);
-//传入值数组添加行
-dt.Rows.Add(new Object[] {1, "Smith"});
+// 传入值数组添加行
+dt.Rows.Add(new Object[] { 1, "Smith" });
 
-//使用索引或列名
-dt.Rows[0][0]="3";
-dt.Rows[0]["column"]="4";
-//获取值
-var str=dt.Row[0][0].ToString();
+// 使用索引或列名
+dt.Rows[0][0] = "3";
+dt.Rows[0]["column"] = "4";
+// 获取值
+var str = dt.Rows[0][0].ToString();
 
-//筛选行
-//使用Select方法
-var drs=dt.Select("column ='4'");
-var drs=dt.Select("column is null");
-var drs=dt.Select("column like 'yu%'","column desc");
-var drs=dt.Select("column ='A' and column ='B'");
-//其中的提供筛选的字符串只能含有 列名 与值 和一些关系表达式 > ,< ,=,<> ...
-//可以提供一个删选表达式可以有多个筛选条件需要由 and or 连接，也可以简单的排序
-//打印数据
+// 筛选行
+// 使用 Select 方法
+var drs = dt.Select("column ='4'");
+var drs2 = dt.Select("column is null");
+var drs3 = dt.Select("column like 'yu%'", "column desc");
+var drs4 = dt.Select("column ='A' and column ='B'");
+// 其中提供筛选的字符串只能含有列名与值和一些关系表达式 >, <, =, <> ...
+// 可以提供一个筛选表达式可以有多个筛选条件需要由 and or 连接，也可以简单的排序
+
+// 打印数据
 private static void PrintRows(DataRow[] rows, string label)
 {
     Console.WriteLine("\n{0}", label);
-    if(rows.Length <= 0)
+    if (rows.Length <= 0)
     {
         Console.WriteLine("no rows found");
         return;
     }
-    foreach(DataRow row in rows)
+    foreach (DataRow row in rows)
     {
-        foreach(DataColumn column in row.Table.Columns)
+        foreach (DataColumn column in row.Table.Columns)
         {
-            Console.Write("\table {0}", row[column]);
+            Console.Write("\t{0}", row[column]);
         }
         Console.WriteLine();
     }
 }
-//删除行
+
+// 删除行
 dt.Rows.Remove(dt.Rows[0]);
-dt.Rows.RomoveAt(0);//根据行索引删除
+dt.Rows.RemoveAt(0);  // 根据行索引删除
 //
 dt.Rows[0].Delete();
 dt.AcceptChanges();
-//Remove与RemoveAt 方法都是直接删除
-//但Delete方法只是把此行标记为deleted,使用RejectChanges()方法回滚之前的操作
-//批量删除时应逆序使用使用索引逆序删除，而不该用foreach，因为删除时索引会发生变化
-for(int i=dt.Rows.Count-1,i>=0;i++){
+// Remove 与 RemoveAt 方法都是直接删除
+// 但 Delete 方法只是把此行标记为 deleted，使用 RejectChanges() 方法回滚之前的操作
+// 批量删除时应逆序使用索引逆序删除，而不该用 foreach，因为删除时索引会发生变化
+for (int i = dt.Rows.Count - 1; i >= 0; i--)
+{
     dt.Rows.RemoveAt(i);
 }
 
-//复制表
-var dt_new=new DataTable();
-dt_new=dt.Copy();
-//复制数据与表结构
-dt_new.ImportRow(dt.Rows[0]);//将某一行加入到行末尾
-//排序
-//表排序必须先转换为DataView
-DataView dv=dt.DefaultView;
-dv.Sort="column DESC,column ASC";
+// 复制表
+var dt_new = new DataTable();
+dt_new = dt.Copy();
+// 复制数据与表结构
+dt_new.ImportRow(dt.Rows[0]);  // 将某一行加入到行末尾
+
+// 排序
+// 表排序必须先转换为 DataView
+DataView dv = dt.DefaultView;
+dv.Sort = "column DESC, column ASC";
 dv.ToTable();
 ```
 
-DataView
+## DataView
+
 DataView 的主要功能是允许在 Windows 窗体和 Web 窗体上绑定数据。
- DataView 不存储数据，而是表示其相应 DataTable的连接视图。 对 DataView数据的更改会影响 DataTable。 对 DataTable数据所做的更改将影响与之关联的所有 DataView。
 
-属性:
-Sort
-包含列名后跟`ASC`(升)或`DESC`(降序)的字符串。 默认情况下，列按升序排序。 多个列可以用逗号分隔
+DataView 不存储数据，而是表示其相应 DataTable 的连接视图。对 DataView 数据的更改会影响 DataTable。对 DataTable 数据所做的更改将影响与之关联的所有 DataView。
 
-LINQ 操作DataTable
+**属性**：
 
-DataTable 存在扩展方法的静态类DataTableExtensions 用于linq查询
-```c#
-AsDataView(DataTable)	
-创建并返回支持 LINQ 的 DataView 对象。
+| 属性 | 说明 |
+|------|------|
+| `Sort` | 包含列名后跟 `ASC`（升）或 `DESC`（降序）的字符串。默认情况下，列按升序排序。多个列可以用逗号分隔 |
 
-AsDataView<T>(EnumerableRowCollection<T>)	
-创建并返回一个支持 DataView LINQ 的对象，该对象表示 LINQ to DataSet 查询。
+## LINQ 操作 DataTable
 
-AsEnumerable(DataTable)	
-返回一个 IEnumerable<T> 对象，其泛型参数 T 为 DataRow。 此对象可用于 LINQ 表达式或方法查询。
+DataTable 存在扩展方法的静态类 `DataTableExtensions`，用于 LINQ 查询。
+
+```csharp
+AsDataView(DataTable)
+// 创建并返回支持 LINQ 的 DataView 对象。
+
+AsDataView<T>(EnumerableRowCollection<T>)
+// 创建并返回一个支持 DataView LINQ 的对象，该对象表示 LINQ to DataSet 查询。
+
+AsEnumerable(DataTable)
+// 返回一个 IEnumerable<T> 对象，其泛型参数 T 为 DataRow。此对象可用于 LINQ 表达式或方法查询。
 
 CopyToDataTable<T>(IEnumerable<T>)
 
 //
-public static System.Data.EnumerableRowCollection<System.Data.DataRow> AsEnumerable (this System.Data.DataTable source);
+public static System.Data.EnumerableRowCollection<System.Data.DataRow> AsEnumerable(this System.Data.DataTable source);
 ```
 
-扩展方法包含在静态类中不需要实例化，首个参数使用this指针，使我们可以使用实例化的对象直接调用静态方法而不是写成`DataTableExtensions.AsEnumerable(table)`.
-table.AsAsEnumerable()将DataTable转换位对应的可枚举器 永久绑定，多次调用生成多个永久绑定的可查询对象
+扩展方法包含在静态类中不需要实例化，首个参数使用 `this` 指针，使我们可以使用实例化的对象直接调用静态方法而不是写成 `DataTableExtensions.AsEnumerable(table)`。
 
-```c#
+`table.AsEnumerable()` 将 DataTable 转换为对应的可枚举器，永久绑定，多次调用生成多个永久绑定的可查询对象。
+
+```csharp
 var group = table.AsEnumerable()
-                               .GroupBy(row => row.Field<decimal>("Price") > 500 ? "High" : "Low")
-                               .Select(group => new 
-                               { 
-                                   Range = group.Key, 
-                                   Count = group.Count() 
-                               });
+    .GroupBy(row => row.Field<decimal>("Price") > 500 ? "High" : "Low")
+    .Select(group => new
+    {
+        Range = group.Key,
+        Count = group.Count()
+    });
 
- var sum = table.AsEnumerable().Sum(row => row.Field<decimal>("Price"));
+var sum = table.AsEnumerable().Sum(row => row.Field<decimal>("Price"));
 
-  var query = table.AsEnumerable()
-                  .Where(row => row.Field<decimal>("Price") > 50)
-                  .OrderBy(row => row.Field<decimal>("Price"));
+var query = table.AsEnumerable()
+    .Where(row => row.Field<decimal>("Price") > 50)
+    .OrderBy(row => row.Field<decimal>("Price"));
 
-   var selectedColumns = table.AsEnumerable()
-               .Select(row => new
-               {
-                   ProductName = row.Field<string>("ProductName"),
-                   Price = row.Field<decimal>("Price")
-               });               
+var selectedColumns = table.AsEnumerable()
+    .Select(row => new
+    {
+        ProductName = row.Field<string>("ProductName"),
+        Price = row.Field<decimal>("Price")
+    });
 ```
+
+---
 
 ## string 字符串类型
 
- C#的String被视为基元类型,直接使用字面值构造
- 但是CLR via c#与微软的copilt ai都和编译器有一些出入
- 在书中这段代码是会报错的
- ```c#
- String str2 = new String("hi aaaa.");
- ```
- 书中直接声明
- >C#不允许使用new操作符从字面值字符串构造String对象
- 但在编译器上试了下是可行的，并且并没有提示
- 我在godbolt上使用.net6 coro指定了/langversion:6 c#6标准发现也是可行了。
- Ai说.net8 为String添加了String(string)构造器。我查了一下msdn根本没有。哎ai也喜欢扯淡
+C# 的 String 被视为基元类型，直接使用字面值构造。
 
- 不过差不多可以确定这句可以允许是因为这个构造器,不过这个构造器.net Core 2.1就加了;godbolt也没有也就没法验证了。我到时候找一下CLR via c#(第四版)这本书的c#标准?
- ```C#
- public String (ReadOnlySpan<char> value);
- ```
+但是 CLR Via C# 与微软的 Copilot AI 都和编译器有一些出入。在书中这段代码是会报错的：
 
- 第二问题
- 字面量使用+ 操作符相连时是在编译期进行的。对非字面量字符串相加实在编译期进行的。这需要在堆上创建存储
+```csharp
+String str2 = new String("hi aaaa.");
+```
 
- 3.使用逐子字符串包含转义符号时
- 一个例子说明
- ```c#
-stirng filePath="C:\\Windos\\System32\\xxx";
-stirng filePath2=@"C:\Windos\System32\xxx";
- ```
- 这两结果一样
+书中直接声明：
 
- 4.忽略语言文化的字符串比较
- 需要在使用Compare函数添加StringComparison参数 Ordinal,OrdinalIgnoreCase。
- 加了这个比较有多快我要测一下?
- 书中有个notice
- 要我们在进行字符串比较前提升字符串大小写(ToUpperInvariant/ToLowerInvariant)
- 书中说微软对大写字符串比较的代码进行的优化,且进行没有区分大小写的比较时FCL(.net类库)会自动转换成大写。且ToUpper对语言文化敏感(这里的说法还没验证)
+> C# 不允许使用 new 操作符从字面值字符串构造 String 对象
 
-5.语言文化的字符串比较CompareInfo,暂时不用也不想看
+但在编译器上试了下是可行的，并且并没有提示。我在 godbolt 上使用 .NET 6 / Roslyn 指定了 `/langversion:6` C#6 标准发现也是可行的。
 
-6.StringCompare进行比较:大量不同字符串反复执行同一比较
+AI 说 .NET 8 为 String 添加了 `String(string)` 构造器。我查了一下 MSDN 根本没有。哎 AI 也喜欢扯淡。
 
-## 字符串留用
-程序中多个相同字符串引用同一个对象
-```c#
+不过差不多可以确定这句可以允许是因为这个构造器，不过这个构造器 .NET Core 2.1 就加了；godbolt 也没有也就没法验证了。我到时候找一下 CLR Via C#（第四版）这本书的 C# 标准。
+
+```csharp
+public String(ReadOnlySpan<char> value);
+```
+
+### 字面量拼接
+
+字面量使用 `+` 操作符相连时是在编译期进行的。对非字面量字符串相加是在运行期进行的。这需要在堆上创建存储。
+
+### 逐字字符串
+
+使用逐字字符串包含转义符号时，一个例子说明：
+
+```csharp
+string filePath = "C:\\Windows\\System32\\xxx";
+string filePath2 = @"C:\Windows\System32\xxx";
+```
+
+这两结果一样。
+
+### 忽略语言文化的字符串比较
+
+需要在使用 Compare 函数添加 `StringComparison` 参数 `Ordinal`、`OrdinalIgnoreCase`。
+
+加了这个比较有多快我要测一下？
+
+书中有个 notice，要我们在进行字符串比较前提升字符串大小写（`ToUpperInvariant` / `ToLowerInvariant`）。书中说微软对大写字符串比较的代码进行的优化，且进行没有区分大小写的比较时 FCL（.NET 类库）会自动转换成大写。且 `ToUpper` 对语言文化敏感（这里的说法还没验证）。
+
+### 语言文化的字符串比较
+
+`CompareInfo`，暂时不用也不想看。
+
+### String.Compare 进行比较
+
+大量不同字符串反复执行同一比较。
+
+### 字符串留用
+
+程序中多个相同字符串引用同一个对象：
+
+```csharp
 string str = "Hello";
-string str2= "Hello";
+string str2 = "Hello";
 
-Console.WriteLine($"str == str2: {str == str2}"); //true
-Console.WriteLine(Object.ReferenceEquals(str, str2)); //按道理是false，但是在.net8上跑是true 被留用了
+Console.WriteLine($"str == str2: {str == str2}"); // true
+Console.WriteLine(Object.ReferenceEquals(str, str2)); // 按道理是 false，但是在 .NET8 上跑是 true 被留用了
 
-str=String.Intern(str); // 显式留用
-str2=String.Intern(str2); // 显式留用
+str = String.Intern(str);   // 显式留用
+str2 = String.Intern(str2); // 显式留用
 Console.WriteLine(Object.ReferenceEquals(str, str2)); // True
 ```
 
-## stringInfro 不想看
+### stringInfro
 
+不想看。
 
+---
 
+### 格式修饰符说明
 
-### 格式修饰符符说明
-数值类型常用格式说明符
-| 说明符 | 含义         | 示例输出（1234.56） |
-| ------ | ------------ | ------------------- |
-| C/c    | 货币         | ￥1,234.56           |
-| D/d    | 十进制整数   | 1235                |
-| E/e    | 科学计数法   | 1.234560E+003       |
-| F/f    | 定点         | 1234.56             |
-| G/g    | 常规         | 1234.56             |
-| N/n    | 数字         | 1,234.56            |
-| P/p    | 百分比       | 123,456.00 %        |
-| X/x    | 十六进制整数 | 4D2                 |
-| B/b    | 二进制数     | 超了                |
-| R/r    | 往返历程     | 还没测              |
+**数值类型常用格式说明符**：
+
+| 说明符 | 含义 | 示例输出（1234.56） |
+|--------|------|---------------------|
+| C/c | 货币 | ￥1,234.56 |
+| D/d | 十进制整数 | 1235 |
+| E/e | 科学计数法 | 1.234560E+003 |
+| F/f | 定点 | 1234.56 |
+| G/g | 常规 | 1234.56 |
+| N/n | 数字 | 1,234.56 |
+| P/p | 百分比 | 123,456.00 % |
+| X/x | 十六进制整数 | 4D2 |
+| B/b | 二进制数 | 超了 |
+| R/r | 往返历程 | 还没测 |
+
 注意：D 和 X 只适用于整数类型。
-日期和时间类型常用格式说明符
-| 说明符 | 含义           | 示例输出               |
-| ------ | -------------- | ---------------------- |
-| d      | 短日期         | 2025/5/29              |
-| D      | 长日期         | 2025年5月29日          |
-| t      | 短时间         | 14:30                  |
-| T      | 长时间         | 14:30:15               |
-| f      | 完整日期短时间 | 2025年5月29日 14:30    |
-| F      | 完整日期长时间 | 2025年5月29日 14:30:15 |
-| g      | 常规短日期时间 | 2025/5/29 14:30        |
-| G      | 常规长日期时间 | 2025/5/29 14:30:15     |
 
-## 格式字符串
-```c#
-{参数位置,对其:格式修饰符|精度}
-//例如 首个参数,打印时10个字符对齐,打印货币类型,保留两位小数
+**日期和时间类型常用格式说明符**：
+
+| 说明符 | 含义 | 示例输出 |
+|--------|------|----------|
+| d | 短日期 | 2025/5/29 |
+| D | 长日期 | 2025年5月29日 |
+| t | 短时间 | 14:30 |
+| T | 长时间 | 14:30:15 |
+| f | 完整日期短时间 | 2025年5月29日 14:30 |
+| F | 完整日期长时间 | 2025年5月29日 14:30:15 |
+| g | 常规短日期时间 | 2025/5/29 14:30 |
+| G | 常规长日期时间 | 2025/5/29 14:30:15 |
+
+### 格式字符串
+
+```csharp
+{参数位置,对齐:格式修饰符|精度}
+// 例如：首个参数，打印时 10 个字符对齐，打印货币类型，保留两位小数
 {0,10:C2}
-//这玩意打印出来是 
+// 这玩意打印出来是
 // ¥123.000
-//注意¥前还有一个空格用于对齐。¥123.000有8个字符,按要求左对齐9个字符,不够就用空格补充。
-var str=string.Format("{0,9:C3}", 123);
+// 注意 ¥ 前还有一个空格用于对齐。¥123.000 有 8 个字符，按要求左对齐 9 个字符，不够就用空格补充。
+var str = string.Format("{0,9:C3}", 123);
 Console.WriteLine(str);
-//抄的msdn例子
+// 抄的 MSDN 例子
 decimal[] amounts = { 16305.32m, 18794.16m };
 Console.WriteLine("   Beginning Balance           Ending Balance");
 Console.WriteLine("   {0,-28:C2}{1,14:C2}", amounts[0], amounts[1]);
@@ -388,66 +348,78 @@ Console.WriteLine("   {0,-28:C2}{1,14:C2}", amounts[0], amounts[1]);
 //        $16,305.32                      $18,794.16
 ```
 
-:::tip
-```c#
-var sb=new StringBuilder("AAA");
- Console.WriteLine($"StringBuilder: {sb}");
- sb.Length = 0; // 这里能清掉sb的对象的内容
- Console.WriteLine($"StringBuilder after clearing: {sb}");
- ```
-::: 
+::: tip StringBuilder 清空
+```csharp
+var sb = new StringBuilder("AAA");
+Console.WriteLine($"StringBuilder: {sb}");
+sb.Length = 0; // 这里能清掉 sb 的对象的内容
+Console.WriteLine($"StringBuilder after clearing: {sb}");
+```
+:::
 
+---
 
 ## 元组
-c# 因为设计缺陷
-存在两个元组
-值元组(值类型) System.valueTuple   其中成员的都是字段  元素可变
-元组(引用类型) System.Tuple 其中成员的都是属性  元素内容不可变
+
+C# 因为设计缺陷，存在两个元组：
+
+| 类型 | 说明 |
+|------|------|
+| `System.ValueTuple` | 值元组（值类型），其中成员都是字段，元素可变 |
+| `System.Tuple` | 元组（引用类型），其中成员都是属性，元素内容不可变 |
 
 ### Tuple
-先介绍元组 System.Tuple 因为没有模板形参包
-所以有Tuple.Tuple\<T\> ,...Tuple\<T1,T2,T3,T4,T5,T6,T7,TRest\> 这么多类型
 
-使用
-```c#
-//静态方法可以进行泛型参数推导
-var tuple1=Tuple.Create(1,.2.1,"123",'c');
-//使用构造函数构造Tuple需要指明泛型参数
+先介绍元组 `System.Tuple`，因为没有模板形参包，所以有 `Tuple<T>`、...、`Tuple<T1,T2,T3,T4,T5,T6,T7,TRest>` 这么多类型。
+
+使用：
+
+```csharp
+// 静态方法可以进行泛型参数推导
+var tuple1 = Tuple.Create(1, 2.1, "123", 'c');
+// 使用构造函数构造 Tuple 需要指明泛型参数
 var population = new Tuple<string, int, int, int, int, int, int>(
-                           "New York", 7891957, 7781984, 
-                           7894862, 7071639, 7322564, 8008278);
+    "New York", 7891957, 7781984,
+    7894862, 7071639, 7322564, 8008278);
 ```
-因为 不同泛型参数的Tuple(Tuple,Tuple\<T\>,...Tuple\<T1,T2...T7,TRest\>) 实际上是不同的九个类型,其构造函数不是泛型方法
-所以无法推导类型.一般使用静态方法Tuple.Create,可以进行泛型参数推导
 
-使用形如 item1,item2,item3...的属性名
-```c#
-tuple1.item1 ，tuple1.item2 ,tuple1.iteam3 
+因为不同泛型参数的 Tuple 实际上是不同的九个类型，其构造函数不是泛型方法，所以无法推导类型。一般使用静态方法 `Tuple.Create`，可以进行泛型参数推导。
+
+使用形如 `Item1`、`Item2`、`Item3`... 的属性名来访问 tuple 中的元素：
+
+```csharp
+tuple1.Item1, tuple1.Item2, tuple1.Item3
 ```
-来访问tuple中的元素
 
-tips 观察所有Item(index)...属性的声明
-```c#
+::: tip 注意
+观察所有 Item(index)... 属性的声明：
+
+```csharp
 public T1 Item1 { get; }
 ```
-只有get,没有set Tuple的所有元素都是只读的
-实现了两个显示接口方法
-以Tuple\<T1,T2,T3\> 为例
-```c#
+
+只有 get，没有 set，Tuple 的所有元素都是只读的。
+:::
+
+实现了两个显式接口方法，以 `Tuple<T1,T2,T3>` 为例：
+
+```csharp
 int IComparable.CompareTo(object obj);
 
 int IStructuralComparable.CompareTo(object other, System.Collections.IComparer comparer);
 
 bool IStructuralEquatable.Equals(object other, System.Collections.IEqualityComparer comparer);
 ```
-IComparable.CompareTo 默认相等性比较 比较方法是按 Tuple元素Item1,Item2...一个个比较 用于数组排序 Array.Sort()默认调用
 
-IStructuralComparable.CompareTo 可以自定义比较器 比如我只比较两个Tuple 的第二个值的大小来代表两个Tuple的大小 
+| 接口方法 | 说明 |
+|----------|------|
+| `IComparable.CompareTo` | 默认相等性比较，比较方法是按 Tuple 元素 Item1, Item2... 一个个比较，用于数组排序 `Array.Sort()` 默认调用 |
+| `IStructuralComparable.CompareTo` | 可以自定义比较器，比如我只比较两个 Tuple 的第二个值的大小来代表两个 Tuple 的大小 |
+| `IStructuralEquatable.Equals` | 相对性比较 |
 
-IStructuralEquatable.Equals 相对性比较
+例子：
 
-例子 
-```C#
+```csharp
 public class CustomComparer<T1, T2, T3> : IComparer
 {
     public int Compare(Object x, Object y)
@@ -462,6 +434,7 @@ public class CustomComparer<T1, T2, T3> : IComparer
         }
     }
 }
+
 Random random = new Random();
 
 // 创建一个数组，用于存放 10 个 Tuple<int, char, double>
@@ -470,7 +443,7 @@ var tuple_arr = new Tuple<int, char, double>[10];
 // 循环生成 10 个随机 Tuple
 for (int i = 0; i < 10; i++)
 {
-    int item1 = random.Next(1, 100); // 随机整数，比如 1~99
+    int item1 = random.Next(1, 100);        // 随机整数，比如 1~99
     char item2 = (char)random.Next(65, 91); // 随机大写字母 A(65) ~ Z(90)
     double item3 = Math.Round(random.NextDouble() * 100, 2); // 随机浮点数 0.00 ~ 99.99
 
@@ -478,122 +451,149 @@ for (int i = 0; i < 10; i++)
     tuple_arr[i] = Tuple.Create(item1, item2, item3);
 }
 
-//默认调用IComparable.CompareTo
+// 默认调用 IComparable.CompareTo
 Array.Sort(tuple_arr);
 
 foreach (var tuple in tuple_arr)
     Console.WriteLine($"[{tuple.Item1}|{tuple.Item2}|{tuple.Item3}]");
 
-//使用IStructuralComparable.CompareTo
-Array.Sort(tuple_arr, new CustomComparer<T1, T2, T3>());
+// 使用 IStructuralComparable.CompareTo
+Array.Sort(tuple_arr, new CustomComparer<int, char, double>());
 foreach (var tuple in tuple_arr)
     Console.WriteLine($"[{tuple.Item1}|{tuple.Item2}|{tuple.Item3}]")
 ```
-这个例子在.net9 上基本上是最新的运行时实际上都没有调用 IStructuralComparable接口而是直接使用默认比较器和IComparable.CompareTo去调用Compare()来进行比较
-但是AI和MSDN都介绍说Array.Sort(Array, IComparer) 会调用IStructuralComparable接口CompareTo找Compare方法实际上Debug一下就知道
-传入比较器为空,会使用默认比较器。
-```c#
+
+::: warning 注意
+这个例子在 .NET9 上基本上是最新的运行时，实际上都没有调用 `IStructuralComparable` 接口而是直接使用默认比较器和 `IComparable.CompareTo` 去调用 `Compare()` 来进行比较。
+
+但是 AI 和 MSDN 都介绍说 `Array.Sort(Array, IComparer)` 会调用 `IStructuralComparable` 接口 `CompareTo` 找 `Compare` 方法，实际上 Debug 一下就知道传入比较器为空会使用默认比较器。
+:::
+
+```csharp
 public void Sort(Span<T> keys, IComparer<T> comparer)
 {
-	try
-	{
-		if (comparer == null)
-		{
-			comparer = Comparer<T>.Default;
-		}
-		IntrospectiveSort(keys, comparer.Compare);
-	}
-    ...//其他代码省略
+    try
+    {
+        if (comparer == null)
+        {
+            comparer = Comparer<T>.Default;
+        }
+        IntrospectiveSort(keys, comparer.Compare);
+    }
+    // ...其他代码省略
 }
 ```
->尽管可以直接调用此方法，但它最常由包含 IComparer 参数的集合排序方法调用，这些方法用于对集合的成员进行排序。 例如，它由 Array.Sort(Array, IComparer) 方法以及Add使用 SortedList.SortedList(IComparer) 构造函数实例化的 对象的 方法SortedList调用。
+
+> 尽管可以直接调用此方法，但它最常由包含 IComparer 参数的集合排序方法调用，这些方法用于对集合的成员进行排序。例如，它由 Array.Sort(Array, IComparer) 方法以及使用 SortedList.SortedList(IComparer) 构造函数实例化的 SortedList 对象的 Add 方法调用。
+
 <https://learn.microsoft.com/zh-cn/dotnet/api/system.tuple-6.system-collections-istructuralcomparable-compareto?view=net-9.0#-->
-吐槽一下msdn的段落链接也炸了。
 
-元组在ai都被吐槽为落后,让我使用c#7/.net core2 开始的值元组
+吐槽一下 MSDN 的段落链接也炸了。
 
-### System.valueTuple
-c# 为值元组设计了新语法,只需要用括号包裹就可以定义一个匿名元组
-```c#
-(int,string)t=("loka", 18);
-var t=("loka", 18);
+元组在 AI 都被吐槽为落后，让我使用 C#7 / .NET Core 2 开始的值元组。
+
+### System.ValueTuple
+
+C# 为值元组设计了新语法，只需要用括号包裹就可以定义一个匿名元组：
+
+```csharp
+(int, string) t = ("loka", 18);
+var t = ("loka", 18);
 ```
-其中t的类型就是 `(int,string)` 这个表达式所表示的类型
 
-1.元组元素的映射,元组元素可以用如下方式指定名字,如果没有指定名字,但其中的值是引用了别的变量,那么可以推导出该变量初始化的名字当元组名。
-```C#
+其中 t 的类型就是 `(int, string)` 这个表达式所表示的类型。
+
+**1. 元组元素的映射**
+
+元组元素可以用如下方式指定名字，如果没有指定名字，但其中的值是引用了别的变量，那么可以推导出该变量初始化的名字当元组名。
+
+```csharp
 var t = (Sum: 4.5, Count: 3);
 Console.WriteLine($"Sum of {t.Count} elements is {t.Sum}.");
 
 (double Sum, int Count) d = (4.5, 3);
 Console.WriteLine($"Sum of {d.Count} elements is {d.Sum}.");
 
-//用初始化的变量名推导元组元素的名字
+// 用初始化的变量名推导元组元素的名字
 var sum = 4.5;
 var count = 3;
 var t = (sum, count);
 Console.WriteLine($"Sum of {t.count} elements is {t.sum}.");
 ```
-同样可以用默认名Item1,Item2...
 
-2.使用using 定义元组别名
-c#12可以说使用,注意使用位置
-1.想在单个文件可见
-```c#
+同样可以用默认名 `Item1`、`Item2`...
+
+**2. 使用 using 定义元组别名**
+
+C#12 可以说使用，注意使用位置：
+
+想在单个文件可见：
+
+```csharp
 using System;
 using System.Collections.Generic;
-using person=(int,string)
+using person = (int, string);
 ```
-2.想要在全局可见需要写在所有using之前,并且使用global修饰
-```c#
-global using person=(int,string)
+
+想要在全局可见需要写在所有 using 之前，并且使用 `global` 修饰：
+
+```csharp
+global using person = (int, string);
 using System;
 using System.Collections.Generic;
 ```
 
-3.和Tuple有类似的api
-其中 元素都是字段
-```c#
+**3. 和 Tuple 有类似的 API**
+
+其中元素都是字段：
+
+```csharp
 public T1 Item1;
 ```
 
-
 ### 元组的赋值与相等性比较
-1.元组赋值按类型和元素数量匹配
-不看字段名,只要按顺序对应位置的类型相同(或可隐式转换)且元素数量相同。
-```c#
- var t = ("1", 12);
- var t2 = ("2", 12);
- var t3 = ("111", 12, 1);
- var t4 = ( 12, "111");
- t = t2;  //可以
- t = t3;  //无法将类型“(string, int, int)”隐式转换为“(string, int)”
- t = t4;  //无法将类型“(int, string)”隐式转换为“(string, int)”
+
+**1. 元组赋值按类型和元素数量匹配**
+
+不看字段名，只要按顺序对应位置的类型相同（或可隐式转换）且元素数量相同。
+
+```csharp
+var t = ("1", 12);
+var t2 = ("2", 12);
+var t3 = ("111", 12, 1);
+var t4 = (12, "111");
+t = t2;  // 可以
+t = t3;  // 无法将类型"(string, int, int)"隐式转换为"(string, int)"
+t = t4;  // 无法将类型"(int, string)"隐式转换为"(string, int)"
 ```
 
+**2. 相等性比较**
 
-2.与赋值一样不考虑元组名字
-考虑
-1.两元组元素数量相等
-2.元组按顺序的两个元素可比较
-以下相等比较的表达式 1,3,4报错 元素数量不一致,无法比较的类型连编译都不通过
-```c#
+与赋值一样不考虑元组名字，考虑：
+
+1. 两元组元素数量相等
+2. 元组按顺序的两个元素可比较
+
+以下相等比较的表达式 1, 3, 4 报错，元素数量不一致，无法比较的类型连编译都不通过：
+
+```csharp
 public struct Customclass { }
 
 var t1 = (1, 2);
 var t2 = (1, '1');
 var t3 = (1, 2, 3);
 var t4 = (1, new Customclass());
- Console.WriteLine(t1 != t3);//元素数量不对
- Console.WriteLine(t1 != t2);
- Console.WriteLine(t1 == t3);//元素数量不对
- Console.WriteLine(t1 == t2);
- Console.WriteLine(t1 != t4);//无法应用相等比较运算符
+Console.WriteLine(t1 != t3);  // 元素数量不对
+Console.WriteLine(t1 != t2);
+Console.WriteLine(t1 == t3);  // 元素数量不对
+Console.WriteLine(t1 == t2);
+Console.WriteLine(t1 != t4);  // 无法应用相等比较运算符
 ```
 
-tips 元组类型可以是表达式,所以在相等比较时会先求值表达式
-MSDN偷的例子
-```c#
+::: tip 补充
+元组类型可以是表达式，所以在相等比较时会先求值表达式。MSDN 偷的例子：
+
+```csharp
 Console.WriteLine((Display(1), Display(2)) == (Display(3), Display(4)));
 
 int Display(int s)
@@ -608,106 +608,117 @@ int Display(int s)
 // 4
 // False
 ```
-
-
+:::
 
 ### 解构赋值
-四种语法
-1.为每个变量单独使用var 
-2.不使用var 指明类型 可隐式转换
-3.为单独某个元素声明var 另编译器推导其类型
-4.在括号外为所有变量声明var 
-```c#
- (var name, var age) = ("loka", 18);
- (string name1, int age2) = ("loka", 18);
- (var name2, int age2) = ("loka", 18);
- var(name3, age3) = ("loka", 18); 
+
+四种语法：
+
+1. 为每个变量单独使用 `var`
+2. 不使用 `var` 指明类型，可隐式转换
+3. 为单独某个元素声明 `var`，另编译器推导其类型
+4. 在括号外为所有变量声明 `var`
+
+```csharp
+(var name, var age) = ("loka", 18);
+(string name1, int age2) = ("loka", 18);
+(var name2, int age2) = ("loka", 18);
+var (name3, age3) = ("loka", 18);
 ```
 
-和模式匹配结合的例子，从MSDN上偷来的
-循环访问多个整数，并输出可被 3 整除的整数
-```c#
-for (int i = 4; i < 20;  i++)
+和模式匹配结合的例子，从 MSDN 上偷来的。循环访问多个整数，并输出可被 3 整除的整数：
+
+```csharp
+for (int i = 4; i < 20; i++)
 {
-    if (Math.DivRem(i, 3) is ( Quotient: var q, Remainder: 0 ))
+    if (Math.DivRem(i, 3) is (Quotient: var q, Remainder: 0))
     {
         Console.WriteLine($"{i} is divisible by 3, with quotient {q}");
     }
 }
 ```
 
-使用`_` 下滑线来忽略元组的某些元素,这被称为弃元
-```c#
- var (_, _, _, pop1, _, pop2) = ("New York City", 1960, 2010，1.1，2.1,3);
- Console.WriteLine($"{pop2 - pop1:N0}");
-```
-### 让用户自定义类型也支持解构
-需要为类型声明 如下方法
-可以重载多个该方法
-参考下面例子
-```c#
-//声明 如下方法
-public void Deconstruct(out [类型]参数名1, out [类型] 参数名2, out [类型]参数名3...){}
+使用 `_` 下划线来忽略元组的某些元素，这被称为弃元：
 
-//使用
- public class TypeCustomDeconstruct
- {
+```csharp
+var (_, _, _, pop1, _, pop2) = ("New York City", 1960, 2010, 1.1, 2.1, 3);
+Console.WriteLine($"{pop2 - pop1:N0}");
+```
+
+### 让用户自定义类型也支持解构
+
+需要为类型声明如下方法，可以重载多个该方法。参考下面例子：
+
+```csharp
+// 声明如下方法
+public void Deconstruct(out [类型]参数名1, out [类型]参数名2, out [类型]参数名3...) {}
+
+// 使用
+public class TypeCustomDeconstruct
+{
     private int id;
     private string name;
 
     public TypeCustomDeconstruct(int id, string name)
-     {
-         this.id = id;
-         this.name = name;
-     }
+    {
+        this.id = id;
+        this.name = name;
+    }
 
     public void Deconstruct(out int id, out string name)
     {
         id = this.id;
         name = this.name;
     }
-    
-    //相同参数
+
+    // 相同参数
     public void Deconstruct(out string type, out string name)
     {
-       type = this.type;
-       name = this.name;
+        type = this.type;
+        name = this.name;
     }
-    
-    //相同参数
+
+    // 相同参数
     public void Deconstruct(out string name, out int id, out string type)
     {
         id = this.id;
         name = this.name;
         type = this.type;
     }
- }
+}
 
 var obj = new TypeCustomDeconstruct(1, "Alice", "male");
-var (id, name, sex) = obj;//可行匹配到了
-var (name2, id2) = obj; //二义性 无法推导类型无法匹配
-var (type, name3) = obj;//二义性 无法推导类型无法匹配
-(string id3, string name4) = obj;//二义性 无法匹配尽管指明类型
-```
-MSDN的说明注意一下
->具有相同数量参数的多个 Deconstruct 方法是不明确的。 在定义 Deconstruct 方法时，必须小心使用不同数量的参数或“arity”。 在重载解析过程中，不能区分具有相同数量参数的 Deconstruct 方法。
-
-~~虽然没有明说为什么不行~~ 不过这表示 **第四个解构赋值** 尽管指明类型但是参数元数的重载有两个也是不能重载解析的
-(有大佬说明:语义上是要求要能先返回一个tuple,再拆tuple到两个变量)
-
-同时也可以设置扩展方法的Deconstruct 函数来设定解构行为
-```c#
-public static void Deconstruct(this [Type] p,out...)
+var (id, name, sex) = obj;   // 可行匹配到了
+var (name2, id2) = obj;      // 二义性 无法推导类型无法匹配
+var (type, name3) = obj;     // 二义性 无法推导类型无法匹配
+(string id3, string name4) = obj;  // 二义性 无法匹配尽管指明类型
 ```
 
+::: warning MSDN 的说明
+具有相同数量参数的多个 Deconstruct 方法是不明确的。在定义 Deconstruct 方法时，必须小心使用不同数量的参数或"arity"。在重载解析过程中，不能区分具有相同数量参数的 Deconstruct 方法。
+:::
+
+虽然没有明说为什么不行，不过这表示 **第四个解构赋值** 尽管指明类型但是参数元数的重载有两个也是不能重载解析的。
+
+（有大佬说明：语义上是要求要能先返回一个 tuple，再拆 tuple 到两个变量）
+
+同时也可以设置扩展方法的 Deconstruct 函数来设定解构行为：
+
+```csharp
+public static void Deconstruct(this [Type] p, out...)
+```
+
+---
 
 ## Record 记录类型
-拥有值语义的引用类型
 
-使用主构造函数语法来声明Record类型
-主构造函数语法(C# 12)即声明类型时后跟类似于函数的参数和括号,编译器会生成签名为此的构造函数
-Person的声明使用record修饰并且使用主构造函数后会生成类似Person2的结构(两者完全不等价只是解糖后的行为相似)
-```c#
+拥有值语义的引用类型。
+
+使用主构造函数语法来声明 Record 类型。主构造函数语法（C# 12）即声明类型时后跟类似于函数的参数和括号，编译器会生成签名为此的构造函数。
+
+Person 的声明使用 record 修饰并且使用主构造函数后会生成类似 Person2 的结构（两者完全不等价只是解糖后的行为相似）：
+
+```csharp
 public record Person(int Id, string Name);
 
 public struct Person2(int Id, string Name)
@@ -717,49 +728,47 @@ public struct Person2(int Id, string Name)
 
     public override string ToString()
     {
-        return $"Person2:{Id={Id}, Name={Name}}";
+        return $"Person2:{{Id={Id}, Name={Name}}}";
     }
 }
 ```
-相似在哪?
-1.主构造函数声明的参数表示这个参数都需要;初始化时不能不提供-对应required
-2.使用主构造函数后这些参数都需要对象值设定语法来指示而不是写在调用函数的参数中
-3.初始化完成后,属性是只读的无法再次赋值,只能在类对象初始化时赋值
-4.打印对象时会打印对应属性而不是调用Object.ToString()打印其类型
-5.相等性比较类似于struct:是比较值是否相同而不是比较引用/地址(是否为同一对象)
 
-```c#
- var tt = new Person();//报错 未提供与“Person.Person(int, string)”的所需参数“Id”对应的参数
- var tt2 = new Person2(1, "loka");//报错 必须在对象初始值设定项或属性构造函数中设置所需的成员'Person2.Id'。必须在对象初始值设定项或属性构造函数中设置所需的成员'Person2.Name'。
+相似在哪？
 
-var tt=new Person(1,"loka");//可行
+1. 主构造函数声明的参数表示这个参数都需要；初始化时不能不提供——对应 `required`
+2. 使用主构造函数后这些参数都需要对象值设定语法来指示而不是写在调用函数的参数中
+3. 初始化完成后，属性是只读的无法再次赋值，只能在类对象初始化时赋值
+4. 打印对象时会打印对应属性而不是调用 `Object.ToString()` 打印其类型
+5. 相等性比较类似于 struct：是比较值是否相同而不是比较引用/地址（是否为同一对象）
 
-var tt2=new Person2 { Name="loka",Id=1 };//可行
+```csharp
+var tt = new Person();  // 报错 未提供与"Person.Person(int, string)"的所需参数"Id"对应的参数
+var tt2 = new Person2(1, "loka");  // 报错 必须在对象初始值设定项或属性构造函数中设置所需的成员'Person2.Id'
+
+var tt = new Person(1, "loka");  // 可行
+
+var tt2 = new Person2 { Name = "loka", Id = 1 };  // 可行
 ```
-### 区分Record/Record class/Record struct
 
-1.record ==record class 本身是引用类型 但是具有值语义
-2.record struct 是值类型 同样的具有值语义
+### 区分 Record / Record class / Record struct
 
-编译器会自动生成一下内容
-1.使用record声明类型;并使用主构造函数语法时,其中参数的位置叫"位置参数",声明的类型叫"位置记录"
-对于record class 编译器会创建对应参数类型的init-only属性
+1. `record` == `record class`，本身是引用类型，但是具有值语义
+2. `record struct` 是值类型，同样的具有值语义
 
-对于record struct 编译器会创建对应参数类型的读写属性
+编译器会自动生成以下内容：
 
-2.创建的构造函数参数声明顺序与位置参数一致
+1. 使用 record 声明类型并使用主构造函数语法时，其中参数的位置叫"位置参数"，声明的类型叫"位置记录"
+   - 对于 `record class`：编译器会创建对应参数类型的 init-only 属性
+   - 对于 `record struct`：编译器会创建对应参数类型的读写属性
+2. 创建的构造函数参数声明顺序与位置参数一致
+3. `record struct` 生成的字段会初始化为默认值
+4. 编译器创建一个包含所有"位置参数"的 Deconstruct 方法
+5. 值相等的 `Object.Equals(Object)`、`Object.GetHashCode()`、`==` 和 `!=`
 
-3.record struct生成的字段会初始化为默认值
+上面那个例子可以扩写一下：
 
-4.编译器创建一个包含所有"位置参数"的Deconstruct方法
-
-5.值相等的 Object.Equals(Object)  Object.GetHashCode()   == 和 !=
-
-上面那个例子可以扩写一下
-```c#
-``diff
+```csharp
 public record struct Person(int Id, string Name);
-``
 
 public struct Person2
 {
@@ -778,19 +787,25 @@ public struct Person2
         name = Name;
     }
 
-    public override string ToString() => $"Preson2: Id={Id}, Name={Name}";
+    public override string ToString() => $"Person2: Id={Id}, Name={Name}";
 }
+```
 
+Person 这个位置记录创建的类型解糖后差不多为 Person2；因为创建的属性是个读写属性。
+
+::: info 补充
+从 C# 11 开始，如果你没有初始化结构中的所有字段，编译器会将代码添加到将这些字段初始化为默认值的构造函数中。分配给其 default 值的结构将初始化为 0 位模式。使用 new 初始化的结构体初始化为 0 位模式，然后执行所有字段初始值设定项和构造函数。**每个 struct 都具有一个 public 无参数构造函数。**
+
+所以可以使用初始值设定语法：
+
+```csharp
+var tt2 = new Person2 { Name = "loka", Id = 1 };
 ```
-Person这个位置记录 创建的类型解糖后差不多为Person2;因为创建的属性是个读写属性
-同时
->从 C# 11 开始，如果你没有初始化结构中的所有字段，编译器会将代码添加到将这些字段初始化为默认值的构造函数中。 分配给其 default 值的结构将初始化为 0 位模式。 使用 new 初始化的结构体初始化为 0 位模式，然后执行所有字段初始值设定项和构造函数。**每个 struct 都具有一个 public 无参数构造函数。**
-所以可以使用初始值设定语法,参考下方初始值设定语法
-```c#
-var tt2=new Person2 { Name="loka",Id=1 };
-```
-再看record/record class的例子
-```c#
+:::
+
+再看 record / record class 的例子：
+
+```csharp
 public record class Person3(string FirstName, string LastName);
 
 public class Person4
@@ -810,91 +825,96 @@ public class Person4
         LastName_ = LastName;
     }
 
-    public override string ToString() => $"Preson2: Id={FirstName}, Name={LastName}";
+    public override string ToString() => $"Person4: FirstName={FirstName}, LastName={LastName}";
 }
 ```
-此处Person3的位置记录声明了类似Person4 的类型
-但是这里使用如下初始化语法
-```c#
- var pre2= new Person3("1", "loka");//可以
- var pre3= new Person3 { FirstName = "2", LastName = "jeff" };//报错:未提供与“Person3.Person3(string, string)”的所需参数“FirstName”对应的参数
- pre2.FirstName="emi";//报错:只能在对象初始值设定项中或在实例构造函数或 "init" 访问器中的 "this" 或 "base" 上分配 init-only 属性或索引器 "Person3.FirstName"。
+
+此处 Person3 的位置记录声明了类似 Person4 的类型。但是这里使用如下初始化语法：
+
+```csharp
+var pre2 = new Person3("1", "loka");  // 可以
+var pre3 = new Person3 { FirstName = "2", LastName = "jeff" };  // 报错
+pre2.FirstName = "emi";  // 报错：只能在对象初始值设定项中或在实例构造函数或 "init" 访问器中的 "this" 或 "base" 上分配 init-only 属性
 ```
-属性赋值语句的报错侧面证实了位置record声明的效果:声明了仅初始化(构造函数中/或对象初始值设定语法中)中(init-only)可以赋值的属性
 
-`var pre3= new Person3 { FirstName = "2", LastName = "jeff" }` 该表达式报错参考下方说明:此语法糖实际上是先调用无参的构造函数,再利用属性的set函数赋值,编译器通过语法检查防止你在初始化外赋值。
-因为结构struct会默认生成一个public的无参构造函数,而class不会这么做。所以record class/record 与record struct在初始化语法上存在一些差异
+属性赋值语句的报错侧面证实了位置 record 的效果：声明了仅初始化（构造函数中/或对象初始值设定语法中）中（init-only）可以赋值的属性。
 
-如果你对编译器默认生成的属性不满意,
-可以主动声明一个同名属性把编译器生成属性覆盖掉
-可以自定义属性访问器
-可添加字段 但必须用位置参数初始化字段
+::: warning 说明
+`var pre3 = new Person3 { FirstName = "2", LastName = "jeff" }` 该表达式报错参考下方说明：此语法糖实际上是先调用无参的构造函数，再利用属性的 set 函数赋值，编译器通过语法检查防止你在初始化外赋值。
 
-参考下面例子
-```c#
-public record Person5(string FirstName, string LastName,int age)
+因为结构 struct 会默认生成一个 public 的无参构造函数，而 class 不会这么做。所以 record class / record 与 record struct 在初始化语法上存在一些差异。
+:::
+
+如果你对编译器默认生成的属性不满意，可以主动声明一个同名属性把编译器生成属性覆盖掉，可以自定义属性访问器，可添加字段但必须用位置参数初始化字段。
+
+参考下面例子：
+
+```csharp
+public record Person5(string FirstName, string LastName, int age)
 {
-    //在记录中定义字段 因为析构函数的需要所以 需要初始化该字段 不一定非要位置字段
+    // 在记录中定义字段，因为析构函数的需要所以需要初始化该字段，不一定非要位置字段
     public string FirstName_ = FirstName;
-   
-   //对默认生成的属性不满意 自定义同名属性和访问器覆盖默认实现
+
+    // 对默认生成的属性不满意，自定义同名属性和访问器覆盖默认实现
     private int age
     {
         get { return age + 1; }
-        set { if (value> 0) age = value; }
+        set { if (value > 0) age = value; }
     }
-    
-    //对默认生成的属性不满意单纯的指向修改访问控制符
-    // (不自定义访问器)实际仍是自动的属性则必须要初始化这个属性
+
+    // 对默认生成的属性不满意单纯的指向修改访问控制符
+    // （不自定义访问器）实际仍是自动的属性则必须要初始化这个属性
     private string LastName
     {
         get;
         init;
-    } = LastName;//=""
+    } = LastName; // = ""
 
-    //和声明类成员一样声明属性 不一定需要位置属性(在主构造函数声明)
+    // 和声明类成员一样声明属性，不一定需要位置属性（在主构造函数声明）
     public string FullName => $"{FirstName} {LastName}";
 }
 ```
 
 ### 关于相等性比较
-record修饰的class或struct都是基于属性值的相等性比较
-见下例
-```c#
+
+record 修饰的 class 或 struct 都是基于属性值的相等性比较。见下例：
+
+```csharp
 public record class Person3(string FirstName, string LastName, string[] phnumber);
 
- var per3=new Person3("Alice","Smith",["1234"]);
- var per3_2 = new Person3("Alice", "Smith", ["1234"]);
+var per3 = new Person3("Alice", "Smith", ["1234"]);
+var per3_2 = new Person3("Alice", "Smith", ["1234"]);
 
- Console.WriteLine(per3==per3_2);//false
+Console.WriteLine(per3 == per3_2);  // false
 
- var phonenumber=new string[2] { "5678", "91011" };
- var per3_3=per3 with { phnumber= phonenumber};
- var per3_4 = per3 with { phnumber = phonenumber };
- Console.WriteLine(per3_3==per3_4);//true
+var phonenumber = new string[2] { "5678", "91011" };
+var per3_3 = per3 with { phnumber = phonenumber };
+var per3_4 = per3 with { phnumber = phonenumber };
+Console.WriteLine(per3_3 == per3_4);  // true
 ```
-可见即使record 声称 相等性比较是值语义的 但是面对引用类型时仍然 会使得这种值语义失败
-这是因为 
-1.record 通过编译器生成 Object.Equals(Object)的替代函数 仅仅通过重写该方法  用户不能重写
 
-2. 合成 virtual/sealed, Equals(R? other) R为记录类型 该函数实现 IEquatable\<T\>。 用户可以重写(不如说用户向实现)
-   
-3. 合成Object.GetHashCode()  用户可以覆盖
-   
-4. `==,!=` 运算符 不能重写
-5. 派生/继承类型的重写参考[MSDN](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#value-equality)
+可见即使 record 声称相等性比较是值语义的，但是面对引用类型时仍然会使得这种值语义失败。这是因为：
 
-对string[2] 这样的引用类型应用Equals方法时 仍然进行的是引用比较,即数组是否指向同一地址
+1. record 通过编译器生成 `Object.Equals(Object)` 的替代函数，仅仅通过重写该方法，用户不能重写
+2. 合成 `virtual` / `sealed`，`Equals(R? other)` R 为记录类型，该函数实现 `IEquatable<T>`。用户可以重写（不如说用户想实现）
+3. 合成 `Object.GetHashCode()`，用户可以覆盖
+4. `==`、`!=` 运算符，不能重写
+5. 派生/继承类型的重写参考 [MSDN](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#value-equality)
 
-注意因为c# 重写了string类型的Object.Equals(Object) 方法所以即使是引用类型相等性比较时仍然是值比较
+对 `string[2]` 这样的引用类型应用 `Equals` 方法时仍然进行的是引用比较，即数组是否指向同一地址。
 
-为了定制更加值语义比较的需求 我们需要这样重写方法
-```c#
+::: tip 注意
+因为 C# 重写了 string 类型的 `Object.Equals(Object)` 方法，所以即使是引用类型相等性比较时仍然是值比较。
+:::
+
+为了定制更加值语义比较的需求，我们需要这样重写方法：
+
+```csharp
 public record class Person3(string FirstName, string LastName, string[] phnumber)
     : IEquatable<Person3>
 {
-    //public override bool Equals(object? obj)  该方法无法声明 因为默认生成的方法不是virtual 修饰
-    //public  bool Equals(Person3? obj)  //如果记录不是密封的(sealed修饰) 该方法必须要声明virtual
+    // public override bool Equals(object? obj)  该方法无法声明，因为默认生成的方法不是 virtual 修饰
+    // public bool Equals(Person3? obj)  // 如果记录不是密封的（sealed 修饰）该方法必须要声明 virtual
     bool IEquatable<Person3>.Equals(Person3? obj)
     {
         return obj is Person3 other
@@ -915,18 +935,20 @@ public record class Person3(string FirstName, string LastName, string[] phnumber
     }
 }
 
-var per3=new Person3("Alice","Smith",["1234"]);
+var per3 = new Person3("Alice", "Smith", ["1234"]);
 var per3_2 = new Person3("Alice", "Smith", ["1234"]);
 
-//这样进行相等性比较
- Console.WriteLine(per3==per3_2);//true
+// 这样进行相等性比较
+Console.WriteLine(per3 == per3_2);  // true
 ```
 
-### 使用with 表达式创建新记录
-对于record class来说位置参数生成的属性都是init-only的(仅在初始化阶段可赋值的)
-这个时候为了简化从一个已存在记录的实例创建只有某些属性不一致的对象时 with表达式初始化很有用
-参考MSDN的例子
-```c#
+### 使用 with 表达式创建新记录
+
+对于 record class 来说位置参数生成的属性都是 init-only 的（仅在初始化阶段可赋值的），这个时候为了简化从一个已存在记录的实例创建只有某些属性不一致的对象时，with 表达式初始化很有用。
+
+参考 MSDN 的例子：
+
+```csharp
 public record Person(string FirstName, string LastName)
 {
     public string[] PhoneNumbers { get; init; }
@@ -952,32 +974,38 @@ public static void Main()
     Console.WriteLine(person1 == person2); // output: True
 }
 ```
-注意使用with 表达式 需要属性不管是否是位置参数生成的属性 都需要init/set访问器
-注意` person2 = person1 with { };`的例子with指向的复制都是浅拷贝 也就是说对于引用类型,复制后的引用的仍是都是同一对象(只复制指针)
-所以输出true
 
-编译器为了实现该功能
+::: warning 注意
+使用 with 表达式需要属性不管是否是位置参数生成的属性都需要 init / set 访问器。
 
-对于record class
-1.合成了一个Clone函数  用户无法重写覆盖 with表达式调用Clone函数 通过Clone函数调用复制构造函数
-2.一个复制构造函数      可以重写
+注意 `person2 = person1 with { };` 的例子，with 指向的复制都是浅拷贝，也就是说对于引用类型，复制后的引用的仍是同一对象（只复制指针），所以输出 true。
+:::
 
-对于record struct
-1.不生成复制构造函数 在值分配时复制
+编译器为了实现该功能：
 
-在Person3中添加复制构造,使用with表达式时就会被调用
-```c#
-public record class Person3(string FirstName, string LastName, string[] phnumber): IEquatable<Person3>
+**对于 record class**：
+
+1. 合成了一个 Clone 函数，用户无法重写覆盖，with 表达式调用 Clone 函数，通过 Clone 函数调用复制构造函数
+2. 一个复制构造函数，可以重写
+
+**对于 record struct**：
+
+1. 不生成复制构造函数，在值分配时复制
+
+在 Person3 中添加复制构造，使用 with 表达式时就会被调用：
+
+```csharp
+public record class Person3(string FirstName, string LastName, string[] phnumber) : IEquatable<Person3>
 {
-  ....
-  public Person3(Person3? obj)
-  {
-    Console.WriteLine("Person3 copy constructor called");
-    FirstName = obj?.FirstName ?? "";
-    LastName = obj?.LastName ?? "";
-    phnumber = obj?.phnumber ?? Array.Empty<string>();
-  }
-  ...
+    // ....
+    public Person3(Person3? obj)
+    {
+        Console.WriteLine("Person3 copy constructor called");
+        FirstName = obj?.FirstName ?? "";
+        LastName = obj?.LastName ?? "";
+        phnumber = obj?.phnumber ?? Array.Empty<string>();
+    }
+    // ...
 }
 
 var per3 = new Person3("Alice", "Smith", ["1234"]);
@@ -985,26 +1013,32 @@ var phonenumber = new string[2] { "5678", "91011" };
 var per3_3 = per3 with { phnumber = phonenumber };
 ```
 
-### 初始化存在依赖的属性 使用with的注意事项
-参考MSDN的[例子](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#nondestructive-mutation:~:text=%E9%80%9A%E8%BF%87%E8%AE%A1%E7%AE%97%E8%AE%BF%E9%97%AE%E4%B8%8A%E7%9A%84%E5%80%BC%E6%9D%A5%E7%A1%AE%E4%BF%9D%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7%E7%9A%84%E6%AD%A3%E7%A1%AE%E6%80%A7%EF%BC%8C%E5%A6%82%E4%BB%A5%E4%B8%8B%E5%A3%B0%E6%98%8E%E6%89%80%E7%A4%BA%EF%BC%9A)
-大致是说 with表达式也依赖初始值设定语法-先构造函数初始值再调用属性赋值.因此如果给属性添加初始化器会导致with表达式赋值的属性依赖
-其他有初始值的属性时可能会使用被克隆对象的初值而不是使用with表达式新赋的值
+### 初始化存在依赖的属性使用 with 的注意事项
 
-### 编译器自动生成的ToString
-对于记录我们更加注重是数据
-所以编译器生成的ToString函数会将属性和值打印出来而不是字段
-格式为`<record type name> { <property name> = <value>, <property name> = <value>, ...}`
+参考 MSDN 的[例子](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#nondestructive-mutation)。
 
-编译器会实现
-对于record class
-1.virtual PrintMembers 方法      用户可重写覆盖
-2.ToString 函数              用户可重写覆盖
+大致是说 with 表达式也依赖初始值设定语法——先构造函数初始值再调用属性赋值。因此如果给属性添加初始化器会导致 with 表达式赋值的属性依赖其他有初始值的属性时可能会使用被克隆对象的初值而不是使用 with 表达式新赋的值。
 
-对于record struct
-同样生成上述方法但是是private的
+### 编译器自动生成的 ToString
 
-这个实现其实有问题
-```c#
+对于记录我们更加注重是数据，所以编译器生成的 ToString 函数会将属性和值打印出来而不是字段。
+
+格式为 `<record type name> { <property name> = <value>, <property name> = <value>, ... }`
+
+编译器会实现：
+
+**对于 record class**：
+
+1. `virtual PrintMembers` 方法，用户可重写覆盖
+2. `ToString` 函数，用户可重写覆盖
+
+**对于 record struct**：
+
+同样生成上述方法但是是 private 的。
+
+这个实现其实有问题：
+
+```csharp
 protected virtual bool PrintMembers(StringBuilder sb)
 {
     Console.WriteLine("Custom PrintMembers called");
@@ -1012,13 +1046,14 @@ protected virtual bool PrintMembers(StringBuilder sb)
     return true;
 }
 
- public override string ToString() => PrintMembers();
+public override string ToString() => PrintMembers();
 ```
-注意对编译器自动生成的PrintMembers 对于一些没重写ToString方法的引用类型仍是打印值
 
-只要定义了符合条件的PrintMembers 编译器合成的ToString函数就能调用到
-编译器合成的ToString大概长这样
-```c#
+注意对编译器自动生成的 PrintMembers，对于一些没重写 ToString 方法的引用类型仍是打印值。
+
+只要定义了符合条件的 PrintMembers，编译器合成的 ToString 函数就能调用到。编译器合成的 ToString 大概长这样：
+
+```csharp
 public override string ToString()
 {
     StringBuilder stringBuilder = new StringBuilder();
@@ -1032,104 +1067,115 @@ public override string ToString()
     return stringBuilder.ToString();
 }
 ```
-对于PrintMembers应该如何声明参考[MSDN]
-(https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#printmembers-formatting-in-derived-records)
 
-最后总结一下 record实际是 一些特殊要求的class类型因为实际确实有这些类型的需求所以c#添加了record这个语法糖来简化一种特定类型的声明
-声明compA 编译器实际上生成类似compB的结构
-```c#
-//一个record class
- public record compA(int Id, string Name);
+对于 PrintMembers 应该如何声明参考 [MSDN](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#printmembers-formatting-in-derived-records)。
 
- //
- public class compB
- {
-     public required int Id { get; init; }
-     public required string Name { get; init; }
+### 总结
 
-     public compB(int Id_, string Name_) 
-     {
-         Id =Id_;
-         Name = Name_;
-     }
-      public compB(compB other)
-     {
+Record 实际是一些特殊要求的 class 类型，因为实际确实有这些类型的需求，所以 C# 添加了 record 这个语法糖来简化一种特定类型的声明。
+
+声明 compA 编译器实际上生成类似 compB 的结构：
+
+```csharp
+// 一个 record class
+public record compA(int Id, string Name);
+
+//
+public class compB
+{
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+
+    public compB(int Id_, string Name_)
+    {
+        Id = Id_;
+        Name = Name_;
+    }
+
+    public compB(compB other)
+    {
         if (other == null)
-         throw new ArgumentNullException(nameof(other));
+            throw new ArgumentNullException(nameof(other));
 
-         Id = other.Id;
-         Name = other.Name;
-     }
-    
+        Id = other.Id;
+        Name = other.Name;
+    }
+
     // 模拟 record class 的行为：编译器对 record class 生成的 with 表达式会调用一个
     // 受保护的虚拟 Clone 方法
-    //然而这个实现有问题手动模拟不了
-     protected virtual compB Clone([with表达式的参数]...args)
-     {
-       return new compB(this){ [whit指定的属性]=args[1]};
-     }
+    // 然而这个实现有问题手动模拟不了
+    protected virtual compB Clone(/* with 表达式的参数 */...args)
+    {
+        return new compB(this) { [with 指定的属性] = args[1] };
+    }
 
-     public override bool Equals(object? obj)
-     {
-         if (obj is not compB other)
-             return false;
-         return Id == other.Id && Name == other.Name;
-     }
-     public override int GetHashCode() => HashCode.Combine(Id, Name);
+    public override bool Equals(object? obj)
+    {
+        if (obj is not compB other)
+            return false;
+        return Id == other.Id && Name == other.Name;
+    }
 
-     public void Deconstruct(out int id, out string name)
-     {
-         id = Id;
-         name = Name;
-     }
-     protected virtual bool PrintMembers(StringBuilder sb)
-     {
-         sb.AppendLine($"Id:{Id} Name:{Name}");
-         return true;
-     }
-     public override string ToString()
-     {
-         StringBuilder stringBuilder = new StringBuilder();
-         stringBuilder.Append("compB"); // type name
-         stringBuilder.Append(" { ");
-         if (PrintMembers(stringBuilder))
-         {
-             stringBuilder.Append(" ");
-         }
-         stringBuilder.Append("}");
-         return stringBuilder.ToString();
-     }
- }
+    public override int GetHashCode() => HashCode.Combine(Id, Name);
+
+    public void Deconstruct(out int id, out string name)
+    {
+        id = Id;
+        name = Name;
+    }
+
+    protected virtual bool PrintMembers(StringBuilder sb)
+    {
+        sb.AppendLine($"Id:{Id} Name:{Name}");
+        return true;
+    }
+
+    public override string ToString()
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.Append("compB"); // type name
+        stringBuilder.Append(" { ");
+        if (PrintMembers(stringBuilder))
+        {
+            stringBuilder.Append(" ");
+        }
+        stringBuilder.Append("}");
+        return stringBuilder.ToString();
+    }
+}
 ```
-其中Clone方法完全模拟不了(可能是我不会写),因为init要求必须由对象初始值指定语法指定属性的初始值
-虽然该语法是先构造对象,再调用属性赋值的语法糖 但在语义上属性赋值的部分仍然属于初始化的语义
-以下例子是一些语法的解糖状态 后面用ILspy看一下
-```c#
-//例子1
-var t=new <RcordType>(someargues){Property=xxx};
 
-var t=new <RcordType>(someargues);
-t.Property=xxx;
+其中 Clone 方法完全模拟不了（可能是我不会写），因为 init 要求必须由对象初始值指定语法指定属性的初始值。虽然该语法是先构造对象，再调用属性赋值的语法糖，但在语义上属性赋值的部分仍然属于初始化的语义。
 
-//例子2
-var t3=with t2{Property2=yyy};
+以下例子是一些语法的解糖状态，后面用 ILSpy 看一下：
 
-var t3=t2.Clone();
-t3.Property2=yyy;
+```csharp
+// 例子1
+var t = new <RecordType>(someargues) { Property = xxx };
 
-//例子3
-var t4=new compA(1,"111");
-var t5=t with { Name="222"};
+var t = new <RecordType>(someargues);
+t.Property = xxx;
+
+// 例子2
+var t3 = with t2 { Property2 = yyy };
+
+var t3 = t2.Clone();
+t3.Property2 = yyy;
+
+// 例子3
+var t4 = new compA(1, "111");
+var t5 = t4 with { Name = "222" };
 ```
-例子3生成的IL
-```IL
+
+例子3生成的 IL：
+
+```cil
 .locals init (class csharp4IL.compA V_0,
            class csharp4IL.compA V_1)
   IL_0000:  nop
   IL_0001:  ldc.i4.1
   IL_0002:  ldstr      "111"
-  IL_0007:  newobj     instance void csharp4IL.compA::.ctor(int32,
-                                                            string)
+  IL_0007:  newobj     instance void csharp4IL.compA::.ctor(int32, string)
   IL_000c:  stloc.0
   IL_000d:  ldloc.0
   IL_000e:  callvirt   instance class csharp4IL.compA csharp4IL.compA::'<Clone>$'()
@@ -1139,23 +1185,26 @@ var t5=t with { Name="222"};
   IL_001e:  nop
   IL_001f:  stloc.1
 ```
-基本上可以验证例子2
 
-
+基本上可以验证例子2。
 
 ### 关于继承和派生的内容
-参考[MSND](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#inheritance)
+
+参考 [MSDN](https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/record#inheritance)。
+
+---
 
 ## 对象初始值设定语法
-可以对象初始化时手动指定属性的值
-```c#
+
+可以对象初始化时手动指定属性的值：
+
+```csharp
 public class outClass
 {
     public int Id { get; set; }
     public string Name { get; set; }
 
-    public override string ToString()=> $"outClass: Id={Id}, Name={Name}";
-
+    public override string ToString() => $"outClass: Id={Id}, Name={Name}";
 }
 
 public class test_type1
@@ -1164,9 +1213,9 @@ public class test_type1
     public string Name { get; set; }
 
     public string[] C = new string[2];
-    
-    //注意这里的注释
-    public outClass out_class_ { get; set; }//=new outClass();
+
+    // 注意这里的注释
+    public outClass out_class_ { get; set; } // = new outClass();
 
     public test_type1()
     {
@@ -1202,58 +1251,35 @@ public static void test()
         C = new string[] { "a", "b" },
     };
 
-   
-    Console.WriteLine($"{t3.Id} {t3.Name} C[0]={t3.C[0]} C[1]={t3.C[1]},out_class_={t3.out_class_}");
-    Console.WriteLine($"{t4.Id} {t4.Name} C[0]={t4.C[0]} C[1]={t4.C[1]},out_class_={t3.out_class_}");
+    Console.WriteLine($"{t3.Id} {t3.Name} C[0]={t3.C[0]} C[1]={t3.C[1]}, out_class_={t3.out_class_}");
+    Console.WriteLine($"{t4.Id} {t4.Name} C[0]={t4.C[0]} C[1]={t4.C[1]}, out_class_={t3.out_class_}");
 }
 ```
-这段代码在t3初始化时会抛异常:System.NullReferenceException:“Object reference not set to an instance of an object.”
-暂时不管,先介绍这个语法:对象初始化的时候可以使用大括号的语法对每个声明为public的属性或字段赋值。如t1和t2
 
-对于t3和t4的示例,演示了嵌套类型"初始化"的语法
-对于嵌套对象 可以使用不带new的 `Property = { ... }`语法初始化嵌套对象，如例子t3,t4所示
+::: warning 注意
+这段代码在 t3 初始化时会抛异常：`System.NullReferenceException: "Object reference not set to an instance of an object."`
+:::
 
-**该语法本质是先创建对象再赋值**,所以这里t3初始化抛异常的原型是因为先初始化时构造函数什么都没干;out_class_==null.
-要想修复这个问题可以在属性声明时初始化 ` public outClass out_class_ { get; set; }=new outClass();`
-或在无参构造函数中初始化该属性;或在{}初始化时使用`new(){...}` 语法"初始化"(赋值)
-```c#
+暂时不管，先介绍这个语法：对象初始化的时候可以使用大括号的语法对每个声明为 public 的属性或字段赋值。如 t1 和 t2。
+
+对于 t3 和 t4 的示例，演示了嵌套类型"初始化"的语法。对于嵌套对象可以使用不带 `new` 的 `Property = { ... }` 语法初始化嵌套对象，如例子 t3、t4 所示。
+
+**该语法本质是先创建对象再赋值**，所以这里 t3 初始化抛异常的原型是因为先初始化时构造函数什么都没干；`out_class_ == null`。
+
+要想修复这个问题可以在属性声明时初始化 `public outClass out_class_ { get; set; } = new outClass();` 或在无参构造函数中初始化该属性；或在 `{}` 初始化时使用 `new() { ... }` 语法"初始化"（赋值）：
+
+```csharp
 public test_type1()
 {
     Id = 0;
     Name = "default";
-    <span style="
-    color: #22863a;
-    background-color: #f0fff4;
-    padding: 0 4px;
-    border-radius: 3px;
-    font-family: Consolas, Monaco, 'Andale Mono', monospace;
-    font-size: 14px;
-    display: inline-block;
-    margin: 0;">
-    +out_class_ = new outClass(); </span>
-    
-   
+    out_class_ = new outClass();
 }
 ```
 
- <span style="
-    color: #22863a;
-    background-color: #f0fff4;
-    padding: 0 4px;
-    border-radius: 3px;
-    font-family: Consolas, Monaco, 'Andale Mono', monospace;
-    font-size: 14px;
-    display: inline-block;
-    margin: 0;">
-    +out_class_ = new outClass(); </span>
+针对 t1、t2 的初始化语句使用 ILDasm 查看后（.NET9 环境）：
 
- //测试一下博客的markdown解析器支不支持这个语法
-    ```diff
-    + out_class_ = new outClass();
-    ```
-
-针对t1,t2的初始化语句 使用ILDsm查看后(.net9环境)
-```IL
+```cil
   IL_0001:  newobj     instance void csharp4IL.Test_object_initializers/test_type1::.ctor()
   IL_0006:  dup
   IL_0007:  ldc.i4.s   10
@@ -1271,65 +1297,67 @@ public test_type1()
   IL_0029:  callvirt   instance void csharp4IL.Test_object_initializers/test_type1::set_Name(string)
 ```
 
-可以明显看到先newobj,调用构造函数生成对象后再调用set函数赋值属性
+可以明显看到先 newobj，调用构造函数生成对象后再调用 set 函数赋值属性。
 
-显而易见的是
-1.`out_class_ = { Id = 11, Name = "111" }` 也就是`Property = { ... }`此语法复用对象的实例
-2.`out_class_ = new() { Id = 11, Name = "111" } Property = new() { ... }` 创建新的对象实例并替换原有对象
+显而易见的是：
 
+1. `out_class_ = { Id = 11, Name = "111" }` 也就是 `Property = { ... }` 此语法复用对象的实例
+2. `out_class_ = new() { Id = 11, Name = "111" }` 也就是 `Property = new() { ... }` 创建新的对象实例并替换原有对象
 
-同时对于没有设置set的只读属性(类对象) 语法1`Property = { ... }`也可以相应初始化该属性
-从MSDN偷来的例子
-```c#
+同时对于没有设置 set 的只读属性（类对象），语法1 `Property = { ... }` 也可以相应初始化该属性。
+
+从 MSDN 偷来的例子：
+
+```csharp
 public class Settings
+{
+    public string Theme { get; set; } = "Light";
+    public int FontSize { get; set; } = 12;
+}
+
+public class Application
+{
+    public string Name { get; set; } = "";
+    // This property is read-only - it can only be set during construction
+    public Settings AppSettings { get; } = new();
+}
+
+public static void Example()
+{
+    // You can still initialize the nested object's properties
+    // even though AppSettings property has no setter
+    var app = new Application
     {
-        public string Theme { get; set; } = "Light";
-        public int FontSize { get; set; } = 12;
-    }
+        Name = "MyApp",
+        AppSettings = { Theme = "Dark", FontSize = 14 }
+    };
 
-    public class Application
-    {
-        public string Name { get; set; } = "";
-        // This property is read-only - it can only be set during construction
-        public Settings AppSettings { get; } = new();
-    }
+    // This would cause a compile error because AppSettings has no setter:
+    // app.AppSettings = new Settings { Theme = "Dark", FontSize = 14 };
 
-    public static void Example()
-    {
-        // You can still initialize the nested object's properties
-        // even though AppSettings property has no setter
-        var app = new Application
-        {
-            Name = "MyApp",
-            AppSettings = { Theme = "Dark", FontSize = 14 }
-        };
-
-        // This would cause a compile error because AppSettings has no setter:
-        // app.AppSettings = new Settings { Theme = "Dark", FontSize = 14 };
-
-        Console.WriteLine($"App: {app.Name}, Theme: {app.AppSettings.Theme}, Font Size: {app.AppSettings.FontSize}");
-    }
+    Console.WriteLine($"App: {app.Name}, Theme: {app.AppSettings.Theme}, Font Size: {app.AppSettings.FontSize}");
+}
 ```
 
-### init访问器/required修饰符
+### init 访问器 / required 修饰符
 
+*待补充*
+
+---
 
 ## StringBuilder
-没什么好说的 c#的string类型是固定大小不能扩容
-StringBuilder就是频繁读写,和处理用户输入等没有预期大小字符内容的
 
-注意两点
-1.c#字符串使用utf-16 c#的char就是utf-16 有时候需要转换
-2.StringBuilder 因为可以扩容,但扩容后不是每次都是连续的,多次扩容的话内存分布类似*队列*。
-MSDN的StringBuilder相关介绍页,在解决Char[]访问器性能下降问题的方法就是说的[这个](https://learn.microsoft.com/zh-cn/dotnet/fundamentals/runtime-libraries/system-text-stringbuilder#iterate-stringbuilder-characters)
-1.ToString()
-2.复制进新StringBuilder
-3.扩展最大容量
-都是让内存连续
+没什么好说的，C# 的 string 类型是固定大小不能扩容。StringBuilder 就是频繁读写，和处理用户输入等没有预期大小字符内容的。
 
+注意两点：
 
+1. C# 字符串使用 UTF-16，C# 的 char 就是 UTF-16，有时候需要转换
+2. StringBuilder 因为可以扩容，但扩容后不是每次都是连续的，多次扩容的话内存分布类似 *队列*。
 
+MSDN 的 StringBuilder 相关介绍页，在解决 `Char[]` 访问器性能下降问题的方法就是说的[这个](https://learn.microsoft.com/zh-cn/dotnet/fundamentals/runtime-libraries/system-text-stringbuilder#iterate-stringbuilder-characters)：
 
+1. `ToString()`
+2. 复制进新 StringBuilder
+3. 扩展最大容量
 
-
-
+都是让内存连续。

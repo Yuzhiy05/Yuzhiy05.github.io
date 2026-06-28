@@ -4,52 +4,52 @@ createTime: 2026/06/21 23:31:33
 permalink: /article/87gt4ybw/
 ---
 
-
-tips 以下代码都是我在windows11 .net10 vs2026(roslyn)下跑过的
+::: tip 运行环境
+以下代码都是我在 Windows 11、.NET 10、VS2026 (Roslyn) 下跑过的
+:::
 
 ### 导出函数
 
-这个比较基本，看示例
-```c#
- [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
- private static partial int MessageBoxW(
-     IntPtr hWnd,
-     string lpText,
-     string lpCaption,
-     uint uType
- );
+这个比较基本，看示例：
+
+```csharp
+[LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+private static partial int MessageBoxW(
+    IntPtr hWnd,
+    string lpText,
+    string lpCaption,
+    uint uType
+);
 
 MessageBoxW(IntPtr.Zero, "Command-line message box", "Attention!", 0);
 ```
-在命令行环境调用Windows关于窗口显示dll函数显示一个消息窗口
 
-关键在于应用于其的属性LibraryImport 专门用来导入外部dll的函数属性
-.net framework 引入了一个DllImport属性和它功能相同不会实现不同,现代C#基本都用LibraryImport属性
-参考msdn的[说明](https://learn.microsoft.com/zh-cn/dotnet/standard/native-interop/pinvoke-source-generation#basic-usage)
+在命令行环境调用 Windows 关于窗口显示 DLL 函数显示一个消息窗口。
 
-其中语法上也有些区别,同时支持aot.
+关键在于应用于其的属性 `LibraryImport`，专门用来导入外部 DLL 的函数属性。
 
-属性说明
-属性的构造函数参数"user32.dll"自然就是 导入的dll名字
+::: info 对比说明
+.NET Framework 引入了一个 `DllImport` 属性和它功能相同但实现不同，现代 C# 基本都用 `LibraryImport` 属性。
 
-StringMarshalling = StringMarshalling.Utf16 指定导入函数使用utf16编码生成封送代码
-对于c#来说一个char就是utf16编码的 c++的char则是根据平台定义的不小于8位bit
+参考 MSDN 的[说明](https://learn.microsoft.com/zh-cn/dotnet/standard/native-interop/pinvoke-source-generation#basic-usage)
 
-还有个参数没显示
-EntryPoint="MessageBoxW"  表明函数入口点,就是dll里这个函数名字;dll加载器根据这个名字在dll查找函数;不指定就和声明函数一致
+其中语法上也有些区别，同时支持 AOT。
+:::
 
-SetLastError=true   CLR会在调用本机函数之后，自动调用 GetLastError函数，并将获取到的错误代码缓存起来;托管代码调用 Marshal.GetLastPInvokeError()方法来获取这个被缓存的错误代码 
-用这个原因是win32 dll很多函数失败不通过返回值表示,而是设置一个错误码
+### 属性说明
 
-StringMarshallingCustomType: 自定义封送器
-    StringMarshallingCustomType = typeof(MyStringMarshaller),  // 当 StringMarshalling = Custom 时使用
+| 属性 | 说明 |
+|------|------|
+| `"user32.dll"` | 构造函数参数，自然就是导入的 DLL 名字 |
+| `StringMarshalling = StringMarshalling.Utf16` | 指定导入函数使用 UTF-16 编码生成封送代码。对于 C# 来说一个 char 就是 UTF-16 编码的，C++ 的 char 则是根据平台定义的不小于 8 位 bit |
+| `EntryPoint = "MessageBoxW"` | 表明函数入口点，就是 DLL 里这个函数名字；DLL 加载器根据这个名字在 DLL 查找函数；不指定就和声明函数一致 |
+| `SetLastError = true` | CLR 会在调用本机函数之后，自动调用 `GetLastError` 函数，并将获取到的错误代码缓存起来；托管代码调用 `Marshal.GetLastPInvokeError()` 方法来获取这个被缓存的错误代码。用这个原因是 Win32 DLL 很多函数失败不通过返回值表示，而是设置一个错误码 |
+| `StringMarshallingCustomType` | 自定义封送器，当 `StringMarshalling = Custom` 时使用 |
 
+**其他相关属性：**
 
+```csharp
 [return: MarshalAs(UnmanagedType.LPWStr)]  // 或 UnmanagedType.LPStr 等
 
 [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)]  // 或 CallConvStdcall, CallConvThiscall)]
-
-
-
-
-
+```
