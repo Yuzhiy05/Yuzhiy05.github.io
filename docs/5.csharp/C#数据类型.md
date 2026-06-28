@@ -1169,7 +1169,7 @@ var t5 = t4 with { Name = "222" };
 
 例子3生成的 IL：
 
-```cil
+```asm
 .locals init (class csharp4IL.compA V_0,
            class csharp4IL.compA V_1)
   IL_0000:  nop
@@ -1279,7 +1279,7 @@ public test_type1()
 
 针对 t1、t2 的初始化语句使用 ILDasm 查看后（.NET9 环境）：
 
-```cil
+```asm
   IL_0001:  newobj     instance void csharp4IL.Test_object_initializers/test_type1::.ctor()
   IL_0006:  dup
   IL_0007:  ldc.i4.s   10

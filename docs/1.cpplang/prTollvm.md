@@ -16,7 +16,7 @@ git clone --depth=1 --filter=blob:none --branch main git@github.com:Yuzhiy05/llv
 --filter=blob：none，“blob”指的是仓库中大于特定大小阈值的二进制对象。默认情况下，Git将任何大于100 KB的对象视为blob。
 当你在克隆仓库时使用--filter=blob：none时，Git会从克隆中排除这些大型二进制对象（blob）。这可以显著减少克隆仓库的大小，并使下载速度更快
 
---filter=blob:limit=<size> 过滤掉大小为size的 文件内容(blob)
+--filter=blob:limit=\<size\> 过滤掉大小为size的 文件内容(blob)
 
 --depth=1 只clone 最新提交
 :::

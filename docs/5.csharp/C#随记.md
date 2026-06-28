@@ -475,7 +475,7 @@ public static void ForIL1()
 
 下面这是生成 IL：
 
-```cil
+```asm
 .method public hidebysig static void ForIL1() cil managed
 {
   // 代码大小       78 (0x4e)
@@ -582,7 +582,7 @@ public static void ForIL1()
 
 下面是生成的 IL：
 
-```cil
+```asm
 .method public hidebysig static void ForIL1() cil managed
 {
   // 代码大小       138 (0x8a)
