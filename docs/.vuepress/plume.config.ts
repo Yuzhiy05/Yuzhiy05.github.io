@@ -10,12 +10,14 @@ export default defineThemeConfig({
 
   // 集合配置（替代 notes）
   collections: [
-    // 博客
+    // 博客 - 从根目录开始，排除 notes 目录
     {
       type: 'post',
-      dir: 'blog',
+      dir: '/',
       title: '博客',
       link: '/blog/',
+      linkPrefix: '/article/',
+      exclude: ['notes/**'],
     },
     // 笔记 - 从 notes 配置迁移
     {
