@@ -378,7 +378,7 @@ if(MSVC)
 ```
 
 ::: warning
-注意在 vs 里使用 cmake+msvc 时，cmakelist 默认模板为了生成调试文件启动热重载会加 `/ZI` 参数，把下面这行注释掉就好：
+==注意在 vs 里使用 cmake+msvc 时，cmakelist 默认模板为了生成调试文件启动热重载会加 `/ZI` 参数==，把下面这行注释掉就好：
 
 ```cmake
 # 如果支持，请为 MSVC 编译器启用热重载。

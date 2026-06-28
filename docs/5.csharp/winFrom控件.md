@@ -6,7 +6,7 @@ permalink: /article/i26uhz4h/
 
 ## TableLayoutPanel
 
-控制控件布局。
+==控制控件布局==。
 
 ![alt text](/images/csharp/tablelayoutPanel.png)
 
@@ -23,7 +23,7 @@ permalink: /article/i26uhz4h/
 
 ## Chart
 
-Chart 控件主要有四个重要属性。
+==Chart 控件主要有四个重要属性==。
 
 ### ChartArea
 

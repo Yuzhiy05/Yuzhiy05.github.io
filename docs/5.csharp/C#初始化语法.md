@@ -44,7 +44,7 @@ public record class TestClass(string name, int age)
 这个类用 record 和主构造函数这么定义纯粹是我不想写两个属性的 get/set 了，虽然 record class 和 class 有区别但是这个例子里没区别。
 :::
 
-在此之前介绍一个 C#9 的语法：**目标类型化 new (target-typed new)**
+在此之前介绍一个 C#9 的语法：==**目标类型化 new (target-typed new)**==
 
 简单说就是能推导出类型的情况下可以省略 new 后面的类型：
 
@@ -131,7 +131,7 @@ List<TestClass> l7 =
 ### 字典类型初始化
 
 :::info 说明
-Dictionary 类型有点特别，他虽然是 IEnumerable 但是没法用[集合表达式](https://learn.microsoft.com/zh-cn/dotnet/csharp/programming-guide/classes-and-structs/how-to-initialize-a-dictionary-with-a-collection-initializer)。
+==Dictionary 类型有点特别，他虽然是 IEnumerable 但是没法用[集合表达式](https://learn.microsoft.com/zh-cn/dotnet/csharp/programming-guide/classes-and-structs/how-to-initialize-a-dictionary-with-a-collection-initializer)==。
 :::
 
 参考[链接](https://learn.microsoft.com/zh-cn/dotnet/csharp/programming-guide/classes-and-structs/how-to-initialize-a-dictionary-with-a-collection-initializer)

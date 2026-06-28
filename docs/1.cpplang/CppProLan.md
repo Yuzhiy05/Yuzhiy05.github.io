@@ -12,7 +12,7 @@ permalink: /article/j3qgcpng/
 > If you find this "lightning tour"
 confusing, skip to the more systematic presentation starting in Chapter 6 
 
-总的来说前五张只是速览，并不该纠结于细节问题
+==总的来说前五张只是速览，并不该纠结于细节问题==
 
 ## The Basics
 
@@ -28,7 +28,7 @@ variety of systems
 >• Standard-library components, such as containers (e.g., vector and map) and I/O operations
 (e.g., << and getline())  
 
-不过这里和cppreference所述的[实体](https://zh.cppreference.com/w/cpp/language/basic_concepts)有些出入。我不知为何*语句(statement)*也被划入实体的范畴。不过相比"**对象**"这个概念，实体确实很少有人去讨论或表述。就我的理解实体就是在c++程序中能被操作或识别的事物。他是真实存在的概念但不必通过占用内存，执行操作之类事件观测他的存在。
+不过这里和cppreference所述的[实体](https://zh.cppreference.com/w/cpp/language/basic_concepts)有些出入。我不知为何*语句(statement)*也被划入实体的范畴。不过相比"**对象**"这个概念，实体确实很少有人去讨论或表述。就我的理解==实体就是在c++程序中能被操作或识别的事物==。他是真实存在的概念但不必通过占用内存，执行操作之类事件观测他的存在。
 
 >C++ is a statically typed language. That is, the type of every entity (e.g., object, value, name,
 and expression) must be known to the compiler at its point of use. The type of an object determines
@@ -213,7 +213,7 @@ Traffic_light next = ++light; // next becomes Traffic_light::green;
 ```
 模块化，分离编译，命名空间，错误处理，异常略过。
 ### 不变式(Invariants)
-程序运行中一直保持为真的前提条件。比如上诉原文异常标题下，使用异常捕获out_of_range。程序运行中数组的索引始终处于[0,size)范围内，或 elme始终是指向 double [size]的指针，类似这样的陈述这就是类中的不变式。不变式的概念是c++中通过构造和析构函数管理内存的基本概念。
+==程序运行中一直保持为真的前提条件==。比如上诉原文异常标题下，使用异常捕获out_of_range。程序运行中数组的索引始终处于[0,size)范围内，或 elme始终是指向 double [size]的指针，类似这样的陈述这就是类中的不变式。==不变式的概念是c++中通过构造和析构函数管理内存的基本概念==。
 >Often, a function has no way of completing its assigned task after an exception is thrown.Then, "handling"an exception simply means doing some minimal local cleanup and rethrowing the exception
 
 通常函数无法完成分配任务时需要抛出异常，并且处理剩余的清理工作。异常是RAII的关键概念。

@@ -6,7 +6,7 @@ permalink: /article/ot09u1xs/
 
 ### XAML
 
-这是一种类似于 HTML 的标记型语言，来源于 XML。XML 原意是用来传输数据的，经过改造的 XAML 用来生成 UI 布局的设计文件。
+==这是一种类似于 HTML 的标记型语言，来源于 XML==。XML 原意是用来传输数据的，经过改造的 XAML 用来生成 UI 布局的设计文件。
 
 和 HTML 不同的是，HTML 可以通过浏览器映射到 DOM 元素，通过 JS 可以动态删除修改 DOM 元素节点。
 
@@ -225,7 +225,7 @@ grid.RowDefinitions[0].Height = GridLength.Auto;                         // Auto
 
 ## MVVM
 
-以下为 AI 生成的例子，已手动验证。
+==以下为 AI 生成的例子，已手动验证==。
 
 ### CommunityToolkit 实现
 

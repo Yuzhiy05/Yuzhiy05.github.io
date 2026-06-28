@@ -138,7 +138,7 @@ scan同理
 :::
 
 fast_io提供了c_stdout()，它就是c_io_observer{stdout}
-但它保证noexcept的，效率会更高的
+但它保证noexcept的，==效率会更高的==
 因为stdout很多C库没加noexcept
 实际根本不可能抛出异常(兼容c函数的都是无条件noexcept 这是lakos规则但是编译器是否遵守不知道)
 
@@ -383,8 +383,8 @@ c_io_observer->fp->c_file这一步就是错的
 这不是二次释放了？
 observer是别人的 FILE*又不是你的
 你能给它fclose了？
-io_observer的意思就是不能关
-只是借用一下
+==io_observer的意思就是不能关==
+==只是借用一下==
 所以你这过程是不成立的
 要注意c层和filebuf层这两级的文件或io_observer都自带缓冲的
 都是标准库已经有的

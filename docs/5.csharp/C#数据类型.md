@@ -6,7 +6,7 @@ permalink: /article/tlw73yi4/
 
 ## DataTable
 
-简单介绍常见的 C# 应用到的数据类型。
+==简单介绍常见的 C# 应用到的数据类型==。
 
 **命名空间**：`System.Data`
 
@@ -361,7 +361,7 @@ Console.WriteLine($"StringBuilder after clearing: {sb}");
 
 ## 元组
 
-C# 因为设计缺陷，存在两个元组：
+==C# 因为设计缺陷，存在两个元组：==
 
 | 类型 | 说明 |
 |------|------|
@@ -712,7 +712,7 @@ public static void Deconstruct(this [Type] p, out...)
 
 ## Record 记录类型
 
-拥有值语义的引用类型。
+==拥有值语义的引用类型==。
 
 使用主构造函数语法来声明 Record 类型。主构造函数语法（C# 12）即声明类型时后跟类似于函数的参数和括号，编译器会生成签名为此的构造函数。
 

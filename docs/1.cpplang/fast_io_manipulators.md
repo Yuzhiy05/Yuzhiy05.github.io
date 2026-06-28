@@ -8,7 +8,7 @@ permalink: /article/d3sghq29/
 
 就是比如浮点格式，场宽，整形基底什么的
 就是一种类型改它输出方式
-操纵符全被定义在fast_io的manipulators命名空间中
+==操纵符全被定义在fast_io的manipulators命名空间中==
 用户允许向这个命名空间加自己的操纵符
 比如你要将整数16进制输出
 ```cpp

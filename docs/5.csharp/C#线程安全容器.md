@@ -8,7 +8,7 @@ permalink: /article/dow05eez/
 
 ## BlockingCollection 阻塞集合
 
-底层有两个其他线程安全集合组成：
+==底层有两个其他线程安全集合组成：==
 
 - `ConcurrentQueue`
 - `ConcurrentStack`
@@ -40,7 +40,7 @@ BlockingCollection<string> bc = new BlockingCollection<string>(new ConcurrentBag
 边界上限在创建 `BlockingCollection` 时需要指明，没有指定边界容量（即调用默认构造函数的版本）则无上限。
 :::
 
-`BlockingCollection` 其实是一个线程安全的生产者消费者模型。
+`BlockingCollection` ==其实是一个线程安全的生产者消费者模型==。
 
 ### 示例
 

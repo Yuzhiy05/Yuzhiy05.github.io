@@ -6,7 +6,7 @@ permalink: /article/g6eg2tsi/
 
 # XAML 说明
 
-XAML 是从 XML 继承来的标记型语言。
+==XAML 是从 XML 继承来的标记型语言==。
 
 XML 用来存储和传输数据。
 
@@ -81,7 +81,7 @@ XAML 由以下结构组成：
 
 ## 重点：NavigationView 和 Frame
 
-按一般设计的想法，是在一个 Grid 布局中设计两列，一列显示导航栏，一列显示 Frame 主体内容。但这样设计 Navigation 导航栏伸缩变化时内容区不会随之变化。
+按一般设计的想法，是在一个 Grid 布局中设计两列，一列显示导航栏，一列显示 Frame 主体内容。==但这样设计 Navigation 导航栏伸缩变化时内容区不会随之变化==。
 
 参考 WinUI3 Gallery 的设计，是将显示内容的 Frame 放在 NavigationView 导航栏里，由导航栏自己管理内容区域：
 

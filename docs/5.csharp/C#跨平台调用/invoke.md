@@ -10,7 +10,7 @@ permalink: /article/87gt4ybw/
 
 ### 导出函数
 
-这个比较基本，看示例：
+==这个比较基本，看示例：==
 
 ```csharp
 [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
@@ -26,7 +26,7 @@ MessageBoxW(IntPtr.Zero, "Command-line message box", "Attention!", 0);
 
 在命令行环境调用 Windows 关于窗口显示 DLL 函数显示一个消息窗口。
 
-关键在于应用于其的属性 `LibraryImport`，专门用来导入外部 DLL 的函数属性。
+关键在于应用于其的属性 ==`LibraryImport`==，专门用来导入外部 DLL 的函数属性。
 
 ::: info 对比说明
 .NET Framework 引入了一个 `DllImport` 属性和它功能相同但实现不同，现代 C# 基本都用 `LibraryImport` 属性。

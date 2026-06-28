@@ -144,6 +144,8 @@ public delegate void WaitOrTimerCallback(object? state, bool timedOut);
 
 ## Task
 
+==Task 是 C# 中更高级的抽象来管理线程==
+
 ### 创建Task
 
 1. `var t = new Task(Action op); t.Start();`
@@ -500,6 +502,8 @@ factory.StartNew(() => // StartNew内部调用QueueTask
 | UI Thread（UI上下文线程） | SynchronizationContext + 消息循环 | UI交互 | 单线程、消息驱动、STA模型 |
 
 ## 同步上下文
+
+==同步上下文是一个执行环境，用来管理任务在哪里执行==
 
 这里有一篇关于同步上下文的 [文章](https://learn.microsoft.com/en-us/archive/msdn-magazine/2011/february/msdn-magazine-parallel-computing-it-s-all-about-the-synchronizationcontext)
 

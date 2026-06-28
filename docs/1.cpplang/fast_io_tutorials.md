@@ -6,7 +6,7 @@ permalink: /article/xst10xfz/
 
 # fast_io 教程
 
-打印自定义类型需要特化print_define
+==打印自定义类型需要特化print_define==
 
 ```cpp
 #include <fast_io.h>

@@ -866,7 +866,7 @@ add_custom_target(Name [ALL] [command1 [args1...]]
 
 ### 生成器表达式
 
-用于在生成阶段而不是配置阶段生成数据，一般用来生成路径。
+==用于在生成阶段而不是配置阶段生成数据==，一般用来生成路径。
 
 config：使用 `cmake -B build -G Ninja -S . --preset xxx` 这是在配置（config）cmake。
 

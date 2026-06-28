@@ -6,7 +6,7 @@ permalink: /article/yemrteud/
 
 ### 关于 CLR Via C#（第四版）一些待讨论的问题
 
-环境：.NET 8.0 / C#12
+==环境：.NET 8.0 / C#12==
 
 **1. 原书中文版 262 页中有这样一段描述：**
 
@@ -42,7 +42,7 @@ interface_method_header
 > 从 C# 11 开始，接口可以声明除字段之外的所有成员类型的 static abstract 和 static virtual 成员。
 > static virtual 方法几乎完全是在泛型接口中声明的。
 
-### 泛型接口可以为同接口不同类型参数的定义多个实现
+### ==泛型接口可以为同接口不同类型参数的定义多个实现==
 
 [显式接口实现](https://learn.microsoft.com/zh-cn/dotnet/csharp/programming-guide/interfaces/explicit-interface-implementation)
 

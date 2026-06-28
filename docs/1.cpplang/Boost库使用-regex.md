@@ -67,7 +67,7 @@ $        // 字符串结束（或行结束，多行模式下）
 \X             // Unicode 组合字符序列
 ```
 
-三个功能函数
+==三个功能函数==
 ```cpp
 boost::regex_match()    // 完全匹配
 boost::regex_search()   // 搜索匹配
@@ -75,5 +75,5 @@ boost::regex_replace()  // 替换匹配
 ```
 
 :::tip
-regex_search 函数搜索到首个匹配项就结束
+==regex_search 函数搜索到首个匹配项就结束==
 :::

@@ -129,7 +129,7 @@ required 要求该对象创建时该属性值是必填的
 signal \<signalName\>[([<parameterName>: <parameterType>[, ...]])]
 ```
 
-信号是某些信息的发出者
+==信号是某些信息的发出者==
 典型的就是 鼠标点击事件
 
 MouseArea 控件有一个叫Clicked 的信号signal
@@ -142,7 +142,7 @@ on\<Property\>Changed
 
 ## 属性绑定
 不管是Vue 还是qml 这些ui框架都有个趋势
-能监听属性/变量变化 ui随之渲染
+==能监听属性/变量变化 ui随之渲染==
 
 ## 附加类型
 附加类型凭什么能实现

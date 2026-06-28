@@ -10,7 +10,7 @@ C# 中的泛型集合。
 
 ## Thread
 
-C# 线程分前台线程和后台线程，前台线程需要进程等待其结束，而后台进程在前台进程执行完后进程结束时自动中止。
+==C# 线程分前台线程和后台线程==，前台线程需要进程等待其结束，而后台进程在前台进程执行完后进程结束时自动中止。
 
 ```csharp
 public bool IsBackground { get; set; }
@@ -194,7 +194,7 @@ Thread.Sleep(TimeSpan.FromSeconds(seconds));
 
 # C# 的异常
 
-不同表达式 CLR 会记录不同的异常起点。
+==不同表达式 CLR 会记录不同的异常起点==。
 
 ```csharp
 try
