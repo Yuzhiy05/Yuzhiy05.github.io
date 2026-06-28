@@ -1,5 +1,4 @@
 import { defineThemeConfig, } from 'vuepress-theme-plume'
-import notes from './notes.js'
 import navbar from './navbar.js'
 
 
@@ -8,7 +7,64 @@ export default defineThemeConfig({
   // docsRepo: 'https://github.com/Yuzhiy05/Yuzhiy05.github.io',
   // docsDir: 'docs',
   navbar,
-  notes,
+
+  // 集合配置（替代 notes）
+  collections: [
+    // 博客
+    {
+      type: 'post',
+      dir: 'blog',
+      title: '博客',
+      link: '/blog/',
+    },
+    // 笔记 - 从 notes 配置迁移
+    {
+      type: 'doc',
+      dir: 'notes/test1',
+      title: '线性代数',
+      linkPrefix: '/test1/',
+      sidebar: [
+        {
+          text: 'test1',
+          link: '/test1/',
+          items: [
+            'chapter3-4.md',
+            'exception.md',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'doc',
+      dir: 'notes/data_struct',
+      title: '数据结构',
+      linkPrefix: '/data_struct/',
+      sidebar: [
+        {
+          text: '数据结构',
+          link: '/data_struct/',
+          items: [
+            'map_str.md',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'doc',
+      dir: 'notes/math',
+      title: '数学',
+      linkPrefix: '/math/',
+      sidebar: [
+        {
+          text: 'math',
+          link: '/math/',
+          items: [
+            'mathformula.md'
+          ],
+        },
+      ],
+    },
+  ],
 
   profile: {
     name: 'Yuzhiy',

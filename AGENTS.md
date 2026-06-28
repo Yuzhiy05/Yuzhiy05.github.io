@@ -19,12 +19,12 @@
 
 | 依赖 | 当前版本 | 最新版本 | 变化幅度 |
 |------|----------|----------|----------|
-| vuepress | 2.0.0-rc.18 | 2.0.0-rc.30 | 12个版本 |
-| @vuepress/bundler-vite | 2.0.0-rc.18 | 2.0.0-rc.30 | 12个版本 |
-| @vuepress/theme-default | 2.0.0-rc.58 | 2.0.0-rc.130 | 72个版本 |
-| vuepress-theme-plume | 1.0.0-rc.114 | 1.0.0-rc.203 | 89个版本 |
-| vue | 3.5.12 | 3.5.38 | 小版本 |
-| sass-embedded | 1.80.5 | 1.100.0 | 大版本 |
+| vuepress | 2.0.0-rc.30 | 2.0.0-rc.30 | 已更新 |
+| @vuepress/bundler-vite | 2.0.0-rc.30 | 2.0.0-rc.30 | 已更新 |
+| @vuepress/theme-default | 2.0.0-rc.130 | 2.0.0-rc.130 | 已更新 |
+| vuepress-theme-plume | 1.0.0-rc.203 | 1.0.0-rc.203 | 已更新 |
+| vue | 3.5.38 | 3.5.38 | 已更新 |
+| sass-embedded | 1.100.0 | 1.100.0 | 已更新 |
 
 ## 升级需要解决的问题
 
@@ -69,6 +69,30 @@
 ### 问题2: collections 和 notes 配置冲突
 **症状**: 同时配置时 notes 会被忽略
 **解决**: 只使用 collections 配置
+
+#### 详细解释
+在 `vuepress-theme-plume 1.0.0-rc.203` 中，主题引入了新的 `collections` 配置来统一管理内容集合，替代了原来的 `notes` 和 `blog` 配置。
+
+新版本有一个兼容函数 `compatBlogAndNotesToCollections`，代码逻辑如下：
+```javascript
+function compatBlogAndNotesToCollections(options) {
+    if (!options.collections?.length) {
+        // 只有当 collections 为空时，才将 notes 转换为 collections
+        if (options.notes) {
+            // 转换逻辑...
+        }
+    }
+    // 删除 notes 配置
+    deleteKey(options, ["blog", "notes"]);
+}
+```
+
+**关键点：**
+- 如果同时配置了 `collections` 和 `notes`，`notes` 会被忽略
+- 只有当 `collections` 为空时，`notes` 才会自动转换为 `collections` 格式
+- 必须将所有配置统一到 `collections` 中：
+  - 博客：`{ type: 'post', dir: 'blog', ... }`
+  - 笔记：`{ type: 'doc', dir: 'notes/test1', ... }`
 
 ### 问题3: 缺少 shiki-twoslash 依赖
 **症状**: twoslash 功能无法使用

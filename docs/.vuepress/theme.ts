@@ -9,7 +9,6 @@ export default plumeTheme({
       lineNumbers: 10,
       languages: ['cpp','powershell', 'csharp','json','cmake','shell','typescript', 'javascript', 'python', 'html', 'css', 'markdown', 'vue'],
     },
-    markdownEnhance: { demo: true },
     markdownPower: { caniuse: true, jsfiddle: true,
       fileTree: {
         icon: 'colored', // 'simple' | 'colored'
