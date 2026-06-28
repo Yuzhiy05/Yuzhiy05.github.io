@@ -17,13 +17,13 @@ cmake 各变量名字
 `CMAKE_CURRENT_BINARY_DIR` 当前正在处理的 `CMakeLists.txt` 文件对应的构建目录也就是配置时指定的build目录。
 
 :::file-tree
-  - myProject
-    - CMakeLists.txt    # 根CMakeLists     
-    - src 
-     - CMakeLists.txt  # src目录的CMakeLists
-     - main.cpp
+- myProject
+  - CMakeLists.txt    # 根CMakeLists     
+  - src 
+    - CMakeLists.txt  # src目录的CMakeLists
+    - main.cpp
   - build    # 构建目录             
- :::
+:::
 
 根目录的cmakelist：
 
@@ -98,17 +98,17 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/cw/src CW_SRC_LIST)
 :::file-tree
 - helloproject      
   - build    
-   -...
+    - ...   
   - src
-   - demo1.cpp
-   - demo2.cxx
-   - demo3.h
-   - demo4.hpp
-   - ...
-   - src2
-    - demo3.cpp  
-  - CmakeLists.txt
-  - CmakePresets.json
+    - demo1.cpp
+    - demo2.cxx
+    - demo3.h
+    - demo4.hpp
+    - ...
+    - src2
+      - demo3.cpp  
+  - CMakeLists.txt
+  - CMakePresets.json
   - hello.cpp
 :::
 
@@ -295,20 +295,20 @@ target_link_libraries(hello spdlog) #链接库
 :::file-tree
 - helloproject      
   - build    
-   -...省略
+    - ...省略
   - src
-   - demo1.cpp
-   - ...
-   - lib
-   - mylib.dll(构建后生成)
-   - mylib
-    - build
-     -...构建文件(省略)  
-    - mylib.h
-    - mylib.cpp
-    - CmakeLists.txt
-  - CmakeLists.txt
-  - CmakePresets.json
+    - demo1.cpp
+    - ...
+    - lib
+    - mylib.dll(构建后生成)
+    - mylib
+      - build
+        - ...构建文件(省略)  
+      - mylib.h
+      - mylib.cpp
+      - CMakeLists.txt
+  - CMakeLists.txt
+  - CMakePresets.json
   - hello.cpp
 :::
 
