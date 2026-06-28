@@ -4,10 +4,6 @@ createTime: 2025/10/12 23:21:12
 permalink: /article/l1y1lkci/
 ---
 
+## xmake 使用记录
 
-
-
-# xmake 使用记录
-
-我本地编译器是通过git拉下来的 编译的llvm 
-我在windows下
+我本地编译器是通过 git 拉下来的编译的 llvm。我在 windows 下。

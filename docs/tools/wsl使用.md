@@ -4,11 +4,9 @@ createTime: 2025/04/07 20:40:23
 permalink: /article/8b43ygth/
 ---
 
+## wsl2/linux使用踩坑
 
-### wsl2/linux使用踩坑
-
-
-记录一些学到的linux命令
+记录一些学到的 linux 命令：
 
 ```bash
 #linux 更新
@@ -40,7 +38,7 @@ echo 'export PATH="/home/yuzhiy/tool/llvm20/bin:$PATH"' >> ~/.bashrc
 
 echo 'export LD_LIBRARY_PATH=~/tools/x86_64-linux-gnu/runtimes/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
 source ~/.bashrc
-//下载glibc,glibc版本不够时下载编译升级，还没搞完
+#下载glibc,glibc版本不够时下载编译升级，还没搞完
 wget https://mirrors.aliyun.com/gnu/glibc/glibc-2.38.tar.
 
 #解压 参数
@@ -50,28 +48,28 @@ v 显示过程
 f 压缩文件的名字 
 tar -zxvf  
 
-tar -xvf file.tar //解压 tar包
+tar -xvf file.tar #解压 tar包
 
-tar -xzvf file.tar.gz //解压tar.gz
+tar -xzvf file.tar.gz #解压tar.gz
 
-tar -xjvf file.tar.bz2   //解压 tar.bz2
+tar -xjvf file.tar.bz2   #解压 tar.bz2
 
-tar -xZvf file.tar.Z   //解压tar.Z
+tar -xZvf file.tar.Z   #解压tar.Z
 
-unrar e file.rar //解压rar
+unrar e file.rar #解压rar
 
-unzip file.zip //解压zip
+unzip file.zip #解压zip
 
 #ls 查找
-ls -1 --format=single-column //单列输出
-ls -a  --all  //列出所有文件包括以. 开头的文件
-ls -1 /usr/bin | grep '^c' //列出所有c开头的文件
-ls /usr/bin/c* 列出该路径下c为首字母的文件，但是非首字母的文件也会输出，只是c开头的会强调
+ls -1 --format=single-column #单列输出
+ls -a  --all  #列出所有文件包括以. 开头的文件
+ls -1 /usr/bin | grep '^c' #列出所有c开头的文件
+ls /usr/bin/c* #列出该路径下c为首字母的文件，但是非首字母的文件也会输出，只是c开头的会强调
 
 #grep Global Regular Expression Print 其实就是文本查找
 grep [options] pattern [files]
 ^    # 锚定行的开始 如：'^grep'匹配所有以grep开头的行
-grep ^c file //其中文件可以时多文件，如果不指定则为默认输入stdin
+grep ^c file #其中文件可以时多文件，如果不指定则为默认输入stdin
 grep ^c file1 file2 file3 ...
 ^    # 锚定行的开始 如：'^grep'匹配所有以grep开头的行。    
 $    # 锚定行的结束 如：'grep$' 匹配所有以grep结尾的行。
@@ -106,8 +104,10 @@ line.
 
  history | grep ls
 ```
-以下文件为file1
-```c++
+
+以下文件为 file1：
+
+```cpp
 #include <cstddef>
 #include <mdspan>
 #include <print>
@@ -142,10 +142,12 @@ int main()
 ```
 
 ## 配环境
+
 ### 安装llvm工具链
 
-用<https://apt.llvm.org/>的脚本，注意安装的时候装全部
-```sh
+用 <https://apt.llvm.org/> 的脚本，注意安装的时候装全部：
+
+```bash
 #测试的时候指定版本就算你只下了一个版本
 clang++-20 --version
 #写一个main测试一下
@@ -157,40 +159,51 @@ sudo ./llvm.sh <version number> all #少这个all
 这时候可以手动装
 ```
 
-### 安装git 对Ubuntu系统来说,添加包源在apt能装上最新的。ubuntu直接apt install有的包太老了
-```sh
- add-apt-repository ppa:git-core/ppa
- apt update; apt install git
- #测试一下
+### 安装git
+
+对 Ubuntu 系统来说，添加包源在 apt 能装上最新的。ubuntu 直接 `apt install` 有的包太老了：
+
+```bash
+add-apt-repository ppa:git-core/ppa
+apt update; apt install git
+#测试一下
 git --version
 ```
 
 ### 安装cmake
-在wsl装cmake 用wget有时候443 .直接在本机下在通过文件管理器复制到对应文件下。
-然后执行
-```sh
+
+在 wsl 装 cmake 用 wget 有时候 443，直接在本机下在通过文件管理器复制到对应文件下。然后执行：
+
+```bash
 wget https://github.com/Kitware/CMake/releases/download/v4.0.1/cmake-4.0.1-linux-x86_64.sh
 #或者这是为了解决443问题，不过我试了没什么用
- wget --user-agent="Mozilla/5.0" https://github.com/Kitware/CMake/releases/download/v4.0.1/cmake-4.0.1-linux-x86_64.sh
+wget --user-agent="Mozilla/5.0" https://github.com/Kitware/CMake/releases/download/v4.0.1/cmake-4.0.1-linux-x86_64.sh
 # 路径指定/usr/local 或者/usr都行都是系统路径都能找到
-  sh cmake-4.0.1-linux-x86_64.sh --prefix=/usr/local --exclude-subdir
+sh cmake-4.0.1-linux-x86_64.sh --prefix=/usr/local --exclude-subdir
 #测试一下
-  cmake --version
+cmake --version
 ```
 
 ### 安装ninja
-注意ninja包叫ninja-build就行，光输ninja找不到包。不过包有些老1.10.1，最新都1.12了凑合用。不过ninja不管在linux或win上都是一个可执行文件可以直接解压完扔/usr/bin 或者/usr/local/bin 里，也不用包管理了
-```sh
+
+::: tip
+注意 ninja 包叫 `ninja-build` 就行，光输 `ninja` 找不到包。不过包有些老 1.10.1，最新都 1.12 了凑合用。不过 ninja 不管在 linux 或 win 上都是一个可执行文件可以直接解压完扔 `/usr/bin` 或者 `/usr/local/bin` 里，也不用包管理了。
+:::
+
+```bash
 apt install ninja-build
 ```
 
-
-以上除了cmake都是用apt包管理安装的，卸载的时候直接`sudo apt remove <包名>` 就行。cmake怎么删我还没不知道
+以上除了 cmake 都是用 apt 包管理安装的，卸载的时候直接 `sudo apt remove <包名>` 就行。cmake 怎么删我还没不知道。
 
 ### 配ssh
-为了在Windows上远程链接wsl或者虚拟机得配ssh链接。
+
+为了在 Windows 上远程链接 wsl 或者虚拟机得配 ssh 链接。
+
 #### 在虚拟机/wsl下
-虚拟机一般都装了网络工具，如果ifconfig -a不起作用就装一个
+
+虚拟机一般都装了网络工具，如果 `ifconfig -a` 不起作用就装一个：
+
 ```bash
 sudo apt install  net-tools 
 
@@ -216,7 +229,8 @@ lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
 # 只需要inet后的ip地址 172.31.94.122 就好
 ```
 
-安装openssh-server
+安装 openssh-server：
+
 ```bash
 sudo apt install openssh-server 
 #安装ssh
@@ -244,69 +258,74 @@ RSAAuthentication yes
 PubKeyAUthentication yes
 #注意AllowUsers 后面是本地登录的用户名我是 yuzhiy
 ```
-安装完成后用ssh生成密钥
-注意用新算法ed25519，不要用rsa了.后跟GitHub的邮箱
+
+安装完成后用 ssh 生成密钥。注意用新算法 ed25519，不要用 rsa 了。后跟 GitHub 的邮箱：
+
 ```bash
 ssh-keygen -t ed25519 -C "ImoutoCon1999@outlook.com"
 ```
-连续三次回车即可，第一次问你私钥路径，不搞什么幺蛾子都放默认路径里
+
+连续三次回车即可，第一次问你私钥路径，不搞什么幺蛾子都放默认路径里：
+
 ```bash
 Enter file in which to save the key  (/home/yuzhiy/.ssh/id_ed25519):
 ```
-第二次问你 这个私钥要不要加密码 一般是不加直接回车
+
+第二次问你这个私钥要不要加密码，一般是不加直接回车：
+
 ```bash
 Enter passphrase (empty for no passphrase):
 Enter same passphrase again:
 ```
-然后显示你的公钥路径和公钥内容
+
+然后显示你的公钥路径和公钥内容：
+
 ```bash
 Your public key has been saved in /home/yuzhiy/.ssh/id_ed25519.pub
 The key fingerprint is:
 xxxx一堆乱起八糟公钥
 ```
-直接把公钥复制到
-`github主页`>>`setting(设置)`>>`SSH and GPG keys`里`new SSH key`
 
-测试一下
+直接把公钥复制到 `github主页` >> `setting(设置)` >> `SSH and GPG keys` 里 `new SSH key`。
+
+测试一下：
+
 ```bash
 ssh -T git@github.com
 #显示如下内容就没啥问题了
 Hi Yuzhiy05! You've successfully authenticated, but GitHub does not provide shell access.
 ```
-然后直接用git 拉代码 
+
+然后直接用 git 拉代码。
 
 #### 在本机vscode里
-在vscode 里安装微软的SSH插件
-Remote-SSH
-Remote-SSH:Editing Configuration Files
-Remote EXplorer
 
-ctrl+shift+p 打开命令面板
-找到remote-ssh插件 Open Configuration File 
-当然可以在C:User/<用户名>/.ssh/config 直接打开
-复制以下内容,直接在文件资源管理器里打开可能需要管理员权限
-```sh
+在 vscode 里安装微软的 SSH 插件：
+- Remote-SSH
+- Remote-SSH: Editing Configuration Files
+- Remote Explorer
+
+Ctrl+Shift+P 打开命令面板，找到 remote-ssh 插件 Open Configuration File。当然可以在 `C:User/<用户名>/.ssh/config` 直接打开。复制以下内容，直接在文件资源管理器里打开可能需要管理员权限：
+
+```bash
 Host Ubuntu-WSL 
     HostName 172.31.x.xxx #服务器ip 虚拟机ifconfig那个
     User yuzhiy # 服务器上的用户名
     Port 22 # ssh端口，一般默认22， 可以修改
 ```
-在vscode的设置json中复制以下内容
+
+在 vscode 的设置 json 中复制以下内容：
+
 ```json
 "remote.SSH.remotePlatform":{
     "ubuntu_remote": "linux"  // 远程连接时，自动选择linux系统，注意和上面的"host"匹配
 },
 "remote.SSH.useLocalServer":true,  // 使用本地服务器
 ```
-测试一下
-```sh
+
+测试一下：
+
+```bash
 ssh yuzhiy@<ip_address>
 #输入密码 链接成功进入命令行界面
 ```
-
-
-
-
-
-
-
