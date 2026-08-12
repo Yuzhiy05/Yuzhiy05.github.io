@@ -85,7 +85,7 @@ With v1.0.3 and v1.1P2, WinAppSDK has fully adopted Hybrid CRT, and a VCLibs.UPW
 #### 打包应用配置应用行为
 
 | 标识 | 说明 | 信任等级 |
-|------|------|----------|
+|------|------|------|
 | `uap10:RuntimeBehavior` | - | - |
 | `packagedClassicApp` | 标识 WinUI3 应用 | `mediumIL`（完全信任） |
 | `win32App` | 其他 Win32 应用 | `mediumIL` |

@@ -3,6 +3,7 @@ title: 完全使用vscode工作
 createTime: 2026/08/05 14:10:50
 permalink: /article/i5bdazq2/
 ---
+
 # 背景
 
 visual stdio 有点重。
@@ -24,11 +25,9 @@ QtCreator 典型的使用构建配置设定的参数，本质上构建是在命�
 
 1. configure：`cmake -S <src> -B <build_path> -G <generator>`
 2. build：`cmake --build <config_path> --target`
-3. clean：`cmake --build`
+3. clean：`cmake --build  <build_path> --target clean `
 
 主要看一下 QtCreator 在构建设置中 `init Configuration` 的参数。
-
-ai看到这给我改成表
 
 | 参数 | 说明 |
 |------|------|
@@ -84,10 +83,8 @@ endif()
 | `QT_CREATOR_ENABLE_MAINTENANCE_TOOL_PROVIDER` | 当 find_package 找不到某个 Qt 组件时，Qt Creator 会启用这个功能，并在 IDE 的"问题"面板提供一个链接。点击这个链接，就可以直接调用 Qt Maintenance Tool 来安装缺失的组件，省去手动打开工具查找的麻烦 |
 | `QT_CREATOR_ENABLE_PACKAGE_MANAGER_SETUP` | 开启后，Qt Creator 会在配置项目时，尝试自动设置所需的包管理器环境，简化依赖项的管理流程 |
 | `QT_ENABLE_QML_DEBUG` | 开启 QML debug 模式 |
-
-`QT_QMAKE_EXECUTABLE` 提供可执行的 qmake，这里 qmake 不是用来做构建工具而是提供当前版本的 qt 信息。
-
-`CMAKE_COLOR_DIAGNOSTICS` 启用颜色警告没啥好说的。
+| `QT_QMAKE_EXECUTABLE` | 提供可执行的 qmake，这里 qmake 不是用来做构建工具而是提供当前版本的 qt 信息 |
+| `CMAKE_COLOR_DIAGNOSTICS` | 启用颜色警告没啥好说的 |
 
 还有一些 `current configuration` 的内容，都是一些 qt 参数。
 
@@ -128,7 +125,7 @@ endif()
             "environment": {
                 "PATH": "../OpenCV4/opencv/build/x64/vc16/bin;$penv{PATH}"
             }
-        }
+        },
         {
             "name": "msvc-debug",
             "displayName": "MSVC x64 Debug (Ninja)",
@@ -142,7 +139,7 @@ endif()
             "displayName": "Visual Studio Community 2026 Preview - amd64",
             "inherits": "windows-base",
             "generator": "Visual Studio 18 2026",
-            "toolset": "host=x64",
+            "toolset": "host=x64"
         }
     ],
     "buildPresets": [
@@ -160,11 +157,6 @@ endif()
     ]
 }
 ```
-
-::: warning 代码异议
-原 JSON 中第一个配置对象（`windows-base`）末尾 `"environment"` 块之后缺少逗号（`}` 后直接跟 `{`），会导致 JSON 解析失败；同时 `msvc2026` 对象末尾 `"toolset": "host=x64",` 有多余逗号。此处未修改代码，仅提示。
-:::
-
 预设本质就是将之前 Qtc 中以 `-D` 参数传递的变量写入预设而已。
 
 :::tip
@@ -245,7 +237,7 @@ importPaths 键存在且官方定义，但它定位是"手工声明额外导入�
 
 2. **C++ 类型导入 qml**
 
-Qt 6.8 的 qmlls 并不支持 QML → C++ 定义跳转，参考[链接](https://doc.qt.io/qt-6.8/qtqml-tooling-qmlls.html#known-limitations)（[6.11 可以](https://www.qt.io/blog/whats-new-in-qml-language-server-in-6.11?ref=dailydev)）。
+Qt 6.8 的 qmlls 并不支持 QML → C++ 定义跳转，参考[链接](https://doc.qt.io/qt-6.8/qtqml-tooling-qmlls.html#known-limitations)([6.11 可以](https://www.qt.io/blog/whats-new-in-qml-language-server-in-6.11?ref=dailydev))。
 
 3. **官方控件跳转**
 
@@ -317,8 +309,6 @@ c++ 部分的智能感知功能都是由插件 clangd 提供。
 
 包括 QT 的宏补全和高亮。
 
-
-
 ---
 
 :::warning
@@ -331,24 +321,24 @@ c++ 部分的智能感知功能都是由插件 clangd 提供。
 
 VSCode 的 Qt 扩展(`theqtcompany.qt-qml` 1.14.0)默认自动下载 standalone qmlls(独立发布,基于更新的 Qt 开发分支,tag 0.7 / commit 0bb2db5908 / 2026-07-20 构建),而不是 Qt 6.8.3 安装目录自带的 qmlls:
 
-| 对比项                    | Qt 6.8.3 自带 qmlls     | standalone(nightly)    |
-| ------------------------- | ----------------------- | ---------------------- |
-| 跳转 QML 类型             | 有已知 bug(见上文 tips) | ✅ 正常                 |
-| 语义 token                | 基本可用                | ✅ 正常                 |
-| workspaceFolders 多工作区 | 支持有限                | ✅ 完整支持             |
-| 新功能/修复               | 冻结在 6.8.3            | 持续更新(扩展自动跟进) |
+| 对比项 | Qt 6.8.3 自带 qmlls | standalone(nightly) |
+|------|------|------|
+| 跳转 QML 类型 | 有已知 bug(见上文 tips) | ✅ 正常 |
+| 语义 token | 基本可用 | ✅ 正常 |
+| workspaceFolders 多工作区 | 支持有限 | ✅ 完整支持 |
+| 新功能/修复 | 冻结在 6.8.3 | 持续更新(扩展自动跟进) |
 
 **结论:继续用扩展自动下载的 standalone 版即可**,它就是为 VSCode 集成而维护的。扩展也支持通过 `qt-qml.qmlls.customExePath` 指定自定义服务器路径。
 
 ### 2. 调试中遇到的配置问题(按解决顺序)
 
-| #   | 现象                                            | 根因                                                                                                                                                                                                                                                                  | 解决                                                                                 |
-| --- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| 1   | 补全时好时坏、类型信息过期                      | 多个构建目录并存(out/build/msvc-debug 与 Qt Creator 的 build/Qt_6_8_3_MSVC2022_64bit-Debug),`.qmlls.ini` 被 Qt Creator 配置时改写指向未构建目录                                                                                                                       | 统一构建目录;不要让 Qt Creator 配置同一项目                                          |
-| 2   | 输入 `fon` 不弹补全,`font.` 才弹                | VSCode 设置 `editor.quickSuggestions.other: "offWhenInlineCompletions"` 抑制打字弹窗(内联补全优先)                                                                                                                                                                    | 改为 `"on"` 或 Ctrl+Space 手动触发                                                   |
-| 3   | 组件属性渲染全是白色                            | 主题(One Monokai)没有 `semanticTokenColors` 规则,语义 token 落到默认回退作用域                                                                                                                                                                                        | settings.json 加 `editor.semanticTokenColorCustomizations.rules` 配色                |
-| 4   | qmlls 崩溃 0xC0000005(访问冲突)                 | 打字快触发 `$/cancelRequest` 请求取消 + 文档更新并发竞态(standalone 0.6 和 6.8.3 都有)                                                                                                                                                                                | 崩溃后 Reload Window;报 Qt 等修复                                                    |
-| 5   | **C++ 跳转"无定义" + 头文件不自动构建**(最隐蔽) | 扩展 1.14.0 bug:创建客户端时传了 `workspaceFolder` 选项 → vscode-languageclient 跳过 WorkspaceFoldersFeature 注册 → 不声明 `capabilities.workspace.workspaceFolders` → nightly qmlls 的 `openInitialWorkspace` 硬门禁不通过 → 工作区从未注册 → headerDirectories 为空 | **修补扩展 `out/extension.js`**(删除 `workspaceFolder:this._folder` 一处),已实测修复 |
+| # | 现象 | 根因 | 解决 |
+|------|------|------|------|
+| 1 | 补全时好时坏、类型信息过期 | 多个构建目录并存(out/build/msvc-debug 与 Qt Creator 的 build/Qt_6_8_3_MSVC2022_64bit-Debug),`.qmlls.ini` 被 Qt Creator 配置时改写指向未构建目录 | 统一构建目录;不要让 Qt Creator 配置同一项目 |
+| 2 | 输入 `fon` 不弹补全,`font.` 才弹 | VSCode 设置 `editor.quickSuggestions.other: "offWhenInlineCompletions"` 抑制打字弹窗(内联补全优先) | 改为 `"on"` 或 Ctrl+Space 手动触发 |
+| 3 | 组件属性渲染全是白色 | 主题(One Monokai)没有 `semanticTokenColors` 规则,语义 token 落到默认回退作用域 | settings.json 加 `editor.semanticTokenColorCustomizations.rules` 配色 |
+| 4 | qmlls 崩溃 0xC0000005(访问冲突) | 打字快触发 `$/cancelRequest` 请求取消 + 文档更新并发竞态(standalone 0.6 和 6.8.3 都有) | 崩溃后 Reload Window;报 Qt 等修复 |
+| 5 | **C++ 跳转"无定义" + 头文件不自动构建**(最隐蔽) | 扩展 1.14.0 bug:创建客户端时传了 `workspaceFolder` 选项 → vscode-languageclient 跳过 WorkspaceFoldersFeature 注册 → 不声明 `capabilities.workspace.workspaceFolders` → nightly qmlls 的 `openInitialWorkspace` 硬门禁不通过 → 工作区从未注册 → headerDirectories 为空 | **修补扩展 `out/extension.js`**(删除 `workspaceFolder:this._folder` 一处),已实测修复 |
 
 ### 3. 两个关键机制(实测验证)
 

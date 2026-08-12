@@ -172,5 +172,5 @@ chart1.Series.Add(dataTableSeries);
 ---
 
 | 控件 | 适用于 |
-|------|--------|
+|------|------|
 | Chart | .NET Framework 4.8.1 |

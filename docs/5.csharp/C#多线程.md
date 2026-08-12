@@ -165,7 +165,7 @@ public delegate void WaitOrTimerCallback(object? state, bool timedOut);
 `TaskStatus` 枚举：
 
 | 值 | 名称 | 说明 |
-|----|------|------|
+|------|------|------|
 | 0 | Created | The task has been initialized but has not yet been scheduled. 可以显示start |
 | 1 | WaitingForActivation | The task is waiting to be activated and scheduled internally by the .NET infrastructure. 隐式创建自动开启 |
 | 2 | WaitingToRun | The task has been scheduled for execution but has not yet begun executing. 被调度还未运行 |
@@ -488,7 +488,7 @@ factory.StartNew(() => // StartNew内部调用QueueTask
 **3. 具体实现的调度器**
 
 | 调度器 | 使用方式 | 内部机制 | 特点 | 限制 |
-|--------|----------|----------|------|------|
+|------|------|------|------|------|
 | ThreadPoolTaskScheduler（系统内置） | `TaskScheduler.Default` | `ThreadPool.QueueUserWorkItem()` | 工作线程池，适合短任务 | 不适合长时间阻塞的任务 |
 | SynchronizationContextTaskScheduler（系统内置） | `TaskScheduler.FromCurrentSynchronizationContext()` | `Post()` 到 SynchronizationContext | 单线程执行（如UI线程） | 不能执行耗时操作，否则界面卡顿 |
 | Custom TaskScheduler（用户自定义） | 自定义实现 | ThreadPool / Thread / 自定义线程池 | 完全可控的调度策略 | 特殊并发控制、测试框架等 |
@@ -496,7 +496,7 @@ factory.StartNew(() => // StartNew内部调用QueueTask
 **4. 线程执行**
 
 | 线程类型 | 组成/创建方式 | 适用场景 | 特点 |
-|----------|---------------|----------|------|
+|------|------|------|------|
 | ThreadPool（全局静态线程池） | Worker Threads, I/O Threads, Timer Threads | CPU密集型短任务、I/O回调 | 线程复用、数量自适应 |
 | Dedicated Thread（专用线程） | `new Thread()` | 长时间运行、阻塞型任务 | 独立线程，不受线程池回收影响 |
 | UI Thread（UI上下文线程） | SynchronizationContext + 消息循环 | UI交互 | 单线程、消息驱动、STA模型 |
@@ -1127,7 +1127,7 @@ CancellationToken 没有一个 `Register<T>(Action<T>, T)` 这样重载的成员
 **Cancel 重载说明：**
 
 | 方法 | 异常处理 |
-|------|----------|
+|------|------|
 | `Cancel()` / `Cancel(false)` | 回调的调用链发生异常时不会立即抛出异常，阻止后续注册函数的调用。异常合并到 `AggregateException` 类里再抛出 |
 | `Cancel(true)` | 第一个回调抛出异常后立即传播，后续回调不会执行 |
 

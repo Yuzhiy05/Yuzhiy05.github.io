@@ -15,7 +15,7 @@ DataTable 是个抽象上的二维表。
 ### 构造函数
 
 | 构造函数 | 说明 |
-|----------|------|
+|------|------|
 | `DataTable()` | 在不使用参数的情况下初始化 DataTable 类的新实例 |
 | `DataTable(String)` | 使用指定的表名初始化 DataTable 类的新实例 |
 | `DataTable(String, String)` | 使用指定的表名和命名空间初始化 DataTable 类的新实例 |
@@ -301,7 +301,7 @@ Console.WriteLine(Object.ReferenceEquals(str, str2)); // True
 **数值类型常用格式说明符**：
 
 | 说明符 | 含义 | 示例输出（1234.56） |
-|--------|------|---------------------|
+|------|------|------|
 | C/c | 货币 | ￥1,234.56 |
 | D/d | 十进制整数 | 1235 |
 | E/e | 科学计数法 | 1.234560E+003 |
@@ -318,7 +318,7 @@ Console.WriteLine(Object.ReferenceEquals(str, str2)); // True
 **日期和时间类型常用格式说明符**：
 
 | 说明符 | 含义 | 示例输出 |
-|--------|------|----------|
+|------|------|------|
 | d | 短日期 | 2025/5/29 |
 | D | 长日期 | 2025年5月29日 |
 | t | 短时间 | 14:30 |
@@ -412,7 +412,7 @@ bool IStructuralEquatable.Equals(object other, System.Collections.IEqualityCompa
 ```
 
 | 接口方法 | 说明 |
-|----------|------|
+|------|------|
 | `IComparable.CompareTo` | 默认相等性比较，比较方法是按 Tuple 元素 Item1, Item2... 一个个比较，用于数组排序 `Array.Sort()` 默认调用 |
 | `IStructuralComparable.CompareTo` | 可以自定义比较器，比如我只比较两个 Tuple 的第二个值的大小来代表两个 Tuple 的大小 |
 | `IStructuralEquatable.Equals` | 相对性比较 |

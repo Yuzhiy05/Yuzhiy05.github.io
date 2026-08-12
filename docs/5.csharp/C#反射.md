@@ -81,7 +81,7 @@ foreach (Type t in types2)
 获取到对应类型的Type后，根据具体成员类型 获得该类型的其他成员信息
 
 | 成员类型 | 说明 | 获取方法 |
-|----------|------|----------|
+|------|------|------|
 | MemberInfo | 该类型的所有成员 | GetMembers |
 | MethodInfo | 该类型的所有方法 | GetMethod, GetMethods |
 | PropertyInfo | 该类所有Property或属性的特性Attribute | GetProperty/GetProperties |
@@ -160,7 +160,7 @@ foreach (var prop in properties)
 ## 部分BindingFlags说明
 
 | BindingFlags | 说明 |
-|--------------|------|
+|------|------|
 | Static | 静态属性 |
 | Instance | 实例属性(也就是所谓非静态成员) |
 | Public | 公共属性 ,因为不能对属性的两个访问器set,get同时添加访问修饰符号.所以即使一个访问器被修饰为private，仍被视为公共属性被检索到 |
@@ -498,7 +498,7 @@ MSDN 有一个[例子](https://learn.microsoft.com/zh-cn/dotnet/api/system.refle
 ### MemberInfo 公共属性
 
 | 属性名 | 修饰符 | 类型 |
-|--------|--------|------|
+|------|------|------|
 | Name | abstract | string |
 | DeclaringType | abstract | Type? |
 | Module | virtual | Module |
@@ -511,7 +511,7 @@ namespace 是语法相关 对 CLR是透明的
 ### 调用成员
 
 | 类型 | 调用方法 | 说明 |
-|------|----------|------|
+|------|------|------|
 | FieldInfo | GetValue/SetValue | 设置字段的值，对于静态字段两个方法的参数都是null(被忽略) |
 | PropertyInfo | GetValue/SetValue | 设置属性值,分别调用对应的set,get访问器 |
 | MethodBase/ConstructorInfo | Invoke | 调用对应构造函数 |

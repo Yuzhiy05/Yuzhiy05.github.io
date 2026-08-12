@@ -905,7 +905,7 @@ add_custom_command(
 ```
 
 | 生成器表达式 | 说明 |
-|-------------|------|
+|------|------|
 | `TARGET_FILE` | 这里的生成器表达式表示目标 sharedlib 的二进制文件（dll）的绝对路径 `.../sharedlib.dll` |
 | `TARGET_FILE_DIR` | 很明显表示 hello（构建目标依赖动态库）二进制文件（exe）的目录 |
 | `TARGET_FILE_NAME` | 因为库可以有别名具体生成的 dll 文件名不一定是 sharedlib，这里可以准确生成正确的文件名 |

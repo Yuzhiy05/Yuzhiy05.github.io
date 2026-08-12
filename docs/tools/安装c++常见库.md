@@ -50,7 +50,7 @@ define=BOOST_USE_WINDOWS_H  -D_DLL -lmsvcrt variant=release,debug target-os=wind
 例如被编译的库为 A，A 依赖库 B，我的程序 C 依赖 A：
 
 | 配置 | 说明 | 需要的文件 |
-|------|------|-----------|
+|------|------|------|
 | `link:static`<br>`runtime-link=static` | C 静态链接 A（C 包含 A.lib），A 静态链接 B | 只需要 C 即可 |
 | `link:static`<br>`runtime-link=shared` | C 静态链接 A（C 包含 A.lib），A 动态链接 B | C 和 B.so/B.dll |
 | `link:shared`<br>`runtime-link=shared` | C 动态链接 A，A 动态链接 B | C 和 B.so/B.dll 和 A.so/A.dll |
